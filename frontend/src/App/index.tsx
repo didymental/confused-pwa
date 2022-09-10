@@ -1,6 +1,6 @@
-import React from 'react';
-import logo from '../logo.svg';
-import './App.css';
+import React from "react";
+import logo from "../logo.svg";
+import "./index.css";
 import {
   IonApp,
   IonContent,
@@ -8,10 +8,10 @@ import {
   IonPage,
   IonRouterOutlet,
   IonTitle,
-  IonToolbar
-} from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { Route } from 'react-router-dom';
+  IonToolbar,
+} from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import { Route } from "react-router-dom";
 
 const Home: React.FC = () => {
   return (
