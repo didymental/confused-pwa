@@ -1,0 +1,36 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  height: 100%;
+}
+
+.grid__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-content.splash {
+  --background: var(--ion-color-background);
+}
+
+.logo {
+  max-width: 25vh;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo {
+    animation: App-logo-spin infinite alternate 1s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
