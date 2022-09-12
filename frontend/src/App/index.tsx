@@ -1,5 +1,5 @@
 import "./index.css";
-import { IonApp, IonRouterOutlet } from "@ionic/react";
+import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route } from "react-router-dom";
 import Login from "../Auth/Login";
@@ -7,6 +7,7 @@ import Splash from "../Splash";
 import SignUp from "../Auth/SignUp";
 
 function App() {
+  setupIonicReact();
   return (
     <IonApp>
       <IonReactRouter>
