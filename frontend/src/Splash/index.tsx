@@ -1,8 +1,10 @@
-import { IonButton, IonButtons, IonContent, IonGrid, IonPage, IonRow } from "@ionic/react";
-import "./index.css";
-import logo from "../logo-light.svg";
+import { IonButton, IonContent, IonGrid, IonPage, IonRow } from "@ionic/react";
+import "./index.scss";
+import logo from "../Assets/logo-light.svg";
+import { useHistory } from "react-router";
 
 const Splash: React.FC = () => {
+  const history = useHistory();
   return (
     <IonPage>
       <IonContent className="splash">
@@ -15,17 +17,28 @@ const Splash: React.FC = () => {
               <p>Confused? You don&apos;t have to be!</p>
             </IonRow>
             <IonRow className="grid__row">
-              <p>Get started</p>
+              <p>Get started as a</p>
             </IonRow>
             <IonRow className="grid__row">
-              <IonButtons>
-                <IonButton color="primary" onClick={() => {}}>
-                  Instructor
-                </IonButton>
-              </IonButtons>
+              <IonButton
+                color="secondary"
+                onClick={() => {
+                  history.push("/login");
+                }}
+              >
+                Instructor
+              </IonButton>
             </IonRow>
             <IonRow className="grid__row">
-              <IonButton color="primary" onClick={() => {}}>
+              <p>or</p>
+            </IonRow>
+            <IonRow className="grid__row">
+              <IonButton
+                color="secondary"
+                onClick={() => {
+                  history.push("/join");
+                }}
+              >
                 Student
               </IonButton>
             </IonRow>
