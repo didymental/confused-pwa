@@ -1,11 +1,17 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react";
+import { IonContent, IonGrid, IonHeader, IonPage, IonRow, IonToolbar } from "@ionic/react";
+import logo from "../../Assets/logo.svg";
+import "./index.scss";
 
 const SignUpPage: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Sign Up</IonTitle>
+          <IonGrid>
+            <IonRow>
+              <img src={logo} alt="logo" className="navbar navbar__logo" />
+            </IonRow>
+          </IonGrid>
         </IonToolbar>
       </IonHeader>
       <IonContent>
