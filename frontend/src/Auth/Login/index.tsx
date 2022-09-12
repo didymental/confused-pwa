@@ -26,7 +26,7 @@ function validateEmail(email: string) {
   return re.test(String(email).toLowerCase());
 }
 
-const Login: React.FC = () => {
+const LoginPage: React.FC = () => {
   const history = useHistory();
   const [email, setEmail] = useState<string>("eve.holt@reqres.in");
   const [password, setPassword] = useState<string>("cityslicka");
@@ -138,4 +138,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default LoginPage;

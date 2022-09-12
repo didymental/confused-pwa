@@ -4,6 +4,7 @@
   justify-content: center;
   color: white;
   height: 100%;
+  font-size: large;
 }
 
 .grid__row {
@@ -13,7 +14,7 @@
 }
 
 ion-content.splash {
-  --background: var(--ion-color-background);
+  --background: var(--ion-color-primary);
 }
 
 .logo {
