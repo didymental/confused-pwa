@@ -2,6 +2,7 @@
 import { IonGrid, IonHeader, IonRow, IonToolbar } from "@ionic/react";
 import { useLocation } from "react-router-dom";
 import logo from "../../Assets/logo.svg";
+import "./index.scss";
 
 interface NavbarProps {
   title?: string;
