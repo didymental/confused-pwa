@@ -20,5 +20,4 @@ class SessionToken(models.Model):
     session = models.OneToOneField(
         "Session",
         on_delete=models.CASCADE,
-        # primary_key=True,
     )
