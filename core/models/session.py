@@ -4,7 +4,7 @@ from django.db import models
 class Session(models.Model):
     """Session created by an instructor"""
 
-    instructor_id = models.ForeignKey("UserProfile", on_delete=models.CASCADE)
+    instructor = models.ForeignKey("UserProfile", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     is_open = models.BooleanField(default=False)
@@ -17,7 +17,7 @@ class Session(models.Model):
 class SessionToken(models.Model):
     """Token generated for a session"""
 
-    session_id = models.OneToOneField(
+    session = models.OneToOneField(
         "Session",
         on_delete=models.CASCADE,
         # primary_key=True,

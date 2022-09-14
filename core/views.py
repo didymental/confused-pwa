@@ -15,6 +15,10 @@ from rest_framework.permissions import IsAuthenticated
 from core import models
 from core import serializers
 from .pagination import StandardResultsSetPagination
+from .models import Session
+
+
+# TODO: split into multiple files if gets too big
 
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -28,7 +32,7 @@ class BaseViewSet(viewsets.ModelViewSet):
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
-    """Handle creating and updating profiles"""
+    """Handles creating and updating profiles"""
 
     serializer_class = serializers.UserProfileSerializer
     queryset = models.UserProfile.objects.all()
@@ -42,6 +46,20 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 
 class UserLoginApiView(ObtainAuthToken):
-    """Handle creating user authentication tokens"""
+    """Handles creating user authentication tokens"""
 
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+class SessionViewSet(BaseViewSet):
+    """Handles CRUDL of session"""
+
+    queryset = Session.objects.all()
+    serializer_class = "test"
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(instructor=user).distinct()
+
+    def perform_create(self, serializer):
+        serializer.save(instructor=self.request.user)

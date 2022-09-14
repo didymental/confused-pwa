@@ -1,15 +1,10 @@
 from typing import Dict, cast
 from wsgiref import validate
+from core.models.session import Session
 from rest_framework import serializers
 
 
 from core import models
-
-
-class HelloSerializer(serializers.Serializer):
-    """Serializer a name field for testing our APIView"""
-
-    name = serializers.CharField(max_length=10)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -37,3 +32,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+
+class SessionSerializer(serializers.Serializer):
+    """Serializer a name field for testing our APIView"""
+
+    # name = serializers.CharField(max_length=10)
+
+    class Meta:
+        model = Session
+        fields = ("id", "instructor", "name", "is_open")
+        read_only_fields = (
+            "id",
+            "instructor",
+        )
+
+    # def create(self, validated_data):
+    #     """Create a new session for the request user"""
+    #     session = super().create(validated_data)
+    #     return session
