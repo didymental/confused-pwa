@@ -11,7 +11,7 @@ class UserManager(BaseUserManager):
     def create_instructor(self, email: str, name: str, password: str):
         """Create an instructor"""
         if not email:
-            raise ValueError("User must have an email address")
+            raise ValueError("Instructor must have an email address")
 
         email = self.normalize_email(email)
         user: UserProfile = self.model(email=email, name=name)
@@ -55,4 +55,4 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         """Return string representation of our user"""
-        return self.name
+        return self.email
