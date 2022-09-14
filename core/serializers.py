@@ -34,7 +34,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return user
 
 
-class SessionSerializer(serializers.Serializer):
+class SessionSerializer(serializers.ModelSerializer):
     """Serializer a name field for testing our APIView"""
 
     # name = serializers.CharField(max_length=10)
@@ -42,10 +42,7 @@ class SessionSerializer(serializers.Serializer):
     class Meta:
         model = Session
         fields = ("id", "instructor", "name", "is_open")
-        read_only_fields = (
-            "id",
-            "instructor",
-        )
+        read_only_fields = ("id", "instructor", "is_open")
 
     # def create(self, validated_data):
     #     """Create a new session for the request user"""

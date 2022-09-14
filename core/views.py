@@ -55,7 +55,7 @@ class SessionViewSet(BaseViewSet):
     """Handles CRUDL of session"""
 
     queryset = Session.objects.all()
-    serializer_class = "test"
+    serializer_class = serializers.SessionSerializer
 
     def get_queryset(self):
         user = self.request.user
