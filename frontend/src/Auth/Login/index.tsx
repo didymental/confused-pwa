@@ -11,7 +11,6 @@ import {
   IonLabel,
   IonPage,
   IonRow,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { useState } from "react";

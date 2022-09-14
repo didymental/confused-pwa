@@ -9,13 +9,12 @@ import {
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { Route, useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { Route, useLocation } from "react-router-dom";
 import LoginPage from "../Auth/Login";
 import Splash from "../Splash";
 import SignUpPage from "../Auth/SignUp";
 import JoinPage from "../Student/JoinSession";
 import logo from "../Assets/logo.svg";
-import { useEffect, useState } from "react";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
