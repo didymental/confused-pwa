@@ -14,7 +14,7 @@ const Splash: React.FC = () => {
               <img src={logo} className="logo" alt="logo" />
             </IonRow>
             <IonRow className="grid__row">
-              <p>Confused? You don&apos;t have to be!</p>
+              <h2>Confused? You don&apos;t have to be!</h2>
             </IonRow>
             <IonRow className="grid__row">
               <p>Get started as a</p>

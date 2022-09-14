@@ -4,20 +4,19 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonPage,
   IonRow,
-  IonTitle,
-  IonToolbar,
 } from "@ionic/react";
 import { useState } from "react";
 import axios from "axios";
 import { personCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
+import Navbar from "../../component/Navbar";
+import "./index.scss";
 
 function validateEmail(email: string) {
   const re =
@@ -68,13 +67,10 @@ const LoginPage: React.FC = () => {
         setIserror(true);
       });
   };
+  // TODO
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Login</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      <Navbar title={"Confused"} />
       <IonContent fullscreen className="ion-padding ion-text-center">
         <IonGrid>
           <IonRow>
@@ -91,7 +87,7 @@ const LoginPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol>
-              <IonIcon style={{ fontSize: "70px", color: "#0040ff" }} icon={personCircle} />
+              <IonIcon className="login-form__profile-icon" icon={personCircle} />
             </IonCol>
           </IonRow>
           <IonRow>

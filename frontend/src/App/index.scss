@@ -1,12 +1,3 @@
 html:not(.hydrated) body {
   display: initial !important;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
