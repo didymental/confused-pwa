@@ -68,12 +68,11 @@ const LoginPage: React.FC = () => {
         setIserror(true);
       });
   };
+  // TODO
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonTitle>Login</IonTitle>
-        </IonToolbar>
+        <IonToolbar>{/* <IonTitle>Login</IonTitle> */}</IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding ion-text-center">
         <IonGrid>

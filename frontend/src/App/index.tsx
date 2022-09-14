@@ -17,22 +17,16 @@ import JoinPage from "../Student/JoinSession";
 import logo from "../Assets/logo.svg";
 import { useEffect, useState } from "react";
 
-interface NavbarProps {
-  path: String;
-}
-const Navbar: React.FC<NavbarProps> = ({ path }) => {
-  // const [path, setPath] = useState(window.location.pathname);
-  // console.log(window.location.pathname);
-  // const history = useHistory();
+const Navbar: React.FC = () => {
+  const location = useLocation();
 
   // useEffect(() => {
-  //   setPath(window.location.pathname);
-  // });
 
-  // history.listen(() => {
-  //   setPath(window.location.pathname);
-  // });
-  if (path === "/") {
+  //   console.log("Location changed");
+  //   console.log(location);
+  // }, [location]);
+
+  if (location.pathname === "/") {
     return null;
   }
   return (
@@ -50,11 +44,10 @@ const Navbar: React.FC<NavbarProps> = ({ path }) => {
 
 function App() {
   setupIonicReact();
-  const location = useLocation();
   return (
     <IonApp>
-      <Navbar path={location.pathname} />
       <IonReactRouter>
+        <Navbar />
         <IonRouterOutlet>
           <Route path="/" exact component={Splash} />
           <Route path="/login" exact component={LoginPage} />
