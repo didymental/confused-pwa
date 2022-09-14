@@ -21,7 +21,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data: Dict[str, str]):
-        """Create and return a new user"""
+        """Creates and returns a new user"""
 
         user_manager = cast(models.UserManager, models.UserProfile.objects)
 
@@ -37,14 +37,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class SessionSerializer(serializers.ModelSerializer):
     """Serializer a name field for testing our APIView"""
 
-    # name = serializers.CharField(max_length=10)
-
     class Meta:
         model = Session
         fields = ("id", "instructor", "name", "is_open")
         read_only_fields = ("id", "instructor", "is_open")
-
-    # def create(self, validated_data):
-    #     """Create a new session for the request user"""
-    #     session = super().create(validated_data)
-    #     return session
