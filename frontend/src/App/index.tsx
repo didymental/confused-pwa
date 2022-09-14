@@ -6,6 +6,7 @@ import LoginPage from "../Auth/Login";
 import Splash from "../Splash";
 import SignUpPage from "../Auth/SignUp";
 import JoinPage from "../Student/JoinSession";
+import JoinDetailPage from "../Student/SetDisplayName";
 
 function App() {
   setupIonicReact();
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login" exact component={LoginPage} />
           <Route path="/signup" exact component={SignUpPage} />
           <Route path="/join" exact component={JoinPage} />
+          <Route path="/joinDetail" exact component={JoinDetailPage} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

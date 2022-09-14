@@ -23,6 +23,8 @@ const JoinPage: React.FC = () => {
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
+  const history = useHistory();
+
   const invalidPINMsg: string = "Please enter a valid session code";
   const sessionNotFoundMsg: string = "Session not found";
   const unknownErrorMsg: string = "error. Please contact administrators for more details";
@@ -71,7 +73,7 @@ const JoinPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Enter Session Code</IonTitle>
+          <IonTitle>Enter Display Name</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding ion-text-center">

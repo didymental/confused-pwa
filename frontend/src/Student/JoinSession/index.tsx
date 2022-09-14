@@ -23,6 +23,8 @@ const JoinPage: React.FC = () => {
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
+  const history = useHistory();
+
   const invalidPINMsg: string = "Please enter a valid session code";
   const sessionNotFoundMsg: string = "Session not found";
   const unknownErrorMsg: string = "error. Please contact administrators for more details";
@@ -46,6 +48,7 @@ const JoinPage: React.FC = () => {
         .then((res) => {
           console.log(res);
           resStatus = res.status;
+          history.push("/joinDetail");
         })
         .catch((error) => {
           console.log(error);
