@@ -1,0 +1,31 @@
+.signup-form__profile-icon {
+  color: var(--ion-color-tertiary);
+  font-size: 100px;
+}
+
+.signup-form__content {
+  margin-top: 12vh;
+  max-width: 800px;
+  width: 90vw;
+  text-align: center;
+}
+
+.signup-form__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-form__auxilliary-text {
+  &--small {
+    font-size: small;
+  }
+
+  &--middle {
+    font-size: medium;
+  }
+}
+
+.signup-form__button {
+  color: var(--ion-color-tertiary);
+}

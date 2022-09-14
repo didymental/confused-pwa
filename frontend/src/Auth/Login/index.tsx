@@ -4,20 +4,19 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonPage,
   IonRow,
-  IonTitle,
-  IonToolbar,
 } from "@ionic/react";
 import { useState } from "react";
 import axios from "axios";
 import { personCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
+import Navbar from "../../component/Navbar";
+import "./index.scss";
 
 function validateEmail(email: string) {
   const re =
@@ -55,6 +54,7 @@ const LoginPage: React.FC = () => {
       password: password,
     };
 
+    // TODO
     const api = axios.create({
       baseURL: "https://reqres.in/api",
     });
@@ -68,15 +68,12 @@ const LoginPage: React.FC = () => {
         setIserror(true);
       });
   };
+  // TODO
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Login</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen className="ion-padding ion-text-center">
-        <IonGrid>
+      <Navbar title={"Confused"} />
+      <IonContent fullscreen className="login-form__container">
+        <IonGrid className="login-form__content">
           <IonRow>
             <IonCol>
               <IonAlert
@@ -91,9 +88,10 @@ const LoginPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol>
-              <IonIcon style={{ fontSize: "70px", color: "#0040ff" }} icon={personCircle} />
+              <IonIcon className="login-form__profile-icon" icon={personCircle} />
             </IonCol>
           </IonRow>
+
           <IonRow>
             <IonCol>
               <IonItem>
@@ -121,13 +119,13 @@ const LoginPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol>
-              <p style={{ fontSize: "small" }}>
+              <p className="login-form__auxilliary-text--small">
                 By clicking LOGIN you agree to our <a href="/">Policy</a>
               </p>
               <IonButton expand="block" onClick={handleLogin}>
                 Login
               </IonButton>
-              <p style={{ fontSize: "medium" }}>
+              <p className="login-form__auxilliary-text--middle">
                 Do not have an account? <a href="/signup">Sign up!</a>
               </p>
             </IonCol>
