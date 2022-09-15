@@ -3,6 +3,6 @@ from ..models.Student import Student
 from ..serializers.StudentSerializer import StudentSerializer
 
 
-class SessionView(ModelViewSet):
+class StudentView(ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer

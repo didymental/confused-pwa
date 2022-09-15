@@ -1,4 +1,4 @@
-from .User import UserProfile, UserManager
+from .UserProfile import UserProfile, UserManager
 from .Session import Session, SessionToken
 from .Question import Question
 from .Student import Student
