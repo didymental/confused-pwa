@@ -15,7 +15,7 @@ import { useState } from "react";
 import axios from "axios";
 import { personCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
-import Navbar from "../../component/Navbar";
+import Navbar from "../../../component/Navbar";
 import "./index.scss";
 
 function validateEmail(email: string) {
@@ -63,7 +63,7 @@ const SignUpPage: React.FC = () => {
     api
       .post("/signup", signUpData)
       .then((res) => {
-        history.push("/dashboard/" + email);
+        history.push(`/instructor/dashboard?email=${email}`);
       })
       .catch((error) => {
         setMessage("Auth failure! Please retry");
