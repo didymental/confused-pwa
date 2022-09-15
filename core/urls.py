@@ -2,7 +2,13 @@ from django.urls import path, include
 from django.contrib import admin
 
 from rest_framework.routers import DefaultRouter
-from core.views import ReactionTypeView, SessionView, UserProfileViewSet
+from core.views import (
+    ReactionTypeView,
+    SessionView,
+    UserProfileViewSet,
+    UserSignUpView,
+    UserLoginApiView,
+)
 
 
 # from core import views
@@ -23,5 +29,6 @@ urlpatterns = [
         ReactionTypeView.as_view({"get": "list"}),
         name="reaction_type",
     ),
-    # path("login/", views.UserLoginApiView.as_view()),
+    path("login/", UserLoginApiView.as_view()),
+    path("signup/", UserSignUpView.as_view()),
 ]

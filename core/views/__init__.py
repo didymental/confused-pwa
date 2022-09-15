@@ -5,6 +5,7 @@ from .SessionView import SessionView
 from .StudentView import StudentView
 from .UserProfileView import UserProfileViewSet
 from .BaseViewSet import BaseViewSet
+from .UserProfileView import UserLoginApiView, UserSignUpView
 
 
 __all__ = [
@@ -15,4 +16,6 @@ __all__ = [
     "StudentView",
     "UserProfileViewSet",
     "BaseViewSet",
+    "UserLoginApiView",
+    "UserSignUpView",
 ]
