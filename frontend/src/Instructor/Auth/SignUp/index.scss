@@ -1,6 +1,9 @@
-.signup-form__profile-icon {
-  color: var(--ion-color-tertiary);
-  font-size: 100px;
+.sign-up__profile-icon {
+  font-weight: bold;
+  font-family: berlinSans;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .signup-form__content {
@@ -27,5 +30,5 @@
 }
 
 .signup-form__button {
-  color: var(--ion-color-tertiary);
+  color: var(--ion-color-primary);
 }

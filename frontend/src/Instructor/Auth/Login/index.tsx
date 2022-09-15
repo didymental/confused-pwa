@@ -4,7 +4,6 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -13,10 +12,10 @@ import {
 } from "@ionic/react";
 import { useState } from "react";
 import axios from "axios";
-import { personCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import Navbar from "../../../component/Navbar";
 import "./index.scss";
+import logo from "../../../Assets/logo.svg";
 
 function validateEmail(email: string) {
   const re =
@@ -86,9 +85,11 @@ const LoginPage: React.FC = () => {
               />
             </IonCol>
           </IonRow>
-          <IonRow>
+          <IonRow className="login-form__profile-icon">
             <IonCol>
-              <IonIcon className="login-form__profile-icon" icon={personCircle} />
+              <a href="/">
+                <img width="200px" src={logo} alt="logo" />
+              </a>
             </IonCol>
           </IonRow>
 
@@ -122,7 +123,7 @@ const LoginPage: React.FC = () => {
               <p className="login-form__auxilliary-text--small">
                 By clicking LOGIN you agree to our <a href="/">Policy</a>
               </p>
-              <IonButton expand="block" onClick={handleLogin}>
+              <IonButton className="login-form__button" expand="block" onClick={handleLogin}>
                 Login
               </IonButton>
               <p className="login-form__auxilliary-text--middle">
