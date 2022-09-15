@@ -6,6 +6,7 @@ import LoginPage from "../Auth/Login";
 import Splash from "../Splash";
 import SignUpPage from "../Auth/SignUp";
 import JoinPage from "../Student/JoinSession";
+import StudentSessionPage from "../Student/Session";
 import JoinDetailPage from "../Student/SetDisplayName";
 
 function App() {
@@ -17,7 +18,8 @@ function App() {
           <Route path="/" exact component={Splash} />
           <Route path="/login" exact component={LoginPage} />
           <Route path="/signup" exact component={SignUpPage} />
-          <Route path="/join" exact component={JoinPage} />
+          <Route path="/student" exact component={JoinPage} />
+          <Route path="/student/session/:id" exact component={StudentSessionPage} />
           <Route path="/joinDetail" exact component={JoinDetailPage} />
         </IonRouterOutlet>
       </IonReactRouter>

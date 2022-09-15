@@ -36,7 +36,7 @@ const Splash: React.FC = () => {
               <IonButton
                 color="secondary"
                 onClick={() => {
-                  history.push("/join");
+                  history.push("/student");
                 }}
               >
                 Student
