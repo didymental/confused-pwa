@@ -1,17 +1,14 @@
-from typing import Dict, cast
-from wsgiref import validate
-from core.models.session import Session
+from typing import cast, Dict
 from rest_framework import serializers
-
-
-from core import models
+from ..models.UserProfile import UserProfile
+from ..models.UserProfile import UserManager
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializes a user profile object"""
 
     class Meta:
-        model = models.UserProfile
+        model = UserProfile
         fields = ("id", "email", "name", "password")
         extra_kwargs = {
             "password": {
@@ -23,7 +20,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data: Dict[str, str]):
         """Creates and returns a new user"""
 
-        user_manager = cast(models.UserManager, models.UserProfile.objects)
+        user_manager = cast(UserManager, UserProfile.objects)
 
         user = user_manager.create_instructor(
             email=validated_data["email"],
@@ -32,12 +29,3 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
 
         return user
-
-
-class SessionSerializer(serializers.ModelSerializer):
-    """Serializer a name field for testing our APIView"""
-
-    class Meta:
-        model = Session
-        fields = ("id", "instructor", "name", "is_open")
-        read_only_fields = ("id", "instructor", "is_open")
