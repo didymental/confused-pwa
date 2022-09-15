@@ -1,6 +1,6 @@
 from typing import Dict, cast
 from wsgiref import validate
-from core.models.session import Session
+from core.models.Session import Session
 from rest_framework import serializers
 
 

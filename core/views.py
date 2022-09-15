@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from core import models
 from core import serializers
 from .pagination import StandardResultsSetPagination
-from .models import Session
+from core.models.Session import Session
 
 
 # TODO: split into multiple files if gets too big
