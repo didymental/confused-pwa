@@ -48,7 +48,6 @@ const JoinPage: React.FC = () => {
         .then((res) => {
           console.log(res);
           resStatus = res.status;
-          history.push("/joinDetail");
         })
         .catch((error) => {
           console.log(error);
@@ -74,7 +73,7 @@ const JoinPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Enter Session Code</IonTitle>
+          <IonTitle>Enter Display Name</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding ion-text-center">
