@@ -11,7 +11,11 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   const { title = "" } = props;
   const location = useLocation();
 
-  if (location.pathname === "/") {
+  if (
+    location.pathname === "/" ||
+    location.pathname === "/login" ||
+    location.pathname === "/signup"
+  ) {
     return null;
   }
   return (
