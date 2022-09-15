@@ -15,7 +15,7 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import Navbar from "../../../component/Navbar";
 import "./index.scss";
-import logo from "../../../Assets/logo.svg";
+import ConfusedIcon from "../../../component/ConfusedIcon";
 
 function validateEmail(email: string) {
   const re =
@@ -89,16 +89,14 @@ const SignUpPage: React.FC = () => {
           </IonRow>
           <IonRow className="login-form__profile-icon">
             <IonCol>
-              <a href="/">
-                <img width="200px" src={logo} alt="logo" />
-              </a>
+              <ConfusedIcon />
             </IonCol>
           </IonRow>
 
           <IonRow>
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Email</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Email</IonLabel>
                 <IonInput
                   type="email"
                   value={email}
@@ -108,10 +106,10 @@ const SignUpPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="signup-form__field">
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Password</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Password</IonLabel>
                 <IonInput
                   type="password"
                   value={password}
@@ -121,10 +119,10 @@ const SignUpPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="signup-form__field">
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Display Name</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Display Name</IonLabel>
                 <IonInput
                   type="text"
                   value={displayName}

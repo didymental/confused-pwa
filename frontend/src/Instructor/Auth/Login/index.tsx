@@ -15,7 +15,7 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import Navbar from "../../../component/Navbar";
 import "./index.scss";
-import logo from "../../../Assets/logo.svg";
+import ConfusedIcon from "../../../component/ConfusedIcon";
 
 function validateEmail(email: string) {
   const re =
@@ -87,16 +87,14 @@ const LoginPage: React.FC = () => {
           </IonRow>
           <IonRow className="login-form__profile-icon">
             <IonCol>
-              <a href="/">
-                <img width="200px" src={logo} alt="logo" />
-              </a>
+              <ConfusedIcon />
             </IonCol>
           </IonRow>
 
           <IonRow>
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Email</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Email</IonLabel>
                 <IonInput
                   type="email"
                   value={email}
@@ -106,10 +104,10 @@ const LoginPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="login-form__field">
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Password</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Password</IonLabel>
                 <IonInput
                   type="password"
                   value={password}
@@ -118,6 +116,7 @@ const LoginPage: React.FC = () => {
               </IonItem>
             </IonCol>
           </IonRow>
+
           <IonRow>
             <IonCol>
               <p className="login-form__auxilliary-text--small">
