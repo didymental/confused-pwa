@@ -1,8 +1,8 @@
-from rest_framework.viewsets import ModelViewSet
+from core.views.BaseViewSet import BaseViewSet
 from ..models.Question import Question
 from ..serializers.QuestionSerializer import QuestionSerializer
 
 
-class QuestionView(ModelViewSet):
+class QuestionView(BaseViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
