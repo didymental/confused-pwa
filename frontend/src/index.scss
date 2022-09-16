@@ -11,12 +11,17 @@ body {
   src: url("./assets/Berlin Sans FB Regular.ttf");
 }
 
+@font-face {
+  font-family: lato;
+  src: url("./assets/Lato-Regular.ttf");
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 :root {
-  --ion-font-family: sans-serif;
+  --ion-font-family: lato;
 
   --ion-color-primary: #190e28;
   --ion-color-primary-rgb: 25, 14, 40;
