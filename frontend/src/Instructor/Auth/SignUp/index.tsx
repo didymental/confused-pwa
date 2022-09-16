@@ -1,3 +1,4 @@
+import "./index.scss";
 import {
   IonAlert,
   IonButton,
@@ -12,11 +13,9 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useState } from "react";
-import axios from "axios";
 import { personCircle } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
 import Navbar from "../../../component/Navbar";
-import "./index.scss";
+import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
 
 function validateEmail(email: string) {
   const re =
@@ -26,13 +25,14 @@ function validateEmail(email: string) {
 }
 
 const SignUpPage: React.FC = () => {
-  const history = useHistory();
   const [email, setEmail] = useState<string>("eve.holt@reqres.in");
   const [password, setPassword] = useState<string>("cityslicka");
   const [displayName, setDisplayName] = useState<string>("ailing35");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const handleSignUp = () => {
+  const { signUp } = useAuthentication();
+
+  const handleSignUp = async () => {
     if (!email) {
       setMessage("Please enter a valid email");
       setIserror(true);
@@ -50,25 +50,13 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    const signUpData = {
+    const signUpRequest = {
       email: email,
       password: password,
-      displayName: displayName,
+      name: displayName,
     };
 
-    // TODO
-    const api = axios.create({
-      baseURL: "https://reqres.in/api",
-    });
-    api
-      .post("/signup", signUpData)
-      .then((res) => {
-        history.push(`/instructor/dashboard?email=${email}`);
-      })
-      .catch((error) => {
-        setMessage("Auth failure! Please retry");
-        setIserror(true);
-      });
+    await signUp(signUpRequest);
   };
   // TODO
   return (

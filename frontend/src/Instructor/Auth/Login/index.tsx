@@ -12,11 +12,11 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useState } from "react";
-import axios from "axios";
 import { personCircle } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
 import Navbar from "../../../component/Navbar";
 import "./index.scss";
+import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
+import { LoginRequest } from "../../../types/auth";
 
 function validateEmail(email: string) {
   const re =
@@ -26,12 +26,12 @@ function validateEmail(email: string) {
 }
 
 const LoginPage: React.FC = () => {
-  const history = useHistory();
   const [email, setEmail] = useState<string>("eve.holt@reqres.in");
   const [password, setPassword] = useState<string>("cityslicka");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const handleLogin = () => {
+  const { login } = useAuthentication();
+  const handleLogin = async () => {
     if (!email) {
       setMessage("Please enter a valid email");
       setIserror(true);
@@ -49,26 +49,14 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    const loginData = {
-      email: email,
+    const loginRequest: LoginRequest = {
+      username: email,
       password: password,
     };
 
-    // TODO
-    const api = axios.create({
-      baseURL: "https://reqres.in/api",
-    });
-    api
-      .post("/login", loginData)
-      .then((res) => {
-        history.push(`/instructor/dashboard?email=${email}`);
-      })
-      .catch((error) => {
-        setMessage("Auth failure! Please create an account");
-        setIserror(true);
-      });
+    await login(loginRequest);
   };
-  // TODO
+
   return (
     <IonPage>
       <Navbar title={"Confused"} />

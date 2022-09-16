@@ -8,7 +8,12 @@ body {
 
 @font-face {
   font-family: berlinSans;
-  src: url("./Assets/Berlin Sans FB Regular.ttf");
+  src: url("./assets/Berlin Sans FB Regular.ttf");
+}
+
+@font-face {
+  font-family: lato;
+  src: url("./assets/Lato-Regular.ttf");
 }
 
 code {
@@ -16,7 +21,7 @@ code {
 }
 
 :root {
-  --ion-font-family: sans-serif;
+  --ion-font-family: lato;
 
   --ion-color-primary: #190e28;
   --ion-color-primary-rgb: 25, 14, 40;
@@ -85,6 +90,9 @@ code {
   --ion-color-button-blue: #11d3f3;
   --ion-color-button-shade-green: #8bcb83;
   --ion-color-button-shade-blue: #0fb9d4;
+
+  --ion-color-toast-success: #b6f8c4;
+  --ion-color-toast-green-contrast: #190e28;
 }
 
 ion-fab-button.ion-color-primary {
@@ -99,4 +107,8 @@ ion-fab-button.ion-color-primary {
     var(--ion-color-button-shade-green) 100%
   ) !important;
   --ion-color-contrast: var(--ion-color-primary) !important;
+}
+
+ion-toast.ion-color-success {
+  --background: #b6f8c4;
 }
