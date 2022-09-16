@@ -1,4 +1,3 @@
-from typing import Dict
 from rest_framework import serializers
 from ..models.Session import Session
 

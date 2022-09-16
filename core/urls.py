@@ -8,6 +8,8 @@ from core.views import (
     UserProfileViewSet,
     UserSignUpView,
     UserLoginApiView,
+    QuestionView,
+    StudentView,
 )
 
 router = DefaultRouter()
@@ -15,6 +17,8 @@ router = DefaultRouter()
 router.register("reaction_types", ReactionTypeView)
 router.register("profile", UserProfileViewSet)
 router.register("sessions", SessionView)
+router.register("students", StudentView)
+router.register("questions", QuestionView)
 
 urlpatterns = [
     path("", include(router.urls)),
