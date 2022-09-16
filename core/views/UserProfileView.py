@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from ..models import UserProfile
-from ..serializers import UserProfileSerializer
+from ..serializers import UserProfileSerializer, CustomAuthTokenSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions, generics, filters, status
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -50,3 +50,11 @@ class UserLoginApiView(ObtainAuthToken):
     """Handles creating user authentication tokens"""
 
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+    serializer_class = CustomAuthTokenSerializer
+    queryset = UserProfile.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return super().post(request, args, kwargs)
