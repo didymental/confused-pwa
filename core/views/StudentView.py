@@ -4,7 +4,6 @@ from ..serializers.StudentSerializer import StudentSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..pagination import StandardResultsSetPagination
-from core.utils import validate_bulk_reference_uniqueness
 
 
 class BaseBulkViewSet(BulkModelViewSet):
@@ -27,15 +26,9 @@ class StudentView(BaseBulkViewSet):
         return self.queryset.filter(session_id__instructor=self.request.user)
 
     def perform_bulk_update(self, serializer):
-        validate_bulk_reference_uniqueness(
-            serializer.validated_data, key="display_name"
-        )
         return self.perform_update(serializer)
 
     def perform_bulk_create(self, serializer):
-        validate_bulk_reference_uniqueness(
-            serializer.validated_data, key="display_name"
-        )
         return self.perform_create(serializer)
 
     def allow_bulk_destroy(self, qs, filtered):
