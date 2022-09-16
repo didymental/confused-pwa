@@ -12,18 +12,13 @@ from core.views import (
 
 router = DefaultRouter()
 
-router.register("reaction_type", ReactionTypeView)
+router.register("reaction_types", ReactionTypeView)
 router.register("profile", UserProfileViewSet)
 router.register("sessions", SessionView)
 
 urlpatterns = [
     path("", include(router.urls)),
     path("admin/", admin.site.urls),
-    path(
-        "reaction_type/",
-        ReactionTypeView.as_view({"get": "list"}),
-        name="reaction_type",
-    ),
     path("login/", UserLoginApiView.as_view()),
     path("signup/", UserSignUpView.as_view()),
 ]
