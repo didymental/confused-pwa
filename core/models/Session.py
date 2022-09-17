@@ -10,7 +10,7 @@ class Session(models.Model):
     is_open = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 # TODO: use this with custom authentication class
