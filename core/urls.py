@@ -31,6 +31,7 @@ bulk_router.register("students_sessions", StudentView)
 urlpatterns = [
     path("", include(router.urls)),
     path("", include(bulk_router.urls)),
+    # TODO: convert to RESTful endpoints?
     path("admin/", admin.site.urls),
     path("signup/", UserSignUpView.as_view()),
     path("login/", TokenObtainPairView.as_view()),
