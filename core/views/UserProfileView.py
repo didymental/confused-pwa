@@ -1,11 +1,9 @@
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet
+from rest_framework import permissions, generics, filters, status
+from rest_framework.response import Response
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from ..models import UserProfile
 from ..serializers import UserProfileSerializer
-from rest_framework import permissions, generics, filters, status
-from rest_framework.settings import api_settings
-from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class UserSignUpView(generics.CreateAPIView):

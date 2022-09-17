@@ -9,7 +9,6 @@ from core.views import (
     SessionView,
     UserProfileViewSet,
     UserSignUpView,
-    # UserLoginApiView,
     QuestionView,
     StudentView,
 )
@@ -33,7 +32,6 @@ urlpatterns = [
     path("", include(router.urls)),
     path("", include(bulk_router.urls)),
     path("admin/", admin.site.urls),
-    # path("login/", UserLoginApiView.as_view()),
     path("signup/", UserSignUpView.as_view()),
     path("login/", TokenObtainPairView.as_view()),
     path("login/refresh/", TokenRefreshView.as_view()),
