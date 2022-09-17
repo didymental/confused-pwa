@@ -10,7 +10,9 @@ class Question(models.Model):
     vote_count = models.IntegerField(default=0)
 
     # no submitting empty questions
-    question_content = models.CharField(max_length=255, null=False, blank=False)
+    question_content = models.CharField(
+        max_length=255, null=False, blank=False
+    )
 
     def __str__(self):
-        return str(self.question_content)
+        return self.question_content

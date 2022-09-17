@@ -9,7 +9,7 @@ class UserManager(BaseUserManager):
     """Manager for user"""
 
     def create_instructor(self, email: str, name: str, password: str):
-        """Create an instructor"""
+        """Creates an instructor"""
         if not email:
             raise ValueError("Instructor must have an email address")
 
@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email: str, name: str, password: str):
-        """Create a superuser"""
+        """Creates a superuser"""
         user = self.create_instructor(email, name, password)
 
         user.is_superuser = True
@@ -57,4 +57,4 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         """Return string representation of our user"""
-        return str(self.email)
+        return self.email
