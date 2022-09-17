@@ -1,6 +1,7 @@
 from django.db import models
 
 
+# TODO: inherit Message
 class Question(models.Model):
     """
     Defines the Question that the Student can send in a Session.

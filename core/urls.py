@@ -1,8 +1,9 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.contrib import admin
 
 from rest_framework.routers import DefaultRouter
 from rest_framework_bulk.routes import BulkRouter
+from core.consumers import RoomConsumer
 
 from core.views import (
     ReactionTypeView,
@@ -36,4 +37,10 @@ urlpatterns = [
     path("signup/", UserSignUpView.as_view()),
     path("login/", TokenObtainPairView.as_view()),
     path("login/refresh/", TokenRefreshView.as_view()),
+    # path("start_session/", LiveConsumer.as_asgi()),
+]
+
+
+websocket_urlpatterns = [
+    re_path(r"ws/chat/room/$", RoomConsumer.as_asgi()),
 ]

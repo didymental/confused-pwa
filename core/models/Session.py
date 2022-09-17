@@ -1,6 +1,9 @@
 from django.db import models
 
+from core.models.UserProfile import UserProfile
 
+
+# TODO: rename to Room
 class Session(models.Model):
     """Session created by an instructor"""
 
@@ -8,6 +11,9 @@ class Session(models.Model):
     name = models.CharField(max_length=255)
 
     is_open = models.BooleanField(default=False)
+    current_users = models.ManyToManyField(
+        UserProfile, related_name="current_rooms", blank=True
+    )
 
     def __str__(self):
         return self.name
