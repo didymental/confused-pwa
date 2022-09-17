@@ -5,7 +5,7 @@ from ..serializers.StudentSerializer import StudentSerializer
 
 
 class StudentView(BaseBulkViewSet):
-    permission_classes = IsPostOrIsAuthenticated
+    permission_classes = (IsPostOrIsAuthenticated,)
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     model = Student

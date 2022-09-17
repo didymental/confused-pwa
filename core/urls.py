@@ -37,7 +37,6 @@ urlpatterns = [
     path("signup/", UserSignUpView.as_view()),
     path("login/", TokenObtainPairView.as_view()),
     path("login/refresh/", TokenRefreshView.as_view()),
-    # path("start_session/", LiveConsumer.as_asgi()),
 ]
 
 

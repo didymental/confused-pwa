@@ -10,7 +10,6 @@ from djangochannelsrestframework.observer.generics import (
     ObserverModelInstanceMixin,
     action,
 )
-from django.db import models
 
 
 class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
