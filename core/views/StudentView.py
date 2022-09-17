@@ -1,18 +1,8 @@
 from rest_framework_bulk import BulkModelViewSet
+
+from core.views.BaseViewSet import BaseBulkViewSet
 from ..models.Student import Student
 from ..serializers.StudentSerializer import StudentSerializer
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from ..pagination import StandardResultsSetPagination
-
-
-class BaseBulkViewSet(BulkModelViewSet):
-    """Represents the interface for the Bulk Viewset"""
-
-    permission_classes = (IsAuthenticated,)
-    pagination_class = StandardResultsSetPagination
-    ordering_fields = "__all__"
-    ordering = ["-id"]
 
 
 class StudentView(BaseBulkViewSet):
