@@ -1,11 +1,11 @@
-from rest_framework_bulk import BulkModelViewSet
-
+from core.permissions import IsPostOrIsAuthenticated
 from core.views.BaseViewSet import BaseBulkViewSet
 from ..models.Student import Student
 from ..serializers.StudentSerializer import StudentSerializer
 
 
 class StudentView(BaseBulkViewSet):
+    permission_classes = IsPostOrIsAuthenticated
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     model = Student
