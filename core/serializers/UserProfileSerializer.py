@@ -1,5 +1,6 @@
 from typing import cast, Dict
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from ..models.UserProfile import UserProfile
 from ..models.UserProfile import UserManager
 

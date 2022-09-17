@@ -1,12 +1,11 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from ..models import UserProfile
-from ..serializers import UserProfileSerializer, CustomAuthTokenSerializer
-from rest_framework.authentication import TokenAuthentication
+from ..serializers import UserProfileSerializer
 from rest_framework import permissions, generics, filters, status
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class UserSignUpView(generics.CreateAPIView):
@@ -20,13 +19,10 @@ class UserSignUpView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         user = serializer.instance
-        token, created = Token.objects.get_or_create(user=user)
+        token = TokenObtainPairSerializer.get_token(user=user)
         # serializer.data will serialize all the readable fields
         return Response(
-            {
-                **serializer.data,
-                "token": token.key,
-            },
+            {**serializer.data, "refresh": str(token)},
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
@@ -37,24 +33,9 @@ class UserProfileViewSet(ModelViewSet):
 
     serializer_class = UserProfileSerializer
     queryset = UserProfile.objects.all()
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     filter_backends = (filters.SearchFilter,)
     search_fields = (
         "name",
         "email",
     )
-
-
-class UserLoginApiView(ObtainAuthToken):
-    """Handles creating user authentication tokens"""
-
-    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
-    serializer_class = CustomAuthTokenSerializer
-    queryset = UserProfile.objects.all()
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        return super().post(request, args, kwargs)

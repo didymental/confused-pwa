@@ -9,7 +9,6 @@ from ..pagination import StandardResultsSetPagination
 class BaseBulkViewSet(BulkModelViewSet):
     """Represents the interface for the Bulk Viewset"""
 
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     pagination_class = StandardResultsSetPagination
     ordering_fields = "__all__"
