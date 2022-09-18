@@ -25,8 +25,6 @@ bulk_router = BulkRouter()
 router.register("reaction_types", ReactionTypeView)
 router.register("profile", UserProfileViewSet)
 router.register("sessions", SessionView)
-# TODO: do we still need this?
-# router.register("students", StudentView)
 router.register("questions", QuestionView)
 bulk_router.register("students", StudentView)
 
@@ -42,5 +40,5 @@ urlpatterns = [
 ]
 
 websocket_urlpatterns = [
-    re_path(r"ws/socket-server/", SessionConsumer.as_asgi()),
+    re_path(r"ws/session/", SessionConsumer.as_asgi()),
 ]

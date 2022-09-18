@@ -251,10 +251,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @handle_student_change.groups_for_signal
     def handle_student_change(self, student: Optional[Student] = None, **kwargs):  # type: ignore
-        # print("kw2", student)
-        if student is None:
-            yield f"session__{-1}"
-        else:
+        print("kw2", student)
+        if student:
             yield f"session__{student.session}"
 
     @handle_student_change.groups_for_consumer  # type: ignore
@@ -280,14 +278,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if not is_open:
             await self._leave_session(silent=True)
 
+    # TODO: remove none check, debug later
     @handle_session_change.groups
     def handle_session_change(
         self, session: Optional[Session] = None, *args, **kwargs
     ):
         print("kw", session)
-        # TODO: why is this called on bulk students endpoint?
-        # TODO: fix session is None
-        if session is None:
-            yield f"pk__{-1}"
-        else:
+        if session:
             yield f"pk__{session.pk}"
