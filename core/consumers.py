@@ -8,7 +8,6 @@ from djangochannelsrestframework.observer.generics import (
     action,
 )
 
-
 from core.models.Session import Session
 from core.models.Student import Student
 from core.models.UserProfile import UserProfile
@@ -107,9 +106,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 session=session, consumer=self
             )
 
-            await self.handle_session_change.unsubscribe(
-                session=session, consumer=self
-            )
+            # await self.handle_session_change.unsubscribe(
+            #     session=session, consumer=self
+            # )
 
             if self.channel_layer:
                 await self.channel_layer.group_discard(
@@ -168,9 +167,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 session=session, consumer=self
             )
 
-            await self.handle_session_change.subscribe(
-                session=session, consumer=self
-            )
+            # await self.handle_session_change.subscribe(
+            #     session=session, consumer=self
+            # )
 
             if self.channel_layer:
                 await self.channel_layer.group_add(
@@ -254,15 +253,15 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             pk=instance.pk,
         )
 
-    @model_observer(Session)
-    async def handle_session_change(  # type: ignore
-        self, message: Dict, **kwargs
-    ):
+    # @model_observer(Session)
+    # async def handle_session_change(  # type: ignore
+    #     self, message: Dict, **kwargs
+    # ):
 
-        is_open: Optional[bool] = message.get("is_open")
-        if not is_open:
-            await self._leave_session(silent=True)
+    #     is_open: Optional[bool] = message.get("is_open")
+    #     if not is_open:
+    #         await self._leave_session(silent=True)
 
-    @handle_session_change.groups
-    def handle_session_change(self, session: Session, *args, **kwargs):
-        yield f"pk__{session.pk}"
+    # @handle_session_change.groups
+    # def handle_session_change(self, session: Session, *args, **kwargs):
+    #     yield f"pk__{session.pk}"
