@@ -8,6 +8,7 @@ from djangochannelsrestframework.observer.generics import (
     ObserverModelInstanceMixin,
     action,
 )
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from core.models.Session import Session
 from core.models.Student import Student
@@ -28,6 +29,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     lookup_field: str = "pk"
     session_subscribe: Optional[int] = None
     temp_user: Optional[Student] = None
+    authentication_classes = (JWTAuthentication,)
 
     @database_sync_to_async
     def get_session(self, pk: int) -> Optional[Session]:
@@ -97,7 +99,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
         try:
             user: UserProfile = self.scope["user"]
-            if not user.is_anonymous:
+            if user.is_authenticated:
                 await self.instructor_leave_session(session=session, user=user)
             elif self.temp_user is not None:
                 await self.student_leave_session(student=self.temp_user)
@@ -125,10 +127,17 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 return
             await self.reply(**e.args[0])
 
+    @database_sync_to_async
+    def get_user(self, session: Session):
+        # session.is_open = True
+        # session.save()
+        return session.instructor
+
     async def instructor_leave_session(
         self, session: Session, user: UserProfile
     ):
-        if session.instructor != user:
+        instructor = await self.get_user(session=session)
+        if instructor != user:
             raise ValidationError(
                 {
                     "action": "leave_session",
@@ -167,15 +176,21 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         try:
             user: UserProfile = self.scope["user"]
 
-            print("kw1", user)
+            print("kw1", user, self.scope)
 
-            if not user.is_anonymous:
+            if user.is_authenticated:
                 print("kw2")
                 await self.instructor_join_session(session=session, user=user)
             else:
                 print("kw3")
                 if not display_name:
-                    raise ValidationError("Display name cannot be empty")
+                    raise ValidationError(
+                        {
+                            "action": "join_session",
+                            "errors": "Display name cannot be empty",
+                            "status": 403,
+                        }
+                    )
                 await self.student_join_session(
                     session=session, display_name=display_name
                 )
@@ -191,7 +206,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
             if self.channel_layer:
                 await self.channel_layer.group_add(
-                    self.session_subscribe, self.channel_name
+                    str(self.session_subscribe), self.channel_name
                 )
 
             print("kw5")
@@ -203,12 +218,14 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             print("kw6")
 
         except ValidationError as e:
+            # print("error", e.args)
             await self.reply(**e.args[0])
 
     async def instructor_join_session(
         self, session: Session, user: UserProfile
     ):
-        if session.instructor != user:
+        instructor = await self.get_user(session=session)
+        if instructor != user:
             raise ValidationError(
                 {
                     "action": "join_session",

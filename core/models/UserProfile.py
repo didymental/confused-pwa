@@ -58,3 +58,12 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """Return string representation of our user"""
         return self.email
+
+    # @property
+    # def is_authenticated(self):
+    #     """
+    #     Always return True. This is a way to tell if the user has been
+    #     authenticated in templates.
+    #     """
+
+    #     return True
