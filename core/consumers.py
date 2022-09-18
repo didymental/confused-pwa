@@ -1,7 +1,5 @@
-import json
-from operator import is_
 from typing import Optional
-from urllib import request
+
 
 from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
 from djangochannelsrestframework.observer import model_observer
@@ -82,12 +80,11 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 )
 
             await self.open_room(room=session, is_open=True)
+
             # FIXME: consumer is self?
             await self.student_change_handler.subscribe(
                 room=session, consumer=self
             )
-
-            self.room_subscribe = pk
 
             if self.channel_layer:
                 await self.channel_layer.group_add(
@@ -96,11 +93,12 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
             await self.notify_joiners()
 
+            self.room_subscribe = pk
+
         except ValidationError as e:
             await self.reply(**e.args[0])
 
     async def instructor_join_room(self, room: Session, user: UserProfile):
-        # pass
         if room.instructor != user:
             raise ValidationError(
                 {
@@ -132,30 +130,34 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             await self.channel_layer.group_send(
                 group,
                 {
-                    "type": "update_students",
+                    "type": "update_joiners",
                     "instructor": await self.get_instructor(room=room),
                     "students": await self.current_students(room=room),
                 },
             )
 
+    @action()
+    async def leave_room(self, pk, **kwargs):
+        self.disconnect
+        pass
+
     @model_observer(Student)
-    async def student_change_handler(
+    async def student_change_handler(  # type: ignore
         self,
         message,
-        observer=None,
         action="",
-        subscribing_request_ids=[],
+        # observer=None,
+        # subscribing_request_ids=[],
         **kwargs,
     ):
-
         await self.reply(data=message, action=action)
 
     @student_change_handler.groups_for_signal
-    def student_change_handler(self, instance: Student, **kwargs):
+    def student_change_handler(self, instance: Student, **kwargs):  # type: ignore
         yield f"session_id__{instance.session_id}"
 
-    @student_change_handler.groups_for_consumer
-    def student_change_handler(self, room: Session, **kwargs):
+    @student_change_handler.groups_for_consumer  # type: ignore
+    def student_change_handler(self, room: Session, **kwargs):  # type: ignore
         if room is not None:
             yield f"session_id__{room}"
 
