@@ -253,11 +253,12 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def handle_student_change(self, student: Optional[Student] = None, **kwargs):  # type: ignore
         print("kw2", student)
         if student:
-            yield f"session__{student.session}"
+            session: Session = student.session
+            yield f"-session__{session.pk}"
 
     @handle_student_change.groups_for_consumer  # type: ignore
     def handle_student_change(self, session: Session, **kwargs):  # type: ignore
-        yield f"session__{session}"
+        yield f"-session__{session.pk}"
 
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
@@ -285,4 +286,4 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     ):
         print("kw", session)
         if session:
-            yield f"pk__{session.pk}"
+            yield f"-pk__{session.pk}"
