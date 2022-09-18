@@ -27,3 +27,9 @@ DATABASES = {
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=999),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=999),
+    "ROTATE_REFRESH_TOKENS": True,
+}

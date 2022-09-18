@@ -250,20 +250,23 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.reply(data=message, action=action)
 
     @handle_student_change.groups_for_signal
-    def handle_student_change(self, student: Student, **kwargs):  # type: ignore
+    def handle_student_change(self, student: Optional[Student] = None, **kwargs):  # type: ignore
         # print("kw2", student)
-        yield f"session__{student.session}"
+        if student is None:
+            yield f"session__{-1}"
+        else:
+            yield f"session__{student.session}"
 
     @handle_student_change.groups_for_consumer  # type: ignore
     def handle_student_change(self, session: Session, **kwargs):  # type: ignore
         yield f"session__{session}"
 
     @handle_student_change.serializer
-    def handle_student_change(self, instance: Student, action, **kwargs):
+    def handle_student_change(self, student: Student, action, **kwargs):
         return dict(
-            data=StudentSerializer(instance).data,
+            data=StudentSerializer(student).data,
             action=action.value,
-            pk=instance.pk,
+            pk=student.pk,
         )
 
     @model_observer(Session)
@@ -288,11 +291,3 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             yield f"pk__{-1}"
         else:
             yield f"pk__{session.pk}"
-
-    # @handle_session_change.groups_for_signal
-    # def handle_session_change(self, test: Session, **kwargs):  # type: ignore
-    #     yield f"pk__{test.pk}"
-
-    # @handle_session_change.groups_for_consumer  # type: ignore
-    # def handle_session_change(self, test2: Session, **kwargs):  # type: ignore
-    #     yield f"pk__{test2.pk}"

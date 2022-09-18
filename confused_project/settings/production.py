@@ -56,3 +56,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://digitalace-env.eba-jj7vp4ec.us-east-2.elasticbeanstalk.com/",
 #     "http://localhost:3000/",
 # ]
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+}
