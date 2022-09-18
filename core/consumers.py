@@ -61,10 +61,17 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def delete_student(self, student: Student):
         student.delete()
 
+    async def disconnect(self, code):
+        # TODO: invoke action as normal func?
+        await self.leave_room(silent=True)
+        return await super().disconnect(code)
+
     @action()
-    async def leave_room(self, **kwargs):
+    async def leave_room(self, silent=False, **kwargs):
 
         if self.room_subscribe is None:
+            if silent:
+                return
             return await self.reply(
                 action="leave_room",
                 errors="You have not joined a session yet",
@@ -74,31 +81,39 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         session: Session = await self.get_room(pk=self.room_subscribe)
 
         if session is None:
+            if silent:
+                return
             return await self.reply(
                 action="leave_room",
                 errors="The session no longer exists",
                 status=404,
             )
 
-        user = self.scope["user"]
-        if user:
-            await self.instructor_leave_room(room=session, user=user)
-        elif self.temp_user is not None:
-            await self.student_leave_room(student=self.temp_user)
-            self.temp_user = None
+        try:
+            user = self.scope["user"]
+            if user:
+                await self.instructor_leave_room(room=session, user=user)
+            elif self.temp_user is not None:
+                await self.student_leave_room(student=self.temp_user)
+                self.temp_user = None
 
-        await self.student_change_handler.unsubscribe(
-            room=session, consumer=self
-        )
-
-        if self.channel_layer:
-            await self.channel_layer.group_discard(
-                self.room_subscribe, self.channel_name
+            await self.student_change_handler.unsubscribe(
+                room=session, consumer=self
             )
 
-        await self.notify_joiners()
+            if self.channel_layer:
+                await self.channel_layer.group_discard(
+                    self.room_subscribe, self.channel_name
+                )
 
-        self.room_subscribe = None
+            await self.notify_joiners()
+
+            self.room_subscribe = None
+
+        except ValidationError as e:
+            if silent:
+                return
+            await self.reply(**e.args[0])
 
     async def instructor_leave_room(self, room: Session, user: UserProfile):
         if room.instructor != user:
