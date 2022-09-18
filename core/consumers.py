@@ -21,7 +21,7 @@ class ValidationError(Exception):
     pass
 
 
-class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
+class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     queryset = Session.objects.all()
     serializer_class: Type[SessionSerializer] = SessionSerializer

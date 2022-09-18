@@ -3,7 +3,7 @@ from django.contrib import admin
 
 from rest_framework.routers import DefaultRouter
 from rest_framework_bulk.routes import BulkRouter
-from core.consumers import RoomConsumer
+from core.consumers import SessionConsumer
 
 from core.views import (
     ReactionTypeView,
@@ -41,5 +41,5 @@ urlpatterns = [
 
 
 websocket_urlpatterns = [
-    re_path(r"ws/chat/room/$", RoomConsumer.as_asgi()),
+    re_path(r"ws/chat/room/$", SessionConsumer.as_asgi()),
 ]

@@ -3,7 +3,6 @@ from django.db import models
 from core.models.UserProfile import UserProfile
 
 
-# TODO: rename to Room
 class Session(models.Model):
     """Session created by an instructor"""
 
