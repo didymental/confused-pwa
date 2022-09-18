@@ -1,0 +1,107 @@
+.ion-card-instructor-session {
+    &__clear {
+        padding-top: 3rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        padding-bottom: 3rem;
+        height: fit-content;
+        background-color: #6bf178;
+    }
+    
+    &__confused-1 {
+        padding-top: 3rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-bottom: 3rem;
+        height: fit-content;
+        background-color: #ffe74c;
+    }
+
+    &__confused-2 {
+        padding-top: 3rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-bottom: 3rem;
+        height: fit-content;
+        background-color: #ff5964;
+    }
+
+    &__reactions {
+        width: 2.5rem;
+        height: 1.5rem;
+        border-radius: 0.25rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: black;
+        font-size: small;
+        font-weight: 550;
+    }
+}
+
+.ion-row-instructor-session {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+
+    &__reactions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: -0.75rem;
+    }
+}
+
+.ion-btn-instructor-session {
+
+    &__reactions {
+        width: 100%;
+        font-size: medium;
+    }
+
+    &__end-session {
+        width: 100%;
+        color: #190e28;
+        font-size: medium;
+        font-weight: 575;
+        background: linear-gradient(0deg, #A1BAFE 50%, #DAACEC 100%);
+        border-radius: 1.25rem;
+        
+    }
+}
+
+
+.ion-list-instructor-session {
+
+    &__questions {
+        min-height: 20rem;
+        max-height: 25rem;
+        overflow-y: scroll;
+        min-width: 90%;
+        border-radius: 25px;
+    }
+    
+}
+
+.ion-list-header-instructor-session {
+    &__questions {
+        margin-bottom: 0.5rem;
+        font-size: large;
+        font-weight: 650;
+    }
+}
+
+.ion-item-instructor-session {
+    &__questions {
+        font-size: medium;
+        margin-bottom: 0.15rem;
+    }
+}
+
+.ion-col-instructor-session {
+    &__reactions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
