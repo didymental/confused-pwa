@@ -14,70 +14,34 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import "../join-page.scss";
 import { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import logo from "../../Assets/logo-light.svg";
 
-const JoinPage: React.FC = () => {
-  const [sessionPIN, setSessionPIN] = useState<string>("ABCDEF");
+const JoinDetailPage: React.FC = () => {
+  const [name, setName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
   const history = useHistory();
 
-  const invalidPINMsg: string = "Please enter a valid session code";
+  const invalidNameMsg: string = "Please enter a valid display name";
   const sessionNotFoundMsg: string = "Session not found";
   const unknownErrorMsg: string = "error. Please contact administrators for more details";
 
-  const handleJoinSession = () => {
-    if (!sessionPIN) {
-      setMessage(invalidPINMsg);
+  const handleSetName = () => {
+    if (!name) {
+      setMessage(invalidNameMsg);
       setIserror(true);
       return;
-    }
-
-    const api = axios.create({
-      baseURL: "https://reqres.in/api",
-    });
-
-    let resStatus: number = 0;
-    if (sessionPIN === "VALIDCODE") {
-      //Simulating a valid session PIN
-      api
-        .get("/unknown/2")
-        .then((res) => {
-          console.log(res);
-          resStatus = res.status;
-        })
-        .catch((error) => {
-          console.log(error);
-          setMessage(error.message + unknownErrorMsg);
-          setIserror(true);
-        });
-    } else {
-      //Simulating session not found
-      api
-        .get("/unknown/23")
-        .then((res) => {
-          console.log(res);
-          resStatus = res.status;
-        })
-        .catch((error) => {
-          console.log(error);
-          setMessage(sessionNotFoundMsg + ". " + invalidPINMsg);
-          setIserror(true);
-        });
     }
   };
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Enter Display Name</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen className="ion-padding ion-text-center">
-        <IonGrid>
+      <IonContent fullscreen className="join-page__container splash">
+        <IonGrid className="join-page__content">
           <IonRow>
             <IonCol>
               <IonAlert
@@ -90,19 +54,22 @@ const JoinPage: React.FC = () => {
               />
             </IonCol>
           </IonRow>
+
           <IonRow>
             <IonCol>
-              <IonIcon style={{ fontSize: "70px", color: "#0040ff" }} />
+              <img width="200em" src={logo} className="logo-noanim" alt="logo" />
             </IonCol>
           </IonRow>
+
           <IonRow>
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating">Session Code</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="floating">Display Name</IonLabel>
                 <IonInput
                   type="text"
-                  value={sessionPIN}
-                  onIonChange={(e) => setSessionPIN(e.detail.value!)}
+                  value={name}
+                  placeholder={"John Doe"}
+                  onIonChange={(e) => setName(e.detail.value!)}
                 ></IonInput>
               </IonItem>
             </IonCol>
@@ -110,7 +77,16 @@ const JoinPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonButton expand="block" onClick={handleJoinSession}>
+              <p
+                className="
+                join-page__auxilliary-text--medium
+                join-page__auxilliary-text--translucent
+              "
+              >
+                This name will be displayed to your instructor. You can&apos;t change this name
+                later.
+              </p>
+              <IonButton color="secondary" size="default" expand="block" onClick={handleSetName}>
                 Join Session
               </IonButton>
             </IonCol>
@@ -121,4 +97,4 @@ const JoinPage: React.FC = () => {
   );
 };
 
-export default JoinPage;
+export default JoinDetailPage;

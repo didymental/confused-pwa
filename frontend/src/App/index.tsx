@@ -19,8 +19,8 @@ function App() {
           <Route path="/login" exact component={LoginPage} />
           <Route path="/signup" exact component={SignUpPage} />
           <Route path="/student" exact component={JoinPage} />
+          <Route path="/student/join" exact component={JoinDetailPage} />
           <Route path="/student/session/:id" exact component={StudentSessionPage} />
-          <Route path="/joinDetail" exact component={JoinDetailPage} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

@@ -94,7 +94,7 @@ const LoginPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonItem>
+              <IonItem fill="outline">
                 <IonLabel position="floating"> Email</IonLabel>
                 <IonInput
                   type="email"

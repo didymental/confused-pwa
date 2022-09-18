@@ -14,12 +14,14 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import "../join-page.scss";
 import { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import logo from "../../Assets/logo.svg";
 
 const JoinPage: React.FC = () => {
-  const [sessionPIN, setSessionPIN] = useState<string>("ABCDEF");
+  const [sessionPIN, setSessionPIN] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
@@ -37,9 +39,9 @@ const JoinPage: React.FC = () => {
     }
 
     const api = axios.create({
-      baseURL: "https://reqres.in/api",
+      baseURL: "https://confused-backend-3216.herokuapp.com/api/",
     });
-
+  
     let resStatus: number = 0;
     if (sessionPIN === "VALIDCODE") {
       //Simulating a valid session PIN
@@ -48,7 +50,7 @@ const JoinPage: React.FC = () => {
         .then((res) => {
           console.log(res);
           resStatus = res.status;
-          history.push("/joinDetail");
+          history.push("/student/join");
         })
         .catch((error) => {
           console.log(error);
@@ -72,13 +74,8 @@ const JoinPage: React.FC = () => {
   };
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Enter Session Code</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen className="ion-padding ion-text-center">
-        <IonGrid>
+      <IonContent fullscreen className="join-page__container">
+        <IonGrid className="join-page__content">
           <IonRow>
             <IonCol>
               <IonAlert
@@ -93,16 +90,17 @@ const JoinPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol>
-              <IonIcon style={{ fontSize: "70px", color: "#0040ff" }} />
+              <img width="200em" src={logo} className="logo-noanim" alt="logo" />
             </IonCol>
           </IonRow>
           <IonRow>
             <IonCol>
-              <IonItem>
+              <IonItem fill="outline">
                 <IonLabel position="floating">Session Code</IonLabel>
                 <IonInput
                   type="text"
                   value={sessionPIN}
+                  placeholder={"1234"}
                   onIonChange={(e) => setSessionPIN(e.detail.value!)}
                 ></IonInput>
               </IonItem>
@@ -111,8 +109,8 @@ const JoinPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonButton expand="block" onClick={handleJoinSession}>
-                Join Session
+              <IonButton color="primary" expand="block" onClick={handleJoinSession}>
+                Enter
               </IonButton>
             </IonCol>
           </IonRow>
