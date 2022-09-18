@@ -34,45 +34,45 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.remove_user_from_room(pk)
 
     @action()
-    async def create_message(self, message, **kwargs):
+    async def create_question(self, question, **kwargs):
         room: Session = await self.get_room(pk=self.room_subscribe)
         await database_sync_to_async(Question.objects.create)(
             # TODO: remove _id
             student_id__session_id=room,
             student_id=self.scope["user"],
-            question_content=message,
+            question_content=question,
         )
 
     # @action()
-    # async def subscribe_to_messages_in_room(self, pk, request_id, **kwargs):
-    #     await self.message_activity.subscribe(room=pk, request_id=request_id)
+    # async def subscribe_to_questions_in_room(self, pk, request_id, **kwargs):
+    #     await self.question_activity.subscribe(room=pk, request_id=request_id)
 
     # @model_observer(Question)
-    # async def message_activity(
-    #     self, message, observer=None, subscribing_request_ids=[], **kwargs
+    # async def question_activity(
+    #     self, question, observer=None, subscribing_request_ids=[], **kwargs
     # ):
     #     """
     #     This is evaluated once for each subscribed consumer.
-    #     The result of `@message_activity.serializer` is provided here as the message.
+    #     The result of `@question_activity.serializer` is provided here as the question.
     #     """
     #     # since we provide the request_id when subscribing we can just loop over them here.
     #     for request_id in subscribing_request_ids:
-    #         message_body = dict(request_id=request_id)
-    #         message_body.update(message)
-    #         await self.send_json(message_body)
+    #         question_body = dict(request_id=request_id)
+    #         question_body.update(question)
+    #         await self.send_json(question_body)
 
-    # @message_activity.groups_for_signal
-    # def message_activity(self, instance: Question, **kwargs):
+    # @question_activity.groups_for_signal
+    # def question_activity(self, instance: Question, **kwargs):
     #     yield "room__{instance.room_id}"
     #     yield f"pk__{instance.pk}"
 
-    # @message_activity.groups_for_consumer
-    # def message_activity(self, room=None, **kwargs):
+    # @question_activity.groups_for_consumer
+    # def question_activity(self, room=None, **kwargs):
     #     if room is not None:
     #         yield f"room__{room}"
 
-    # @message_activity.serializer
-    # def message_activity(self, instance: Question, action, **kwargs):
+    # @question_activity.serializer
+    # def question_activity(self, instance: Question, action, **kwargs):
     #     """
     #     This is evaluated before the update is sent
     #     out to all the subscribing consumers.

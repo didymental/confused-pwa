@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
@@ -34,6 +34,9 @@ class UserManager(BaseUserManager):
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     """Database model for user"""
+
+    # TODO: fix any usage
+    current_rooms: Any
 
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
