@@ -17,6 +17,7 @@ import Navbar from "../../../component/Navbar";
 import "./index.scss";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
 import { LoginRequest } from "../../../types/auth";
+import ConfusedIcon from "../../../component/ConfusedIcon";
 
 function validateEmail(email: string) {
   const re =
@@ -74,9 +75,9 @@ const LoginPage: React.FC = () => {
               />
             </IonCol>
           </IonRow>
-          <IonRow>
+          <IonRow className="login-form__profile-icon">
             <IonCol>
-              <IonIcon className="login-form__profile-icon" icon={personCircle} />
+              <ConfusedIcon />
             </IonCol>
           </IonRow>
 

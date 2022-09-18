@@ -1,5 +1,5 @@
 import "./index.scss";
-import logo from "../../Assets/logo.svg";
+import logo from "../../assets/logo.svg";
 
 const ConfusedIcon: React.FC = () => {
   return (
