@@ -23,8 +23,8 @@ class ValidationError(Exception):
 
 class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
-    room_subscribe: Optional[int]
-    temp_user: Optional[Student]
+    room_subscribe: Optional[int] = None
+    temp_user: Optional[Student] = None
 
     @database_sync_to_async
     def get_room(self, pk: int) -> Optional[Session]:
@@ -47,7 +47,7 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         return UserProfileSerializer(room.instructor).data
 
     @database_sync_to_async
-    def current_students(self, room: Session):
+    def get_current_students(self, room: Session):
         return [
             StudentSerializer(student).data
             for student in Student.objects.filter(session_id=room)
@@ -113,7 +113,6 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.close_room(room=room)
 
     async def student_leave_room(self, student: Student):
-
         await self.delete_student(student=student)
 
     @action()
@@ -183,14 +182,14 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             return
         room: Session = await self.get_room(pk=self.room_subscribe)
         for group in self.groups:
-            if not self.channel_layer:
+            if self.channel_layer is None:
                 continue
             await self.channel_layer.group_send(
                 group,
                 {
                     "type": "update_joiners",
                     "instructor": await self.get_instructor(room=room),
-                    "students": await self.current_students(room=room),
+                    "students": await self.get_current_students(room=room),
                 },
             )
 
