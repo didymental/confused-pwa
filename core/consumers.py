@@ -57,7 +57,6 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @database_sync_to_async
     def create_student(self, room: Session, display_name: str):
-        # room.is_open = False
         Student.objects.create(session_id=room, display_name=display_name)
 
     @action()
@@ -77,9 +76,7 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 await self.instructor_join_room(room=session, user=user)
             else:
                 if not display_name:
-                    raise ValidationError(
-                        "Student must have a non-empty display name"
-                    )
+                    raise ValidationError("Display name cannot be empty")
                 await self.student_join_room(
                     room=session, display_name=display_name
                 )
