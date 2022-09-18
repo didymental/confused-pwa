@@ -10,7 +10,7 @@ import {
   IonList,
   IonListHeader,
   IonItem,
-  IonCol
+  IonCol,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 
@@ -24,22 +24,39 @@ import confused_2 from "../../assets/confused-2-bg.svg";
 import confused_reaction from "../../assets/confused-face.svg";
 import clear_reaction from "../../assets/thumbs-up.svg";
 
+const CLEAR_STATE = "clear";
+const CONFUSED_1_STATE = "confused-1";
+const CONFUSED_2_STATE = "confused-2";
 
-interface ConfusionDisplayProps {
-  levelOfConfusion: string,
-  questions: QuestionData[] | [],
-  students: StudentData[] | [],
-  sessionId: number
-}
-
-const ConfusionDisplay: React.FC<ConfusionDisplayProps> = ({ levelOfConfusion, questions, students, sessionId }) => {
+/**
+ * Represents the page that shows the Instructor when the Instructor is 
+ * in view of the session. 
+ * 
+ * @param sessionId the id of the Session the Instructor is in view of.
+ */
+const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) => {
+  const [levelOfConfusion, setLevelOfConfusion] = useState<string>();
+  const [questions, setQuestions] = useState<QuestionData[] | []>([]);
+  const [students, setStudents] = useState<StudentData[] | []>([]);
   const { presentToast } = useToast();
 
-  const endSession = () => {
-    client.get(`/sessions/${sessionId}`)
-      .then(res => {
-        let toSend = { ...res.data, is_open: false }
-        client.post(`/sessions/${sessionId}`, toSend)
+  // Gets all students and questions in the session
+  const getStudentsAndQuestionsInSession = (sessionId: number) => {
+    client
+      .get("/students/").then(res => {
+        let studentsInCurrSession: StudentData[] = res.data.results
+          .filter((x: { session_id: number; }) => x.session_id === sessionId);
+        setStudents(studentsInCurrSession);
+
+        let setOfStudents: Set<number> = new Set();
+        studentsInCurrSession.forEach(student => setOfStudents.add(student.id));
+
+        client
+          .get("/questions/")
+          .then(res => {
+            let questionsFetched: QuestionData[] = res.data.results;
+            setQuestions(questionsFetched.filter(question => setOfStudents.has(question.student_id)));
+          })
           .catch(err => {
             presentToast({
               header: "Error occurred!",
@@ -55,7 +72,60 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = ({ levelOfConfusion, q
           color: "danger",
         });
       });
+  }
 
+  useEffect(() => {
+    setLevelOfConfusion(CLEAR_STATE) // default to set as clear
+    getStudentsAndQuestionsInSession(sessionId)
+  }, []);
+
+  return (
+    <IonPage>
+      <Navbar title={"Session Title"} />
+      <IonContent fullscreen>
+        <ConfusionDisplay
+          levelOfConfusion={levelOfConfusion || "clear"}
+          questions={questions || []}
+          students={students || []}
+          sessionId={sessionId}
+        />
+      </IonContent>
+    </IonPage>
+  );
+};
+
+interface ConfusionDisplayProps {
+  levelOfConfusion: string;
+  questions: QuestionData[] | [];
+  students: StudentData[] | [];
+  sessionId: number;
+}
+
+const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
+  let { levelOfConfusion, questions, students, sessionId } = props;
+  const { presentToast } = useToast();
+
+  const endSession = () => {
+    client
+      .get(`/sessions/${sessionId}/`)
+      .then((res) => {
+        let toSend = { ...res.data, is_open: false };
+        client.put(`/sessions/${sessionId}/`, toSend)
+          .catch(err => {
+            presentToast({
+              header: "Error occurred!",
+              message: err.response.data.detail,
+              color: "danger",
+            });
+          });
+      })
+      .catch(err => {
+        presentToast({
+          header: "Error occurred!",
+          message: err.response.data.detail,
+          color: "danger",
+        });
+      });
   }
 
   return (
@@ -93,6 +163,27 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = ({ levelOfConfusion, q
   );
 }
 
+/**
+ * Defines the structure of the QuestionData that 
+ * is received from the backend.
+ */
+interface QuestionData {
+  student_id: number,
+  question_content: string,
+  vote_count: number
+}
+
+/**
+ * Defines the structure of the StudentData that 
+ * is received from the backend.
+ */
+interface StudentData {
+  id: number,
+  display_name: string,
+  session_id: number,
+  reaction_type_id: number | null
+}
+
 const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questions }) => {
   return (
     questions.length === 0
@@ -124,7 +215,7 @@ const ReactionsDisplay: React.FC<{ students: StudentData[] | [], levelOfConfusio
       }
 
       if (student.reaction_type_id === 1) {
-        countConfused += 1
+        countConfused += 1;
       }
     });
 
@@ -183,89 +274,6 @@ const ReactionsDisplay: React.FC<{ students: StudentData[] | [], levelOfConfusio
 }
 
 /**
- * Defines the structure of the QuestionData that 
- * is received from the backend.
- */
-interface QuestionData {
-  student_id: number,
-  question_content: string,
-  vote_count: number
-}
-
-/**
- * Defines the structure of the StudentData that 
- * is received from the backend.
- */
-interface StudentData {
-  id: number,
-  display_name: string,
-  session_id: number,
-  reaction_type_id: number | null
-}
-
-const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) => {
-  const [levelOfConfusion, setLevelOfConfusion] = useState<string>();
-  const [questions, setQuestions] = useState<QuestionData[] | []>([]);
-  const [students, setStudents] = useState<StudentData[] | []>([]);
-  const { presentToast } = useToast();
-
-  // Gets all students and questions in the session
-  const getStudentsAndQuestionsInSession = (sessionId: number) => {
-    client.get("/students/").then(res => {
-      let studentsInCurrSession: StudentData[] = res.data.results
-        .filter((x: { session_id: number; }) => x.session_id === sessionId);
-      setStudents(studentsInCurrSession)
-
-      let setOfStudents: Set<number> = new Set();
-      studentsInCurrSession.forEach(student => setOfStudents.add(student.id))
-
-      client.get("/questions/")
-        .then(res => {
-          let questionsFetched: QuestionData[] = res.data.results;
-          setQuestions(questionsFetched.filter(question => setOfStudents.has(question.student_id)));
-        }).catch(err => {
-          presentToast({
-            header: "Error occurred!",
-            message: err.response.data.detail,
-            color: "danger",
-          });
-        });
-
-    }).catch(err => {
-      presentToast({
-        header: "Error occurred!",
-        message: err.response.data.detail,
-        color: "danger",
-      });
-    });
-  }
-
-  useEffect(() => {
-    sessionId = 3; /** TODO: delete after integration with other parts **/
-    setLevelOfConfusion(CONFUSED_2_STATE) // default to set as clear
-    getStudentsAndQuestionsInSession(sessionId)
-  }, []);
-
-  return (
-    <IonPage>
-      <Navbar title={"Session Title"} />
-      <IonContent fullscreen>
-        <ConfusionDisplay
-          levelOfConfusion={levelOfConfusion || "clear"}
-          questions={questions || []}
-          students={students || []}
-          sessionId={sessionId}
-        />
-      </IonContent>
-    </IonPage>
-  );
-};
-
-const CLEAR_STATE = "clear";
-const CONFUSED_1_STATE = "confused-1";
-const CONFUSED_2_STATE = "confused-2";
-
-/**
  * Finite state machine mapping the levelOfConfusion to svg component
  */
 const mapLevelToSvg: { [key: string]: any } = {
@@ -281,11 +289,6 @@ const mapLevelToText: { [key: string]: string } = {
   "clear": "I am clear!",
   "confused-1": "I am confused...",
   "confused-2": "I am really confused..."
-}
-
-const mapReactionIdToSvg: { [key: number]: any } = {
-  1: confused_reaction,
-  2: clear_reaction
 }
 
 export default InstructorSessionPage;
