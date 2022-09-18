@@ -141,6 +141,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     async def student_leave_session(self, student: Student):
         await self.delete_student(student=student)
 
+    async def connect(self):
+        print("kw connecting")
+        return await super().connect()
+
     @action()
     async def join_session(self, pk, display_name=None, **kwargs):
         session: Session = await self.get_session(pk=pk)
