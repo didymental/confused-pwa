@@ -18,10 +18,10 @@ class Session(models.Model):
 
 # TODO: use this with custom authentication class
 # TODO: remove model, use auth token for student session instead
-class SessionToken(models.Model):
-    """Token generated for a session"""
+# class SessionToken(models.Model):
+#     """Token generated for a session"""
 
-    session = models.OneToOneField(
-        "Session",
-        on_delete=models.CASCADE,
-    )
+#     session = models.OneToOneField(
+#         "Session",
+#         on_delete=models.CASCADE,
+#     )
