@@ -1,3 +1,4 @@
+import "./index.scss";
 import {
   IonAlert,
   IonButton,
@@ -12,11 +13,9 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useState } from "react";
-import axios from "axios";
 import { personCircle } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
-import Navbar from "../../component/Navbar";
-import "./index.scss";
+import Navbar from "../../../component/Navbar";
+import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
 
 function validateEmail(email: string) {
   const re =
@@ -25,13 +24,15 @@ function validateEmail(email: string) {
   return re.test(String(email).toLowerCase());
 }
 
-const LoginPage: React.FC = () => {
-  const history = useHistory();
+const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState<string>("eve.holt@reqres.in");
   const [password, setPassword] = useState<string>("cityslicka");
+  const [displayName, setDisplayName] = useState<string>("ailing35");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const handleLogin = () => {
+  const { signUp } = useAuthentication();
+
+  const handleSignUp = async () => {
     if (!email) {
       setMessage("Please enter a valid email");
       setIserror(true);
@@ -49,31 +50,20 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    const loginData = {
+    const signUpRequest = {
       email: email,
       password: password,
+      name: displayName,
     };
 
-    // TODO
-    const api = axios.create({
-      baseURL: "https://reqres.in/api",
-    });
-    api
-      .post("/login", loginData)
-      .then((res) => {
-        history.push("/dashboard/" + email);
-      })
-      .catch((error) => {
-        setMessage("Auth failure! Please create an account");
-        setIserror(true);
-      });
+    await signUp(signUpRequest);
   };
   // TODO
   return (
     <IonPage>
       <Navbar title={"Confused"} />
-      <IonContent fullscreen className="login-form__container">
-        <IonGrid className="login-form__content">
+      <IonContent fullscreen className="signup-form__container">
+        <IonGrid className="signup-form__content">
           <IonRow>
             <IonCol>
               <IonAlert
@@ -88,13 +78,13 @@ const LoginPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol>
-              <IonIcon className="login-form__profile-icon" icon={personCircle} />
+              <IonIcon className="signup-form__profile-icon" icon={personCircle} />
             </IonCol>
           </IonRow>
 
           <IonRow>
             <IonCol>
-              <IonItem fill="outline">
+              <IonItem>
                 <IonLabel position="floating"> Email</IonLabel>
                 <IonInput
                   type="email"
@@ -117,16 +107,29 @@ const LoginPage: React.FC = () => {
               </IonItem>
             </IonCol>
           </IonRow>
+
           <IonRow>
             <IonCol>
-              <p className="login-form__auxilliary-text--small">
-                By clicking LOGIN you agree to our <a href="/">Policy</a>
+              <IonItem>
+                <IonLabel position="floating"> Display Name</IonLabel>
+                <IonInput
+                  type="text"
+                  value={displayName}
+                  onIonChange={(e) => setDisplayName(e.detail.value!)}
+                ></IonInput>
+              </IonItem>
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <p className="signup-form__auxilliary-text--small">
+                By clicking SIGN UP you agree to our <a href="/">Policy</a>
               </p>
-              <IonButton expand="block" onClick={handleLogin}>
-                Login
+              <IonButton expand="block" color="tertiary" onClick={handleSignUp}>
+                Sign up
               </IonButton>
-              <p className="login-form__auxilliary-text--middle">
-                Do not have an account? <a href="/signup">Sign up!</a>
+              <p className="signup-form__auxilliary-text--middle">
+                Have an account? <a href="/login">Log in!</a>
               </p>
             </IonCol>
           </IonRow>
@@ -136,4 +139,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default SignUpPage;
