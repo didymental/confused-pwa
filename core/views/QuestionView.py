@@ -12,5 +12,5 @@ class QuestionView(BaseViewSet):
     def get_queryset(self):
         """Returns questions that are asked in the session created by the instructor."""
         return self.queryset.filter(
-            student_id__session_id__instructor=self.request.user
+            student__session__instructor=self.request.user
         )

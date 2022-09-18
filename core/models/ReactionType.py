@@ -11,4 +11,4 @@ class ReactionType(models.Model):
     )
 
     def __str__(self):
-        return str(self.reaction_description)
+        return self.reaction_description
