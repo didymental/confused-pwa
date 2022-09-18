@@ -41,5 +41,5 @@ urlpatterns = [
 
 
 websocket_urlpatterns = [
-    re_path(r"ws/chat/room/$", SessionConsumer.as_asgi()),
+    re_path(r"ws/socket-server/", SessionConsumer.as_asgi()),
 ]
