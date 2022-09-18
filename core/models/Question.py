@@ -7,7 +7,7 @@ class Question(models.Model):
     Defines the Question that the Student can send in a Session.
     """
 
-    student_id = models.ForeignKey("Student", on_delete=models.CASCADE)
+    student = models.ForeignKey("Student", on_delete=models.CASCADE)
     vote_count = models.IntegerField(default=0)
 
     # no submitting empty questions

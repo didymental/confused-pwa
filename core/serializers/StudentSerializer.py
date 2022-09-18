@@ -6,6 +6,6 @@ from ..models.Student import Student
 class StudentSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["id", "display_name", "session_id", "reaction_type_id"]
+        fields = ["id", "display_name", "session", "reaction_type_id"]
         read_only_fields = ("id",)
         list_serializer_class = BulkListSerializer

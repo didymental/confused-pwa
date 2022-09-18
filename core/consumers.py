@@ -53,12 +53,12 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def get_current_students(self, room: Session):
         return [
             StudentSerializer(student).data
-            for student in Student.objects.filter(session_id=room)
+            for student in Student.objects.filter(session=room)
         ]
 
     @database_sync_to_async
     def create_student(self, room: Session, display_name: str):
-        Student.objects.create(session_id=room, display_name=display_name)
+        Student.objects.create(session=room, display_name=display_name)
 
     @database_sync_to_async
     def delete_student(self, student: Student):
@@ -236,12 +236,12 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @handle_student_change.groups_for_signal
     def handle_student_change(self, instance: Student, **kwargs):  # type: ignore
-        yield f"session_id__{instance.session_id}"
+        yield f"session__{instance.session}"
 
     @handle_student_change.groups_for_consumer  # type: ignore
     def handle_student_change(self, room: Session, **kwargs):  # type: ignore
         # if room is not None:
-        yield f"session_id__{room}"
+        yield f"session__{room}"
 
     @handle_student_change.serializer
     def handle_student_change(self, instance: Student, action, **kwargs):

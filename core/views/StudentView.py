@@ -12,7 +12,7 @@ class StudentView(BaseBulkViewSet):
 
     def get_queryset(self):
         """Returns students that has joined the session by the instructor."""
-        return self.queryset.filter(session_id__instructor=self.request.user)
+        return self.queryset.filter(session__instructor=self.request.user)
 
     def perform_bulk_update(self, serializer):
         return self.perform_update(serializer)
