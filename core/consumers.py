@@ -244,7 +244,6 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @handle_student_change.groups_for_consumer  # type: ignore
     def handle_student_change(self, session: Session, **kwargs):  # type: ignore
-        # if session is not None:
         yield f"session__{session}"
 
     @handle_student_change.serializer
