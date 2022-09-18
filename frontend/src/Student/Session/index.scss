@@ -1,0 +1,30 @@
+.container {
+  padding: 10vh;
+}
+
+.container__questions-container {
+  height: 40vh;
+}
+
+ion-slides.slides {
+  height: auto;
+}
+
+.card {
+  height: 30vh;
+  width: 30vh;
+}
+
+.card__content {
+  display: flex;
+  justify-content: center;
+}
+
+.textarea {
+  background-color: rgba(var(--ion-color-secondary-rgb), 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 1em;
+  border-radius: 1em;
+}

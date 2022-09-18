@@ -1,6 +1,6 @@
 import { IonButton, IonContent, IonGrid, IonPage, IonRow } from "@ionic/react";
 import "./index.scss";
-import logo from "../Assets/logo-light.svg";
+import logo from "../assets/logo-light.svg";
 import { useHistory } from "react-router";
 
 const Splash: React.FC = () => {
@@ -36,7 +36,7 @@ const Splash: React.FC = () => {
               <IonButton
                 color="secondary"
                 onClick={() => {
-                  history.push("/join");
+                  history.push("/student");
                 }}
               >
                 Student
