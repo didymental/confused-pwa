@@ -1,3 +1,4 @@
+import json
 from typing import Dict, Optional, Type
 
 from channels.db import database_sync_to_async
@@ -142,8 +143,15 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.delete_student(student=student)
 
     async def connect(self):
-        print("kw connecting")
-        return await super().connect()
+        await super().connect()
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "connection_established",
+                    "message": "You are now connected!",
+                }
+            )
+        )
 
     @action()
     async def join_session(self, pk, display_name=None, **kwargs):
