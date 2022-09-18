@@ -234,8 +234,6 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         self,
         message: Dict,
         action="",
-        # observer=None,
-        # subscribing_request_ids=[],
         **kwargs,
     ):
         await self.reply(data=message, action=action)
@@ -259,7 +257,7 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @model_observer(Session)
     async def handle_session_change(  # type: ignore
-        self, message: Dict, group=None, action=None, **kwargs
+        self, message: Dict, **kwargs
     ):
 
         is_open: Optional[bool] = message.get("is_open")
