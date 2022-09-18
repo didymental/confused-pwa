@@ -1,13 +1,12 @@
 from typing import Optional
 
-
+from channels.db import database_sync_to_async
 from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
 from djangochannelsrestframework.observer import model_observer
 from djangochannelsrestframework.observer.generics import (
     ObserverModelInstanceMixin,
     action,
 )
-from channels.db import database_sync_to_async
 
 from core.models.Question import Question
 from core.models.Session import Session
@@ -24,7 +23,8 @@ class ValidationError(Exception):
 
 class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
-    room_subscribe: int
+    room_subscribe: Optional[int]
+    temp_user: Optional[Student]
 
     @database_sync_to_async
     def get_room(self, pk: int) -> Optional[Session]:
@@ -57,17 +57,76 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def create_student(self, room: Session, display_name: str):
         Student.objects.create(session_id=room, display_name=display_name)
 
+    @database_sync_to_async
+    def delete_student(self, student: Student):
+        student.delete()
+
+    @action()
+    async def leave_room(self, **kwargs):
+
+        if self.room_subscribe is None:
+            return await self.reply(
+                action="leave_room",
+                errors="You have not joined a session yet",
+                status=405,
+            )
+
+        session: Session = await self.get_room(pk=self.room_subscribe)
+
+        if session is None:
+            return await self.reply(
+                action="leave_room",
+                errors="The session no longer exists",
+                status=404,
+            )
+
+        user = self.scope["user"]
+        if user:
+            await self.instructor_leave_room(room=session, user=user)
+        elif self.temp_user is not None:
+            await self.student_leave_room(student=self.temp_user)
+            self.temp_user = None
+
+        await self.student_change_handler.unsubscribe(
+            room=session, consumer=self
+        )
+
+        if self.channel_layer:
+            await self.channel_layer.group_discard(
+                self.room_subscribe, self.channel_name
+            )
+
+        await self.notify_joiners()
+
+        self.room_subscribe = None
+
+    async def instructor_leave_room(self, room: Session, user: UserProfile):
+        if room.instructor != user:
+            raise ValidationError(
+                {
+                    "action": "leave_room",
+                    "errors": "This session does not belong to you",
+                    "status": 403,
+                }
+            )
+
+        await self.close_room(room=room)
+
+    async def student_leave_room(self, student: Student):
+
+        await self.delete_student(student=student)
+
     @action()
     async def join_room(self, pk, display_name=None, **kwargs):
         session: Session = await self.get_room(pk=pk)
 
-        if not session:
-            await self.reply(
+        if session is None:
+            return await self.reply(
                 action="join_room",
                 errors=f"Session of id {pk} does not exist",
                 status=404,
             )
-            return
+
         try:
             user = self.scope["user"]
             if user:
@@ -79,9 +138,6 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     room=session, display_name=display_name
                 )
 
-            await self.open_room(room=session, is_open=True)
-
-            # FIXME: consumer is self?
             await self.student_change_handler.subscribe(
                 room=session, consumer=self
             )
@@ -123,7 +179,9 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.create_student(room=room, display_name=display_name)
 
     async def notify_joiners(self):
-        room: Session = await self.get_room(self.room_subscribe)
+        if self.room_subscribe is None:
+            return
+        room: Session = await self.get_room(pk=self.room_subscribe)
         for group in self.groups:
             if not self.channel_layer:
                 continue
@@ -136,11 +194,7 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 },
             )
 
-    @action()
-    async def leave_room(self, pk, **kwargs):
-        self.disconnect
-        pass
-
+    # TODO: does it work if name differently
     @model_observer(Student)
     async def student_change_handler(  # type: ignore
         self,
