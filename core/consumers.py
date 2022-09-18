@@ -96,8 +96,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
         try:
-            user = self.scope["user"]
-            if user:
+            user: UserProfile = self.scope["user"]
+            if not user.is_anonymous:
                 await self.instructor_leave_session(session=session, user=user)
             elif self.temp_user is not None:
                 await self.student_leave_session(student=self.temp_user)
@@ -165,16 +165,22 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
         try:
-            user = self.scope["user"]
-            if user:
+            user: UserProfile = self.scope["user"]
+
+            print("kw1", user)
+
+            if not user.is_anonymous:
+                print("kw2")
                 await self.instructor_join_session(session=session, user=user)
             else:
+                print("kw3")
                 if not display_name:
                     raise ValidationError("Display name cannot be empty")
                 await self.student_join_session(
                     session=session, display_name=display_name
                 )
 
+            print("kw4")
             await self.handle_student_change.subscribe(
                 session=session, consumer=self
             )
@@ -188,9 +194,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     self.session_subscribe, self.channel_name
                 )
 
+            print("kw5")
+
             await self.notify_joiners()
 
             self.session_subscribe = pk
+
+            print("kw6")
 
         except ValidationError as e:
             await self.reply(**e.args[0])
