@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional, Type
 
 from channels.db import database_sync_to_async
 from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
@@ -23,6 +23,9 @@ class ValidationError(Exception):
 
 class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
+    queryset = Session.objects.all()
+    serializer_class: Type[SessionSerializer] = SessionSerializer
+    lookup_field: str = "pk"
     room_subscribe: Optional[int] = None
     temp_user: Optional[Student] = None
 
@@ -63,11 +66,14 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     async def disconnect(self, code):
         # TODO: invoke action as normal func?
-        await self.leave_room(silent=True)
+        await self._leave_room(silent=True)
         return await super().disconnect(code)
 
     @action()
-    async def leave_room(self, silent=False, **kwargs):
+    async def leave_room(self, **kwargs):
+        await self._leave_room(silent=False)
+
+    async def _leave_room(self, silent=False, **kwargs):
 
         if self.room_subscribe is None:
             if silent:
@@ -97,7 +103,11 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 await self.student_leave_room(student=self.temp_user)
                 self.temp_user = None
 
-            await self.student_change_handler.unsubscribe(
+            await self.handle_student_change.unsubscribe(
+                room=session, consumer=self
+            )
+
+            await self.handle_session_change.unsubscribe(
                 room=session, consumer=self
             )
 
@@ -152,7 +162,11 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     room=session, display_name=display_name
                 )
 
-            await self.student_change_handler.subscribe(
+            await self.handle_student_change.subscribe(
+                room=session, consumer=self
+            )
+
+            await self.handle_session_change.subscribe(
                 room=session, consumer=self
             )
 
@@ -210,9 +224,9 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     # TODO: does it work if name differently
     @model_observer(Student)
-    async def student_change_handler(  # type: ignore
+    async def handle_student_change(  # type: ignore
         self,
-        message,
+        message: Dict,
         action="",
         # observer=None,
         # subscribing_request_ids=[],
@@ -220,19 +234,32 @@ class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     ):
         await self.reply(data=message, action=action)
 
-    @student_change_handler.groups_for_signal
-    def student_change_handler(self, instance: Student, **kwargs):  # type: ignore
+    @handle_student_change.groups_for_signal
+    def handle_student_change(self, instance: Student, **kwargs):  # type: ignore
         yield f"session_id__{instance.session_id}"
 
-    @student_change_handler.groups_for_consumer  # type: ignore
-    def student_change_handler(self, room: Session, **kwargs):  # type: ignore
-        if room is not None:
-            yield f"session_id__{room}"
+    @handle_student_change.groups_for_consumer  # type: ignore
+    def handle_student_change(self, room: Session, **kwargs):  # type: ignore
+        # if room is not None:
+        yield f"session_id__{room}"
 
-    @student_change_handler.serializer
-    def student_change_handler(self, instance: Student, action, **kwargs):
+    @handle_student_change.serializer
+    def handle_student_change(self, instance: Student, action, **kwargs):
         return dict(
             data=StudentSerializer(instance).data,
             action=action.value,
             pk=instance.pk,
         )
+
+    @model_observer(Session)
+    async def handle_session_change(  # type: ignore
+        self, message: Dict, group=None, action=None, **kwargs
+    ):
+
+        is_open: Optional[bool] = message.get("is_open")
+        if not is_open:
+            await self._leave_room(silent=True)
+
+    @handle_session_change.groups
+    def handle_session_change(self, room: Session, *args, **kwargs):
+        yield f"pk__{room.pk}"
