@@ -4,6 +4,7 @@ import {
   IonCol,
   IonContent,
   IonGrid,
+  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -11,11 +12,11 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useState } from "react";
-import axios from "axios";
-import { useHistory } from "react-router-dom";
+import { personCircle } from "ionicons/icons";
 import Navbar from "../../../component/Navbar";
 import "./index.scss";
-import ConfusedIcon from "../../../component/ConfusedIcon";
+import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
+import { LoginRequest } from "../../../types/auth";
 
 function validateEmail(email: string) {
   const re =
@@ -25,12 +26,12 @@ function validateEmail(email: string) {
 }
 
 const LoginPage: React.FC = () => {
-  const history = useHistory();
   const [email, setEmail] = useState<string>("eve.holt@reqres.in");
   const [password, setPassword] = useState<string>("cityslicka");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const handleLogin = () => {
+  const { login } = useAuthentication();
+  const handleLogin = async () => {
     if (!email) {
       setMessage("Please enter a valid email");
       setIserror(true);
@@ -48,26 +49,14 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    const loginData = {
-      email: email,
+    const loginRequest: LoginRequest = {
+      username: email,
       password: password,
     };
 
-    // TODO
-    const api = axios.create({
-      baseURL: "https://reqres.in/api",
-    });
-    api
-      .post("/login", loginData)
-      .then((res) => {
-        history.push(`/instructor/dashboard?email=${email}`);
-      })
-      .catch((error) => {
-        setMessage("Auth failure! Please create an account");
-        setIserror(true);
-      });
+    await login(loginRequest);
   };
-  // TODO
+
   return (
     <IonPage>
       <Navbar title={"Confused"} />
@@ -85,16 +74,16 @@ const LoginPage: React.FC = () => {
               />
             </IonCol>
           </IonRow>
-          <IonRow className="login-form__profile-icon">
+          <IonRow>
             <IonCol>
-              <ConfusedIcon />
+              <IonIcon className="login-form__profile-icon" icon={personCircle} />
             </IonCol>
           </IonRow>
 
           <IonRow>
             <IonCol>
-              <IonItem fill="outline">
-                <IonLabel position="stacked"> Email</IonLabel>
+              <IonItem>
+                <IonLabel position="floating"> Email</IonLabel>
                 <IonInput
                   type="email"
                   value={email}
@@ -104,10 +93,10 @@ const LoginPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow className="login-form__field">
+          <IonRow>
             <IonCol>
-              <IonItem fill="outline">
-                <IonLabel position="stacked"> Password</IonLabel>
+              <IonItem>
+                <IonLabel position="floating"> Password</IonLabel>
                 <IonInput
                   type="password"
                   value={password}
@@ -116,13 +105,12 @@ const LoginPage: React.FC = () => {
               </IonItem>
             </IonCol>
           </IonRow>
-
           <IonRow>
             <IonCol>
               <p className="login-form__auxilliary-text--small">
                 By clicking LOGIN you agree to our <a href="/">Policy</a>
               </p>
-              <IonButton className="login-form__button" expand="block" onClick={handleLogin}>
+              <IonButton expand="block" onClick={handleLogin}>
                 Login
               </IonButton>
               <p className="login-form__auxilliary-text--middle">
