@@ -35,9 +35,6 @@ class UserManager(BaseUserManager):
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     """Database model for user"""
 
-    # TODO: fix any usage
-    current_rooms: Any
-
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
 

@@ -11,9 +11,6 @@ class Session(models.Model):
     name = models.CharField(max_length=255)
 
     is_open = models.BooleanField(default=False)
-    current_users = models.ManyToManyField(
-        UserProfile, related_name="current_rooms", blank=True
-    )
 
     def __str__(self):
         return self.name
