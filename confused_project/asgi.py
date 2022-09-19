@@ -12,14 +12,19 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 
-# from channels.auth import AuthMiddlewareStack
+
 from .channelsmiddleware import JwtAuthMiddlewareStack
 import core.urls
 
 
-os.environ.setdefault(
-    "DJANGO_SETTINGS_MODULE", "confused_project.settings.development"
-)
+if os.getenv("ENV") == "Heroku":
+    os.environ.setdefault(
+        "DJANGO_SETTINGS_MODULE", "confused_project.settings.production"
+    )
+else:
+    os.environ.setdefault(
+        "DJANGO_SETTINGS_MODULE", "confused_project.settings.development"
+    )
 
 
 # TODO: https

@@ -211,9 +211,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
             print("kw5")
 
-            await self.notify_joiners()
-
             self.session_subscribe = pk
+
+            await self.notify_joiners()
 
             print("kw6")
 
@@ -249,9 +249,12 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.create_student(session=session, display_name=display_name)
 
     async def notify_joiners(self):
+        print("kw notify", self.groups)
         if self.session_subscribe is None:
             return
         session: Session = await self.get_session(pk=self.session_subscribe)
+
+        print("kw groups", self.groups)
         for group in self.groups:
             if self.channel_layer is None:
                 continue
@@ -265,6 +268,16 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     ),
                 },
             )
+
+    async def update_joiners(self, event: dict):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "instructor": event["instructor"],
+                    "students": event["students"],
+                }
+            )
+        )
 
     # TODO: does it work if name differently
     @model_observer(Student)
