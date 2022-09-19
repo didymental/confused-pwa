@@ -5,7 +5,7 @@ import sys
 
 
 def main():
-    if os.getenv("ENV") == "Heroku":
+    if 'DYNO' in os.environ:
         os.environ.setdefault(
             "DJANGO_SETTINGS_MODULE", "confused_project.settings.production"
         )
