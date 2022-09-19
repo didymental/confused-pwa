@@ -29,7 +29,8 @@ const SessionForm: React.FunctionComponent = () => {
   const { presentToast } = useToast();
 
   useEffect(() => {
-    if (location.pathname === "/instructor/create") {
+    if (location.pathname === "/instructor/session/create") {
+      console.log("create");
       setIsEdit(false);
       return;
     }
