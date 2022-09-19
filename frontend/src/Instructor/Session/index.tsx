@@ -17,10 +17,8 @@ import {
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { powerSharp } from "ionicons/icons";
-
 import client from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
-
 import clear from "../../assets/clear-bg.svg";
 import confused_1 from "../../assets/confused-1-bg.svg";
 import confused_2 from "../../assets/confused-2-bg.svg";
@@ -159,6 +157,12 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
       });
   };
 
+  // TODO: share link to join session
+  const shareLink = () => {};
+
+  // TODO: open qr code to join session
+  const openQrCode = () => {};
+
   return (
     <>
       <IonCard />
@@ -192,6 +196,14 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
           >
             <IonIcon icon={powerSharp} size="small" />
           </IonButton>
+        </IonRow>
+        <IonRow className="ion-row-instructor-session">
+          <IonCol className="ion-col-instructor-session__share">
+            <IonButton onClick={shareLink}>Share Link</IonButton>
+          </IonCol>
+          <IonCol className="ion-col-instructor-session__share">
+            <IonButton onClick={openQrCode}>Open QR</IonButton>
+          </IonCol>
         </IonRow>
       </IonGrid>
     </>
@@ -272,7 +284,7 @@ const ReactionsDisplay: React.FC<{
   }, [students]);
 
   useEffect(() => {
-    if (ratio > 0.7) {
+    if (ratio > 0.7 && ratio <= 0.9) {
       setLevelOfConfusion(CONFUSED_1_STATE);
       return () => {
         setLevelOfConfusion(CLEAR_STATE);
