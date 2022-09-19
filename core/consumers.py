@@ -176,13 +176,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         try:
             user: UserProfile = self.scope["user"]
 
-            print("kw1", user, self.scope)
-
             if user.is_authenticated:
-                print("kw2")
                 await self.instructor_join_session(session=session, user=user)
             else:
-                print("kw3")
                 if not display_name:
                     raise ValidationError(
                         {
@@ -195,7 +191,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     session=session, display_name=display_name
                 )
 
-            print("kw4")
             await self.handle_student_change.subscribe(
                 session=session, consumer=self
             )
@@ -209,16 +204,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     str(self.session_subscribe), self.channel_name
                 )
 
-            print("kw5")
-
             self.session_subscribe = pk
 
             await self.notify_joiners()
 
-            print("kw6")
-
         except ValidationError as e:
-            # print("error", e.args)
             await self.reply(**e.args[0])
 
     async def instructor_join_session(
@@ -249,12 +239,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.create_student(session=session, display_name=display_name)
 
     async def notify_joiners(self):
-        print("kw notify", self.groups)
         if self.session_subscribe is None:
             return
         session: Session = await self.get_session(pk=self.session_subscribe)
 
-        print("kw groups", self.groups)
         for group in self.groups:
             if self.channel_layer is None:
                 continue
