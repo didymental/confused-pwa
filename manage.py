@@ -5,9 +5,14 @@ import sys
 
 
 def main():
-    os.environ.setdefault(
-        "DJANGO_SETTINGS_MODULE", "confused_project.settings.development"
-    )
+    if os.getenv("ENV") == "Heroku":
+        os.environ.setdefault(
+            "DJANGO_SETTINGS_MODULE", "confused_project.settings.production"
+        )
+    else:
+        os.environ.setdefault(
+            "DJANGO_SETTINGS_MODULE", "confused_project.settings.development"
+        )
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
