@@ -1,91 +1,101 @@
+import React, { useState } from "react";
 import {
+  IonApp,
   IonButton,
-  IonCard,
-  IonCardContent,
-  IonCardSubtitle,
-  IonCardTitle,
+  IonContent,
+  IonPage,
+  IonItem,
+  IonInput,
   IonCol,
-  IonGrid,
-  IonIcon,
-  IonPopover,
   IonRow,
-  useIonAlert,
+  IonGrid,
+  IonToast,
+  IonText,
 } from "@ionic/react";
-import { ellipsisVertical } from "ionicons/icons";
+
 import "./index.scss";
 
-interface SessionData {
-  sessionId: number;
-  name: string;
-  isOpen: boolean;
-}
+import Navbar from "../../component/Navbar";
+import { useHistory } from "react-router";
 
-const SessionForm: React.FC<SessionData> = ({ sessionId, name, isOpen }) => {
-  const deleteHandler = () => {};
+const SessionForm: React.FunctionComponent = () => {
+  const history = useHistory();
+  const [sessionName, setSessionName] = useState<string>("");
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [iserror, setIserror] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
 
-  const [presentAlert] = useIonAlert();
-  const deleteClickHandler = () => {
-    presentAlert({
-      header: "Are you sure you want to delete this session?",
-      subHeader: "This action is irreversible!",
-      buttons: [
-        {
-          text: "CANCEL",
-          role: "cancel",
-        },
-        {
-          text: "DELETE",
-          role: "destructive",
-          handler: deleteHandler,
-        },
-      ],
-    });
+  const onSubmit = () => {
+    // TODO
+    if (!sessionName) {
+      setMessage("Please enter a session name.");
+      setIserror(true);
+      return;
+    }
+    if (sessionName.length < 5) {
+      setMessage("Please fill in at least 5 characters.");
+      setIserror(true);
+      return;
+    }
+    setIserror(false);
+    setShowToast(true);
+    setTimeout(() => {
+      history.push("/instructor/dashboard");
+    }, 800);
   };
 
   return (
-    <>
-      <IonCard key={sessionId}>
-        <IonCardContent>
-          <IonGrid>
+    <IonApp>
+      <IonPage>
+        <Navbar title="Create Sesssion" />
+        <IonContent>
+          <IonGrid className="session-form__grid">
             <IonRow>
-              <IonCol size="10">
-                <IonRow>
-                  <IonCardTitle>{name}</IonCardTitle>
-                </IonRow>
-                <IonRow>
-                  <IonCardSubtitle>Created at:</IonCardSubtitle>
-                </IonRow>
+              <IonCol>
+                <IonToast
+                  color="success"
+                  isOpen={showToast}
+                  position="top"
+                  onDidDismiss={() => setShowToast(false)}
+                  message="Created successfully!"
+                  duration={1000}
+                />
               </IonCol>
-              <IonCol size="2">
-                <IonButton
-                  id={`ellipsis-button-${sessionId}`}
-                  fill="clear"
-                  size="large"
-                  className="ellipsis-button"
-                >
-                  <IonIcon icon={ellipsisVertical}></IonIcon>
-                </IonButton>
-                <IonPopover trigger={`ellipsis-button-${sessionId}`} triggerAction="click">
-                  <IonButton fill="clear">Edit Session</IonButton>
-                  <IonButton fill="clear" onClick={deleteClickHandler}>
-                    Delete Session
-                  </IonButton>
-                </IonPopover>
+            </IonRow>
+            <IonRow>
+              <IonCol className="session-form__description">
+                <h3>What is your session name?</h3>
+                <p>Fill in a descriptive name for your session!</p>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonItem fill="outline">
+                  {/* <IonLabel position="floating"> Email</IonLabel> */}
+                  <IonInput
+                    type="text"
+                    placeholder="e.g. CS1101S Studio Group 8"
+                    value={sessionName}
+                    onIonChange={(e) => setSessionName(e.detail.value!)}
+                  ></IonInput>
+                </IonItem>
+                {iserror && (
+                  <IonText color="danger">
+                    <p>{message}</p>
+                  </IonText>
+                )}
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol className="session-form__button">
+                <IonButton onClick={onSubmit}>submit</IonButton>
               </IonCol>
             </IonRow>
           </IonGrid>
-          {isOpen ? (
-            <IonButton fill="solid" expand="block" color="tertiary">
-              ONGOING
-            </IonButton>
-          ) : (
-            <IonButton fill="solid" expand="block" color="success">
-              START
-            </IonButton>
-          )}
-        </IonCardContent>
-      </IonCard>
-    </>
+        </IonContent>
+      </IonPage>
+    </IonApp>
   );
 };
 

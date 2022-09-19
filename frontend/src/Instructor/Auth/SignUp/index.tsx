@@ -58,12 +58,12 @@ const SignUpPage: React.FC = () => {
 
     await signUp(signUpRequest);
   };
-  // TODO
+
   return (
     <IonPage>
       <Navbar title={"Confused"} />
       <IonContent fullscreen className="signup-form__container">
-        <IonGrid className="signup-form__content">
+        <IonGrid className="signup-form__grid">
           <IonRow>
             <IonCol>
               <IonAlert
