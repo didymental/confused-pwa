@@ -13,24 +13,29 @@ import {
 } from "@ionic/react";
 import { createOutline, trashOutline, ellipsisVertical } from "ionicons/icons";
 import { useHistory } from "react-router";
+import { useSessions } from "../../../hooks/session/useSession";
+import { SessionEntity } from "../../../types/session";
 import "./index.scss";
 
-interface SessionData {
-  sessionId: number;
-  name: string;
-  isOpen: boolean;
-}
+const SessionViewCard: React.FC<SessionEntity> = (session) => {
+  const sessionId = session.id;
+  const name = session.name;
+  const isOpen = session.is_open;
+  // TODO: convert to correct date format
+  const createdAt = session.created_date_time ?? null;
 
-const SessionViewCard: React.FC<SessionData> = ({ sessionId, name, isOpen }) => {
   const history = useHistory();
-  // TODO
-  const deleteHandler = () => {};
+  const { deleteSession } = useSessions();
+
+  const deleteHandler = async (sessionId: number) => {
+    await deleteSession(sessionId);
+  };
 
   const editClickHandler = (sessionId: number) => {
     history.push(`/instructor/session/edit?id=${sessionId}&name=${name}`);
   };
   const [presentAlert] = useIonAlert();
-  const deleteClickHandler = () => {
+  const deleteClickHandler = (sessionId: number) => {
     presentAlert({
       header: "Are you sure you want to delete this session?",
       subHeader: "This action is irreversible!",
@@ -42,7 +47,7 @@ const SessionViewCard: React.FC<SessionData> = ({ sessionId, name, isOpen }) => 
         {
           text: "DELETE",
           role: "destructive",
-          handler: deleteHandler,
+          handler: () => deleteHandler(sessionId),
         },
       ],
     });
@@ -59,7 +64,7 @@ const SessionViewCard: React.FC<SessionData> = ({ sessionId, name, isOpen }) => 
                   <IonCardTitle>{name}</IonCardTitle>
                 </IonRow>
                 <IonRow>
-                  <IonCardSubtitle>Created at:</IonCardSubtitle>
+                  <IonCardSubtitle>{`Created at: ${createdAt}`}</IonCardSubtitle>
                 </IonRow>
               </IonCol>
               <IonCol className="dashboard__menu" size="2">
@@ -80,7 +85,7 @@ const SessionViewCard: React.FC<SessionData> = ({ sessionId, name, isOpen }) => 
                     <IonIcon slot="start" icon={createOutline}></IonIcon>
                     Edit Session
                   </IonButton>
-                  <IonButton fill="clear" onClick={deleteClickHandler}>
+                  <IonButton fill="clear" onClick={() => deleteClickHandler(sessionId)}>
                     <IonIcon slot="start" icon={trashOutline}></IonIcon>
                     Delete Session
                   </IonButton>
