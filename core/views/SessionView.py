@@ -15,7 +15,7 @@ class SessionView(BaseViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(instructor=user).distinct()
+        return self.queryset.filter(instructor=user).distinct().order_by("-id")
 
     def perform_create(self, serializer):
         serializer.save(instructor=self.request.user)
