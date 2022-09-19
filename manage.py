@@ -5,6 +5,7 @@ import sys
 
 
 def main():
+    # print("kw manage.py")
     if "DYNO_RAM" in os.environ:
         os.environ.setdefault(
             "DJANGO_SETTINGS_MODULE", "confused_project.settings.production"
@@ -25,4 +26,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print("kw manage.py")
     main()
