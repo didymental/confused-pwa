@@ -49,7 +49,7 @@ const LoginPage: React.FC = () => {
     }
 
     const loginRequest: LoginRequest = {
-      username: email,
+      email: email,
       password: password,
     };
 
