@@ -8,9 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
-# from rest_framework_simplejwt.state import User
 from django.contrib.auth.models import User
 from channels.middleware import BaseMiddleware
 from channels.auth import AuthMiddlewareStack
@@ -24,7 +22,6 @@ from django.conf import settings
 def get_user(validated_token):
     try:
         user = get_user_model().objects.get(id=validated_token["user_id"])
-        # return get_user_model().objects.get(id=toke_id)
         print(f"{user}")
         return user
 
@@ -72,8 +69,3 @@ class JwtAuthMiddleware(BaseMiddleware):
 
 def JwtAuthMiddlewareStack(inner):
     return JwtAuthMiddleware(AuthMiddlewareStack(inner))
-
-
-if __name__ == "__main__":
-    # main()
-    print("kw channels", os.environ)
