@@ -16,6 +16,7 @@ import "./index.scss";
 import ConfusedIcon from "../../../component/ConfusedIcon";
 import Navbar from "../../../component/Navbar";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
+import { Redirect } from "react-router-dom";
 
 function validateEmail(email: string) {
   const re =
@@ -30,7 +31,7 @@ const SignUpPage: React.FC = () => {
   const [displayName, setDisplayName] = useState<string>("ailing35");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const { signUp } = useAuthentication();
+  const { user, signUp } = useAuthentication();
 
   const handleSignUp = async () => {
     if (!email) {
@@ -59,6 +60,9 @@ const SignUpPage: React.FC = () => {
     await signUp(signUpRequest);
   };
 
+  if (user) {
+    return <Redirect to="/instructor/dashboard" />;
+  }
   return (
     <IonPage>
       <Navbar title={"Confused"} />
