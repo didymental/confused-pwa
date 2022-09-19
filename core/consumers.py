@@ -88,7 +88,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if self.session_subscribe is None:
             if silent:
                 return
-            return await self.reply(
+            return await self.notify_failure(
                 action="leave_session",
                 errors="You have not joined a session yet",
                 status=405,
@@ -99,7 +99,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if session is None:
             if silent:
                 return
-            return await self.reply(
+            return await self.notify_failure(
                 action="leave_session",
                 errors="The session no longer exists",
                 status=404,
@@ -132,7 +132,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         except ValidationError as e:
             if silent:
                 return
-            await self.reply(**e.args[0])
+            await self.notify_failure(**e.args[0])
 
     async def instructor_leave_session(
         self, session: Session, user: UserProfile
@@ -154,13 +154,36 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     async def connect(self):
         await super().connect()
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "type": "connection_established",
-                    "message": "You are now connected!",
-                }
-            )
+        await self.notify_success(
+            action="connect",
+            message="You are now connected!",
+        )
+
+    async def notify_success(self, action: str, message: str = ""):
+        data = {
+            "type": "success",
+            "message": message,
+        }
+
+        return await self.reply(
+            data=data,
+            action=action,
+            status=200,
+        )
+
+    async def notify_failure(
+        self, action: str, errors: str, message: str = "", status=403
+    ):
+        data = {
+            "type": "failed",
+            "message": message,
+        }
+
+        return await self.reply(
+            data=data,
+            action=action,
+            errors=errors,
+            status=status,
         )
 
     @action()
@@ -168,7 +191,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         session: Session = await self.get_session(pk=pk)
 
         if session is None:
-            return await self.reply(
+
+            return await self.notify_failure(
                 action="join_session",
                 errors=f"Session of id {pk} does not exist",
                 status=404,
@@ -213,7 +237,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             await self.notify_joiners()
 
         except ValidationError as e:
-            await self.reply(**e.args[0])
+            await self.notify_failure(**e.args[0])
 
     async def instructor_join_session(
         self, session: Session, user: UserProfile
