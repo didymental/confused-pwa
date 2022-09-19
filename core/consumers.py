@@ -70,6 +70,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def get_user(self, session: Session):
         return session.instructor
 
+    async def websocket_disconnect(self, message):
+        print("kw websocket disconnect")
+        await super().websocket_disconnect(message)
+
+    # TODO: handle unexpected disconnection
     async def disconnect(self, code):
         await self._leave_session(silent=True)
         return await super().disconnect(code)
@@ -99,7 +104,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 errors="The session no longer exists",
                 status=404,
             )
-
         try:
             user: UserProfile = self.scope["user"]
             if user.is_authenticated:
@@ -116,12 +120,12 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 session=session, consumer=self
             )
 
+            await self.notify_joiners()
+
             if self.channel_layer:
                 await self.channel_layer.group_discard(
                     self.session_subscribe, self.channel_name
                 )
-
-            await self.notify_joiners()
 
             self.session_subscribe = None
 
@@ -196,12 +200,15 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 session=session, consumer=self
             )
 
+            self.session_subscribe = pk
+
             if self.channel_layer:
                 await self.channel_layer.group_add(
                     str(self.session_subscribe), self.channel_name
                 )
 
-            self.session_subscribe = pk
+                print("kw channels", self.channel_layer.channels)
+                print("kw groups", self.channel_layer.groups)
 
             await self.notify_joiners()
 
@@ -240,11 +247,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             return
         session: Session = await self.get_session(pk=self.session_subscribe)
 
-        for group in self.groups:
-            if self.channel_layer is None:
-                continue
+        if self.channel_layer is not None:
             await self.channel_layer.group_send(
-                group,
+                str(self.session_subscribe),
                 {
                     "type": "update_joiners",
                     "instructor": await self.get_instructor(session=session),
@@ -255,14 +260,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
     async def update_joiners(self, event: dict):
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "instructor": event["instructor"],
-                    "students": event["students"],
-                }
-            )
-        )
+        await self.send(text_data=json.dumps(event))
 
     # TODO: does it work if name differently
     @model_observer(Student)
