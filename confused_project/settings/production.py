@@ -12,7 +12,7 @@ SECRET_KEY = "q6c2shz22py=qyol6b5i^jvs77y=cejvdb)i6a!0s172dr4rp%"
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # SECURITY WARNING: update this when you have the production host
 ALLOWED_HOSTS = [
