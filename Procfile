@@ -1,1 +1,2 @@
-web: gunicorn confused_project.wsgi --log-file -
+release: python manage.py migrate
+web: daphne confused_project.asgi:application --port $PORT --bind 0.0.0.0
