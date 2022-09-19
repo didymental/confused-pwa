@@ -20,17 +20,18 @@ import { useToast } from "../../hooks/util/useToast";
 interface NavbarProps {
   title?: string;
   showProfileIcon?: boolean;
+  showBackButton?: boolean;
+  showLogo?: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-  const { title = "", showProfileIcon = false } = props;
+  const { title = "", showProfileIcon = false, showBackButton = false, showLogo = false } = props;
   const location = useLocation();
   const history = useHistory();
   const [presentAlert] = useIonAlert();
   const { presentToast } = useToast();
 
   const handleChangeName = () => {
-    console.log("in change name");
     presentAlert({
       header: "Enter your new nickname",
       buttons: [
@@ -82,20 +83,26 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   return (
     <IonHeader>
       <IonToolbar>
-        <IonButtons slot="start">
-          <IonBackButton />
-        </IonButtons>
+        {showBackButton && (
+          <IonButtons slot="start">
+            <IonBackButton />
+          </IonButtons>
+        )}
+
         <IonGrid>
           <IonRow>
-            <img
-              src={logo}
-              alt="logo"
-              className="navbar navbar__logo"
-              onClick={() => history.push("/")}
-            />
+            {showLogo && (
+              <img
+                src={logo}
+                alt="logo"
+                className="navbar navbar__logo"
+                onClick={() => history.push("/")}
+              />
+            )}
             <h2 className="navbar navbar__title">{title}</h2>
           </IonRow>
         </IonGrid>
+
         {/* TODO: Check if user is logged in */}
         {showProfileIcon && (
           <>

@@ -76,7 +76,7 @@ const SessionForm: React.FunctionComponent = () => {
   return (
     <IonApp>
       <IonPage>
-        <Navbar title={`${isEdit ? "Edit" : "Create"} Sesssion`} />
+        <Navbar title={`${isEdit ? "Edit" : "Create"} Sesssion`} showBackButton={true} />
         <IonContent>
           <IonGrid className="session-form__grid">
             <IonRow>

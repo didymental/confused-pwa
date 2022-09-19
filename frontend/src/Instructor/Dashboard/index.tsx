@@ -31,7 +31,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <IonPage>
-      <Navbar title={"Dashboard"} showProfileIcon={true} />
+      <Navbar title={"Dashboard"} showProfileIcon={true} showLogo={true} />
       <IonContent fullscreen>
         <IonGrid className="dashboard__grid">
           <IonRow>
