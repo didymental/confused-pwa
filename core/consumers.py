@@ -127,6 +127,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     self.session_subscribe, self.channel_name
                 )
 
+            await self.notify_success(
+                action="leave_session",
+                message=f"You have successfully left session {self.session_subscribe}",
+            )
+
             self.session_subscribe = None
 
         except ValidationError as e:
@@ -233,6 +238,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
                 print("kw channels", self.channel_layer.channels)
                 print("kw groups", self.channel_layer.groups)
+
+            await self.notify_success(
+                action="join_session",
+                message="You have successfully joined the session",
+            )
 
             await self.notify_joiners()
 
