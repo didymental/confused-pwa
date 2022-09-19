@@ -16,7 +16,7 @@ SECRET_KEY = "q6c2shz22py=qyol6b5i^jvs77y=cejvdb)i6a!0s172dr4rp%"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "api", "confused-backend-3216.herokuapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
