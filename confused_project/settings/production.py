@@ -15,7 +15,10 @@ SECRET_KEY = "q6c2shz22py=qyol6b5i^jvs77y=cejvdb)i6a!0s172dr4rp%"
 DEBUG = False
 
 # SECURITY WARNING: update this when you have the production host
-ALLOWED_HOSTS = ["confused-backend-3216.herokuapp.com"]
+ALLOWED_HOSTS = [
+    "confused-backend-3216.herokuapp.com",
+    "*",
+]  # to update when we have the production host
 
 
 DATABASES = {}
