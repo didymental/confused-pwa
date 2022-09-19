@@ -129,7 +129,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
             await self.notify_success(
                 action="leave_session",
-                message=f"You have successfully left session {self.session_subscribe}",
+                message=f"You have left or been removed from session {self.session_subscribe}",
             )
 
             self.session_subscribe = None
@@ -294,7 +294,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
     async def update_joiners(self, event: dict):
-        await self.send(text_data=json.dumps(event))
+        await self.reply(
+            data=event,
+            action="notify_joiners",
+        )
 
     # TODO: does it work if name differently
     @model_observer(Student)
