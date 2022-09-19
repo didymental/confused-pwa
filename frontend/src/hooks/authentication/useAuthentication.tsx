@@ -46,7 +46,6 @@ export const useAuthentication = (): UpdateAuthenticationState => {
     try {
       const response = await api.auth.signUp(signUpRequest);
       const { data } = response;
-      console.log(data);
       setAuthenthicationData(data);
       history.push("/instructor/dashboard");
       presentToast({ header: "Sign up success!", color: "success" });

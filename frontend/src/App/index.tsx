@@ -9,6 +9,7 @@ import JoinPage from "../Student/JoinSession";
 import StudentSessionPage from "../Student/Session";
 import DashboardPage from "../Instructor/Dashboard";
 import { RecoilRoot } from "recoil";
+import SessionFormPage from "../Instructor/SessionForm";
 
 function App() {
   setupIonicReact();
@@ -23,6 +24,7 @@ function App() {
             <Route path="/student" exact component={JoinPage} />
             <Route path="/student/session/:id" exact component={StudentSessionPage} />
             <Route path="/instructor/dashboard" component={DashboardPage} />
+            <Route path="/instructor/create_session" component={SessionFormPage} />
           </IonRouterOutlet>
         </IonReactRouter>
       </IonApp>

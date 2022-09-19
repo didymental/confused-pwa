@@ -1,13 +1,20 @@
 .login-form__profile-icon {
-  color: var(--ion-color-tertiary);
-  font-size: 100px;
+  font-weight: bold;
+  font-family: berlinSans;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.login-form__content {
+.login-form__grid {
   margin-top: 12vh;
   max-width: 800px;
   width: 90vw;
   text-align: center;
+}
+
+.login-form__field {
+  margin-top: 16px;
 }
 
 .login-form__container {
@@ -24,4 +31,8 @@
   &--middle {
     font-size: medium;
   }
+}
+
+.login-form__button {
+  background-color: var(--ion-color-primary);
 }

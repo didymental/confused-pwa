@@ -4,7 +4,6 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -12,11 +11,11 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useState } from "react";
-import { personCircle } from "ionicons/icons";
 import Navbar from "../../../component/Navbar";
 import "./index.scss";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
 import { LoginRequest } from "../../../types/auth";
+import ConfusedIcon from "../../../component/ConfusedIcon";
 
 function validateEmail(email: string) {
   const re =
@@ -61,28 +60,28 @@ const LoginPage: React.FC = () => {
     <IonPage>
       <Navbar title={"Confused"} />
       <IonContent fullscreen className="login-form__container">
-        <IonGrid className="login-form__content">
+        <IonGrid className="login-form__grid">
           <IonRow>
             <IonCol>
               <IonAlert
                 isOpen={iserror}
                 onDidDismiss={() => setIserror(false)}
-                cssClass="my-custom-class"
+                // cssClass="my-custom-class"
                 header={"Error!"}
                 message={message}
                 buttons={["Dismiss"]}
               />
             </IonCol>
           </IonRow>
-          <IonRow>
+          <IonRow className="login-form__profile-icon">
             <IonCol>
-              <IonIcon className="login-form__profile-icon" icon={personCircle} />
+              <ConfusedIcon />
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="login-form__field">
             <IonCol>
-              <IonItem>
+              <IonItem fill="outline">
                 <IonLabel position="floating"> Email</IonLabel>
                 <IonInput
                   type="email"
@@ -93,9 +92,9 @@ const LoginPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="login-form__field">
             <IonCol>
-              <IonItem>
+              <IonItem fill="outline">
                 <IonLabel position="floating"> Password</IonLabel>
                 <IonInput
                   type="password"
