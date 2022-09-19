@@ -8,11 +8,14 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/asgi/
 """
 
 import os
+import django
 
 from django.core.asgi import get_asgi_application
+
+asgi_application = get_asgi_application()
+
+
 from channels.routing import ProtocolTypeRouter, URLRouter
-
-
 from .channelsmiddleware import JwtAuthMiddlewareStack
 import core.urls
 
@@ -25,12 +28,13 @@ else:
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE", "confused_project.settings.development"
     )
+django.setup()
 
 
 # TODO: https
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "http": asgi_application,
         "websocket": JwtAuthMiddlewareStack(
             URLRouter(core.urls.websocket_urlpatterns)
         ),

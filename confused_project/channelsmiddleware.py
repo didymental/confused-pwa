@@ -1,6 +1,8 @@
 """General web socket middlewares
 """
 
+import os
+
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
@@ -70,3 +72,8 @@ class JwtAuthMiddleware(BaseMiddleware):
 
 def JwtAuthMiddlewareStack(inner):
     return JwtAuthMiddleware(AuthMiddlewareStack(inner))
+
+
+if __name__ == "__main__":
+    # main()
+    print("kw channels", os.environ)
