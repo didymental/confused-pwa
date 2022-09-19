@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IonApp,
   IonButton,
@@ -9,21 +9,37 @@ import {
   IonCol,
   IonRow,
   IonGrid,
-  IonToast,
   IonText,
 } from "@ionic/react";
 
 import "./index.scss";
 
 import Navbar from "../../component/Navbar";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
+import { useToast } from "../../hooks/util/useToast";
 
 const SessionForm: React.FunctionComponent = () => {
+  const location = useLocation();
   const history = useHistory();
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string>();
   const [sessionName, setSessionName] = useState<string>("");
-  const [showToast, setShowToast] = useState<boolean>(false);
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const { presentToast } = useToast();
+
+  useEffect(() => {
+    if (location.pathname === "/instructor/session/create") {
+      console.log("create");
+      setIsEdit(false);
+      return;
+    }
+    setIsEdit(true);
+    const id = new URLSearchParams(location.search).get("id");
+    const name = new URLSearchParams(location.search).get("name");
+    setSessionId(id ?? "");
+    setSessionName(name ?? "");
+  }, [location.pathname, location.search]);
 
   const onSubmit = () => {
     // TODO
@@ -38,7 +54,18 @@ const SessionForm: React.FunctionComponent = () => {
       return;
     }
     setIserror(false);
-    setShowToast(true);
+
+    // if (isEdit) {
+    //     handleEdit();
+    // } else {
+    //     handleCreate();
+    // }
+
+    presentToast({
+      header: `${isEdit ? "Edited" : "Created"} session successfully!`,
+      color: "success",
+    });
+
     setTimeout(() => {
       history.push("/instructor/dashboard");
     }, 800);
@@ -47,21 +74,9 @@ const SessionForm: React.FunctionComponent = () => {
   return (
     <IonApp>
       <IonPage>
-        <Navbar title="Create Sesssion" />
+        <Navbar title={`${isEdit ? "Edit" : "Create"} Sesssion`} />
         <IonContent>
           <IonGrid className="session-form__grid">
-            <IonRow>
-              <IonCol>
-                <IonToast
-                  color="success"
-                  isOpen={showToast}
-                  position="top"
-                  onDidDismiss={() => setShowToast(false)}
-                  message="Created successfully!"
-                  duration={1000}
-                />
-              </IonCol>
-            </IonRow>
             <IonRow>
               <IonCol className="session-form__description">
                 <h3>What is your session name?</h3>

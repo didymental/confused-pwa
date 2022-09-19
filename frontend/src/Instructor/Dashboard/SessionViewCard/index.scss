@@ -1,3 +1,11 @@
-.ellipsis-button {
+.dashboard__ellipsis-button {
   margin-top: -0.5em;
+  margin-left: 0px;
+}
+
+@media (min-width: 600px) {
+  .dashboard__menu {
+    display: flex;
+    justify-content: end;
+  }
 }

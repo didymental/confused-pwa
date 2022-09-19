@@ -31,7 +31,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <IonPage>
-      <Navbar title={"Dashboard"} />
+      <Navbar title={"Dashboard"} showProfileIcon={true} />
       <IonContent fullscreen>
         <IonGrid className="dashboard__grid">
           <IonRow>
@@ -46,7 +46,7 @@ const DashboardPage: React.FC = () => {
           <IonFabButton
             color="primary"
             className="dashboard__add-session-button"
-            onClick={() => history.push("/instructor/create_session")}
+            onClick={() => history.push("/instructor/session/create")}
           >
             <IonIcon icon={add} />
           </IonFabButton>
