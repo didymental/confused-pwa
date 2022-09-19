@@ -30,10 +30,17 @@ const useAuthenticatedUserState = () => {
     setUser({ id: id, email: email, name: name });
   };
 
+  const clearAuthenticationData = () => {
+    setAccessToken(null);
+    setRefreshToken(null);
+    setUser(null);
+  };
+
   return {
     user,
     setUser,
     setAuthenthicationData,
+    clearAuthenticationData,
   };
 };
 
@@ -42,35 +49,13 @@ interface UpdateAuthenticationState {
   signUp: (signUpRequest: SignUpRequest) => Promise<void>;
   login: (loginRequest: LoginRequest) => Promise<void>;
   loginWithAccessToken: () => Promise<void>;
+  logout: () => void;
 }
 
 export const useAuthentication = (): UpdateAuthenticationState => {
   const history = useHistory();
-  const { user, setAuthenthicationData } = useAuthenticatedUserState();
+  const { user, setAuthenthicationData, clearAuthenticationData } = useAuthenticatedUserState();
   const { presentToast } = useToast();
-
-  const loginWithAccessToken = async () => {
-    const refreshToken = getRefreshToken();
-    try {
-      if (!refreshToken) {
-        throw Error();
-      }
-      const refreshTokenRequest = { refresh: refreshToken };
-      const response = await api.auth.refreshAccessToken(refreshTokenRequest);
-      const { access, refresh } = response.data;
-      await setAuthenthicationData(access, refresh);
-
-      history.push("/instructor/dashboard");
-      presentToast({ header: "Login success!", color: "success" });
-    } catch (err: any) {
-      history.push("/");
-      presentToast({
-        header: "Login failed!",
-        message: "The previous session expired or internet connection is poor.",
-        color: "danger",
-      });
-    }
-  };
 
   const signUp = async (signUpRequest: SignUpRequest) => {
     try {
@@ -109,11 +94,41 @@ export const useAuthentication = (): UpdateAuthenticationState => {
     }
   };
 
+  const loginWithAccessToken = async () => {
+    const refreshToken = getRefreshToken();
+    try {
+      if (!refreshToken) {
+        throw Error();
+      }
+      const refreshTokenRequest = { refresh: refreshToken };
+      const response = await api.auth.refreshAccessToken(refreshTokenRequest);
+      const { access, refresh } = response.data;
+      await setAuthenthicationData(access, refresh);
+
+      history.push("/instructor/dashboard");
+      presentToast({ header: "Login success!", color: "success" });
+    } catch (err: any) {
+      history.push("/");
+      presentToast({
+        header: "Login failed!",
+        message: "The previous session expired or internet connection is poor.",
+        color: "danger",
+      });
+    }
+  };
+
+  const logout = () => {
+    clearAuthenticationData();
+    history.push("/");
+    presentToast({ header: "Logout success!", color: "success" });
+  };
+
   return {
     user,
     signUp,
     login,
     loginWithAccessToken,
+    logout,
   };
 };
 

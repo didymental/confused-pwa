@@ -1,4 +1,4 @@
-// import "./index.scss";
+import "./index.scss";
 import {
   IonBackButton,
   IonButton,
@@ -14,8 +14,8 @@ import {
 import { useHistory, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.svg";
 import { personCircle, logOutOutline, createOutline } from "ionicons/icons";
-import "./index.scss";
 import { useToast } from "../../hooks/util/useToast";
+import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 
 interface NavbarProps {
   title?: string;
@@ -30,6 +30,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   const history = useHistory();
   const [presentAlert] = useIonAlert();
   const { presentToast } = useToast();
+  const { logout } = useAuthentication();
 
   const handleChangeName = () => {
     presentAlert({
@@ -72,7 +73,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     });
   };
 
-  const handleLogout = () => {};
   if (
     location.pathname === "/" ||
     location.pathname === "/login" ||
@@ -121,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 <IonIcon slot="start" icon={createOutline} />
                 Edit nickname
               </IonButton>
-              <IonButton className="navbar__profile-menu" fill="clear" onClick={handleLogout}>
+              <IonButton className="navbar__profile-menu" fill="clear" onClick={logout}>
                 <IonIcon slot="start" icon={logOutOutline} />
                 Log out
               </IonButton>
