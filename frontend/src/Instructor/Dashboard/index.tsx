@@ -13,21 +13,16 @@ import "./index.scss";
 import SessionViewCard from "./SessionViewCard";
 import { add } from "ionicons/icons";
 import { useHistory } from "react-router";
+import { useSessions } from "../../hooks/session/useSession";
+import { useEffect } from "react";
 
 const DashboardPage: React.FC = () => {
   const history = useHistory();
-  const data = [
-    {
-      sessionId: 1,
-      name: "CS3216 Lecture 1",
-      isOpen: false,
-    },
-    {
-      sessionId: 2,
-      name: "Uncle Soo Classroom Week 1",
-      isOpen: true,
-    },
-  ];
+  const { sessions, getSessions } = useSessions();
+
+  useEffect(() => {
+    getSessions();
+  }, []);
 
   return (
     <IonPage>
@@ -36,9 +31,16 @@ const DashboardPage: React.FC = () => {
         <IonGrid className="dashboard__grid">
           <IonRow>
             <IonCol>
-              {data.map((sessionData) => (
-                <SessionViewCard key={sessionData.sessionId} {...sessionData} />
-              ))}
+              {sessions &&
+                sessions.map((sessionData) => (
+                  <SessionViewCard key={sessionData.id} {...sessionData} />
+                ))}
+              {!sessions && (
+                <p>
+                  You have not created any sessions, press the `&quot;`+`&quot;` button to create
+                  one!
+                </p>
+              )}
             </IonCol>
           </IonRow>
         </IonGrid>
