@@ -17,34 +17,61 @@ import "./index.scss";
 import Navbar from "../../component/Navbar";
 import { useHistory, useLocation } from "react-router";
 import { useToast } from "../../hooks/util/useToast";
+import { useSessions } from "../../hooks/session/useSession";
+import { SessionEntity } from "../../types/session";
+import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 
 const SessionForm: React.FunctionComponent = () => {
   const location = useLocation();
   const history = useHistory();
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [sessionId, setSessionId] = useState<string>();
+  const [sessionId, setSessionId] = useState<number>();
   const [sessionName, setSessionName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { presentToast } = useToast();
-
-  console.log(sessionId);
+  const { user } = useAuthentication();
+  const { sessions, createSession, updateSession } = useSessions();
 
   useEffect(() => {
     if (location.pathname === "/instructor/session/create") {
-      console.log("create");
       setIsEdit(false);
       return;
     }
     setIsEdit(true);
     const id = new URLSearchParams(location.search).get("id");
     const name = new URLSearchParams(location.search).get("name");
-    setSessionId(id ?? "");
+    setSessionId(Number(id));
     setSessionName(name ?? "");
   }, [location.pathname, location.search]);
 
+  const handleCreate = async () => {
+    await createSession({
+      name: sessionName,
+      is_open: false,
+    });
+  };
+
+  const handleEdit = async () => {
+    let old_session: SessionEntity;
+    if (!sessions || !sessionId) {
+      return;
+    }
+    for (let i = 0; i < sessions?.length; i++) {
+      if (sessions[i].id === sessionId) {
+        old_session = sessions[i];
+        break;
+      }
+    }
+    await updateSession({
+      id: sessionId,
+      instructor: user!.id,
+      name: sessionName,
+      is_open: old_session!.is_open,
+    });
+  };
+
   const onSubmit = () => {
-    // TODO
     if (!sessionName) {
       setMessage("Please enter a session name.");
       setIserror(true);
@@ -57,11 +84,11 @@ const SessionForm: React.FunctionComponent = () => {
     }
     setIserror(false);
 
-    // if (isEdit) {
-    //     handleEdit();
-    // } else {
-    //     handleCreate();
-    // }
+    if (isEdit) {
+      handleEdit();
+    } else {
+      handleCreate();
+    }
 
     presentToast({
       header: `${isEdit ? "Edited" : "Created"} session successfully!`,
