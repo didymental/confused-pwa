@@ -124,7 +124,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
             if self.channel_layer:
                 await self.channel_layer.group_discard(
-                    self.session_subscribe, self.channel_name
+                    str(self.session_subscribe), self.channel_name
                 )
 
             await self.notify_success(
@@ -151,6 +151,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     "status": 403,
                 }
             )
+
+        print(
+            "kw instructor close session",
+        )
 
         await self.close_session(session=session)
 
@@ -228,6 +232,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             await self.handle_session_change.subscribe(
                 session=session, consumer=self
             )
+
+            print("kw subbed to session change")
 
             self.session_subscribe = pk
 
@@ -313,11 +319,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def handle_student_change(self, student: Optional[Student] = None, **kwargs):  # type: ignore
         if student:
             session: Session = student.session
-            yield f"-session__{session.pk}"
+            yield f"session__{session.pk}"
 
     @handle_student_change.groups_for_consumer  # type: ignore
     def handle_student_change(self, session: Session, **kwargs):  # type: ignore
-        yield f"-session__{session.pk}"
+        yield f"session__{session.pk}"
 
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
@@ -335,6 +341,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         **kwargs,
     ):
         is_open: Optional[bool] = message.get("is_open")
+        print("kw fire handle session change", is_open)
         if not is_open:
             await self._leave_session(silent=True)
 
@@ -344,4 +351,5 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         self, session: Optional[Session] = None, *args, **kwargs
     ):
         if session:
-            yield f"-pk__{session.pk}"
+            print("kw subbing to session change")
+            yield f"pk__{session.pk}"
