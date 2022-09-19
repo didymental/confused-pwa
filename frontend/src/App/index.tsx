@@ -24,7 +24,8 @@ function App() {
             <Route path="/student" exact component={JoinPage} />
             <Route path="/student/session/:id" exact component={StudentSessionPage} />
             <Route path="/instructor/dashboard" component={DashboardPage} />
-            <Route path="/instructor/create_session" component={SessionFormPage} />
+            <Route path="/instructor/session/create" component={SessionFormPage} />
+            <Route path="/instructor/session/edit" component={SessionFormPage} />
           </IonRouterOutlet>
         </IonReactRouter>
       </IonApp>

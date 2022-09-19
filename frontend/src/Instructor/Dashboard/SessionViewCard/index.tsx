@@ -11,7 +11,8 @@ import {
   IonRow,
   useIonAlert,
 } from "@ionic/react";
-import { ellipsisVertical } from "ionicons/icons";
+import { createOutline, trashOutline, ellipsisVertical } from "ionicons/icons";
+import { useHistory } from "react-router";
 import "./index.scss";
 
 interface SessionData {
@@ -21,8 +22,13 @@ interface SessionData {
 }
 
 const SessionViewCard: React.FC<SessionData> = ({ sessionId, name, isOpen }) => {
+  const history = useHistory();
+  // TODO
   const deleteHandler = () => {};
 
+  const editClickHandler = (sessionId: number) => {
+    history.push(`/instructor/session/edit?id=${sessionId}&name=${name}`);
+  };
   const [presentAlert] = useIonAlert();
   const deleteClickHandler = () => {
     presentAlert({
@@ -56,18 +62,26 @@ const SessionViewCard: React.FC<SessionData> = ({ sessionId, name, isOpen }) => 
                   <IonCardSubtitle>Created at:</IonCardSubtitle>
                 </IonRow>
               </IonCol>
-              <IonCol size="2">
+              <IonCol className="dashboard__menu" size="2">
                 <IonButton
                   id={`ellipsis-button-${sessionId}`}
                   fill="clear"
                   size="large"
-                  className="ellipsis-button"
+                  className="dashboard__ellipsis-button"
                 >
                   <IonIcon icon={ellipsisVertical}></IonIcon>
                 </IonButton>
-                <IonPopover trigger={`ellipsis-button-${sessionId}`} triggerAction="click">
-                  <IonButton fill="clear">Edit Session</IonButton>
+                <IonPopover
+                  dismiss-on-select
+                  trigger={`ellipsis-button-${sessionId}`}
+                  triggerAction="click"
+                >
+                  <IonButton fill="clear" onClick={() => editClickHandler(sessionId)}>
+                    <IonIcon slot="start" icon={createOutline}></IonIcon>
+                    Edit Session
+                  </IonButton>
                   <IonButton fill="clear" onClick={deleteClickHandler}>
+                    <IonIcon slot="start" icon={trashOutline}></IonIcon>
                     Delete Session
                   </IonButton>
                 </IonPopover>
@@ -75,7 +89,7 @@ const SessionViewCard: React.FC<SessionData> = ({ sessionId, name, isOpen }) => 
             </IonRow>
           </IonGrid>
           {isOpen ? (
-            <IonButton fill="solid" expand="block" color="tertiary">
+            <IonButton fill="solid" expand="block" color="secondary">
               ONGOING
             </IonButton>
           ) : (
