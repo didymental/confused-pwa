@@ -45,20 +45,12 @@
         
     }
 
-    &__reactions {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.3);
-        box-shadow: none;
-        margin-top: 0.75rem;
-        margin-bottom: 1.25rem;
-    }
-
     &__questions {
         width: 100%;
         background: rgba(255, 255, 255, 0.3);
         box-shadow: none;
         margin-top: 1.25rem;
-        margin-bottom: 0.25rem;
+        margin-bottom: 1.25rem;
         display: flex;
         flex-direction: column;
     }
@@ -87,7 +79,7 @@
         color: #1877F2;
         text-transform: capitalize;
         border-radius: 0.25rem;
-        max-width: 150px;
+        width: 100%;
         
         &:hover {
             text-decoration: underline;
@@ -97,12 +89,8 @@
     }
 
     &__end-session {
-        width: fit-content;
-        min-width: 100px;
-        max-width: 150px;
+        width: 100%;
         color: #190e28;
-        font-size: medium;
-        font-weight: 575;
         background: rgba(255, 255, 255, 0.75);
         border-radius: 1.25rem;
 
@@ -110,7 +98,17 @@
             background: rgba(0, 0, 0, 0.25);
             color: white;
         }
-        
+    }
+
+    &__share {
+        width: fit-content;
+        color: #190e28;
+        border-radius: 1.25rem;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+        }
     }
 }
 

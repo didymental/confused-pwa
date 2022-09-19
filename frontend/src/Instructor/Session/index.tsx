@@ -16,7 +16,7 @@ import {
   CreateAnimation,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { powerSharp } from "ionicons/icons";
+import { powerSharp, qrCode, shareSocialSharp } from "ionicons/icons";
 import client from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import clear from "../../assets/clear-bg.svg";
@@ -89,17 +89,6 @@ const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) =
   return (
     <IonPage>
       <IonContent fullscreen className={`ion-content-instructor-session__${levelOfConfusion}`}>
-        {/* <IonButton
-          onClick={() =>
-            levelOfConfusion === CLEAR_STATE
-              ? setLevelOfConfusion(CONFUSED_1_STATE)
-              : levelOfConfusion === CONFUSED_1_STATE
-              ? setLevelOfConfusion(CONFUSED_2_STATE)
-              : setLevelOfConfusion(CLEAR_STATE)
-          }
-        >
-          Test
-        </IonButton> */}
         <ConfusionDisplay
           levelOfConfusion={levelOfConfusion || "clear"}
           questions={questions || []}
@@ -189,20 +178,32 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
           <ReactionsDisplay students={students} setLevelOfConfusion={setLevelOfConfusion} />
         </IonRow>
         <IonRow className="ion-row-instructor-session">
-          <IonButton
-            className="ion-btn-instructor-session__end-session"
-            fill="clear"
-            onClick={endSession}
-          >
-            <IonIcon icon={powerSharp} size="small" />
-          </IonButton>
-        </IonRow>
-        <IonRow className="ion-row-instructor-session">
           <IonCol className="ion-col-instructor-session__share">
-            <IonButton onClick={shareLink}>Share Link</IonButton>
+            <IonButton
+              onClick={shareLink}
+              className="ion-btn-instructor-session__share"
+              fill="clear"
+            >
+              <IonIcon icon={shareSocialSharp} size="small" />
+            </IonButton>
           </IonCol>
           <IonCol className="ion-col-instructor-session__share">
-            <IonButton onClick={openQrCode}>Open QR</IonButton>
+            <IonButton
+              className="ion-btn-instructor-session__end-session"
+              fill="clear"
+              onClick={endSession}
+            >
+              <IonIcon icon={powerSharp} size="small" />
+            </IonButton>
+          </IonCol>
+          <IonCol className="ion-col-instructor-session__share">
+            <IonButton
+              onClick={openQrCode}
+              className="ion-btn-instructor-session__share"
+              fill="clear"
+            >
+              <IonIcon icon={qrCode} size="small" />
+            </IonButton>
           </IonCol>
         </IonRow>
       </IonGrid>
@@ -228,7 +229,7 @@ interface StudentData {
   id: number;
   display_name: string;
   session: number;
-  reaction_type_id: number | null;
+  reaction_type: number | null;
 }
 
 const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questions }) => {
@@ -263,11 +264,11 @@ const ReactionsDisplay: React.FC<{
     let countClear = 0;
     let countConfused = 0;
     students.forEach((student) => {
-      if (student.reaction_type_id === 2) {
+      if (student.reaction_type === 2) {
         countClear += 1;
       }
 
-      if (student.reaction_type_id === 1) {
+      if (student.reaction_type === 1) {
         countConfused += 1;
       }
     });
@@ -275,7 +276,7 @@ const ReactionsDisplay: React.FC<{
     setCountOfClear(countClear);
     setCountOfConfused(countConfused);
 
-    if (countOfClear === 0 && countOfConfused === 0) {
+    if (countClear === 0 && countConfused === 0) {
       setRatio(0.5);
     } else {
       let ratioOfConfused = countConfused / (countClear + countConfused);
@@ -286,16 +287,12 @@ const ReactionsDisplay: React.FC<{
   useEffect(() => {
     if (ratio > 0.7 && ratio <= 0.9) {
       setLevelOfConfusion(CONFUSED_1_STATE);
-      return () => {
-        setLevelOfConfusion(CLEAR_STATE);
-      };
+      return;
     }
 
     if (ratio > 0.9) {
       setLevelOfConfusion(CONFUSED_2_STATE);
-      return () => {
-        setLevelOfConfusion(CLEAR_STATE);
-      };
+      return;
     }
 
     setLevelOfConfusion(CLEAR_STATE);
@@ -305,48 +302,46 @@ const ReactionsDisplay: React.FC<{
     let toSend = [];
     for (let i = 0; i < students.length; i++) {
       let studentCopy = { ...students[i] };
-      studentCopy.reaction_type_id = null;
+      studentCopy.reaction_type = null;
       toSend.push(studentCopy);
     }
     client.put("/students/", toSend);
   };
 
   return (
-    <IonCard className="ion-card-instructor-session__reactions">
-      <IonGrid>
-        <IonRow>
-          <IonCol className="ion-col-instructor-session__reactions">
-            <IonRow>
-              <img src={confused_reaction} alt={"confused"} onClick={() => {}} />
-            </IonRow>
-            <IonRow>
-              <IonBadge className="ion-badge-instructor-session__reactions" color="light">
-                <IonText>{countOfConfused}</IonText>
-              </IonBadge>
-            </IonRow>
-          </IonCol>
-          <IonCol className="ion-col-instructor-session__reactions">
-            <IonRow>
-              <img src={clear_reaction} alt={"clear"} onClick={() => {}} />
-            </IonRow>
-            <IonRow>
-              <IonBadge className="ion-badge-instructor-session__reactions" color="light">
-                <IonText>{countOfClear}</IonText>
-              </IonBadge>
-            </IonRow>
-          </IonCol>
-        </IonRow>
+    <IonGrid>
+      <IonRow>
         <IonCol className="ion-col-instructor-session__reactions">
-          <IonButton
-            className="ion-btn-instructor-session__reactions"
-            onClick={clearReactions}
-            fill="clear"
-          >
-            <IonText>Reset</IonText>
-          </IonButton>
+          <IonRow>
+            <img src={confused_reaction} alt={"confused"} onClick={() => {}} />
+          </IonRow>
+          <IonRow>
+            <IonBadge className="ion-badge-instructor-session__reactions" color="light">
+              <IonText>{countOfConfused}</IonText>
+            </IonBadge>
+          </IonRow>
         </IonCol>
-      </IonGrid>
-    </IonCard>
+        <IonCol className="ion-col-instructor-session__reactions">
+          <IonRow>
+            <img src={clear_reaction} alt={"clear"} onClick={() => {}} />
+          </IonRow>
+          <IonRow>
+            <IonBadge className="ion-badge-instructor-session__reactions" color="light">
+              <IonText>{countOfClear}</IonText>
+            </IonBadge>
+          </IonRow>
+        </IonCol>
+      </IonRow>
+      <IonCol className="ion-col-instructor-session__reactions">
+        <IonButton
+          className="ion-btn-instructor-session__reactions"
+          onClick={clearReactions}
+          fill="clear"
+        >
+          <IonText>Reset Reactions</IonText>
+        </IonButton>
+      </IonCol>
+    </IonGrid>
   );
 };
 

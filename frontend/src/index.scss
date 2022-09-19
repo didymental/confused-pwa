@@ -44,7 +44,8 @@ code {
   --ion-color-tertiary-shade: #0bb8cc;
   --ion-color-tertiary-tint: #24d6ea;
 
-  --ion-color-success: #6bf178;
+  // --ion-color-success: #6bf178;
+  --ion-color-success: #7fffc3;
   --ion-color-success-rgb: 107, 241, 120;
   --ion-color-success-contrast: #190e28;
   --ion-color-success-contrast-rgb: 25, 14, 40;
@@ -95,20 +96,29 @@ code {
   --ion-color-toast-green-contrast: #190e28;
 }
 
-ion-fab-button.ion-color-primary {
-  --ion-color-base: linear-gradient(
-    to right,
-    var(--ion-color-button-blue) 0%,
-    var(--ion-color-button-green) 100%
-  ) !important;
-  --ion-color-shade: linear-gradient(
-    to right,
-    var(--ion-color-button-shade-blue) 0%,
-    var(--ion-color-button-shade-green) 100%
-  ) !important;
-  --ion-color-contrast: var(--ion-color-primary) !important;
-}
+// ion-fab-button.ion-color-primary {
+//   --ion-color-base: linear-gradient(
+//     to right,
+//     var(--ion-color-button-blue) 0%,
+//     var(--ion-color-button-green) 100%
+//   ) !important;
+//   --ion-color-shade: linear-gradient(
+//     to right,
+//     var(--ion-color-button-shade-blue) 0%,
+//     var(--ion-color-button-shade-green) 100%
+//   ) !important;
+//   --ion-color-contrast: var(--ion-color-primary) !important;
+// }
+
+// ion-fab-button.ion-color-primary {
+//   --ion-color-base: #190e28
+//   --ion-color-contrast: var(--ion-color-primary) !important;
+// }
 
 ion-toast.ion-color-success {
   --background: #b6f8c4;
+}
+
+ion-button {
+  font-weight: 600;
 }
