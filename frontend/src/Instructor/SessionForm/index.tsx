@@ -28,6 +28,8 @@ const SessionForm: React.FunctionComponent = () => {
   const [message, setMessage] = useState<string>("");
   const { presentToast } = useToast();
 
+  console.log(sessionId);
+
   useEffect(() => {
     if (location.pathname === "/instructor/session/create") {
       console.log("create");
