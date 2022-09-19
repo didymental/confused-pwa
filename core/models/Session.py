@@ -8,7 +8,7 @@ class Session(models.Model):
 
     instructor = models.ForeignKey("UserProfile", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-
+    created_date_time = models.DateTimeField(auto_now_add=True)
     is_open = models.BooleanField(default=False)
 
     def __str__(self):
