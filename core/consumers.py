@@ -66,8 +66,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def delete_student(self, student: Student):
         student.delete()
 
+    @database_sync_to_async
+    def get_user(self, session: Session):
+        return session.instructor
+
     async def disconnect(self, code):
-        # TODO: invoke action as normal func?
         await self._leave_session(silent=True)
         return await super().disconnect(code)
 
@@ -126,12 +129,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             if silent:
                 return
             await self.reply(**e.args[0])
-
-    @database_sync_to_async
-    def get_user(self, session: Session):
-        # session.is_open = True
-        # session.save()
-        return session.instructor
 
     async def instructor_leave_session(
         self, session: Session, user: UserProfile
