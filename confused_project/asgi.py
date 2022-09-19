@@ -17,7 +17,7 @@ from .channelsmiddleware import JwtAuthMiddlewareStack
 import core.urls
 
 
-if "DYNO" in os.environ:
+if "DYNO_RAM" in os.environ:
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE", "confused_project.settings.production"
     )
