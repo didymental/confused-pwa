@@ -37,3 +37,6 @@ class UserProfileViewSet(ModelViewSet):
         "name",
         "email",
     )
+
+    def get_queryset(self):
+        return self.queryset.filter(email=self.request.user)
