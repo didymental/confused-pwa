@@ -1,6 +1,10 @@
 .navbar {
+  &__back-button {
+    padding: 0em 1em;
+  }
+
   &__logo {
-    max-width: 30px;
+    max-width: 25px;
     margin: 0rem 1rem 0rem 1rem;
   }
 

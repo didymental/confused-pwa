@@ -93,8 +93,8 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     <IonHeader>
       <IonToolbar>
         {showBackButton && (
-          <IonButtons slot="start">
-            <IonBackButton />
+          <IonButtons slot="start" className="navbar__back-button">
+            <IonBackButton text="" />
           </IonButtons>
         )}
 
