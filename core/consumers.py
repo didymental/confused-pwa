@@ -104,6 +104,65 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             return None
 
     @database_sync_to_async
+    def update_question_vote(
+        self, question_pk: int, increment: bool
+    ) -> Optional[Question]:
+
+        try:
+            # TODO: double check?
+            if self.temp_user is None:
+                raise ValidationError(
+                    {
+                        "action": "update_question_vote",
+                        "errors": ["You have not joined a session yet"],
+                        "status": status.HTTP_403_FORBIDDEN,
+                    }
+                )
+
+            question = Question.objects.get(pk=question_pk)
+            # TODO: check if stu exists?
+            student = Student.objects.get(id=self.temp_user)
+
+            if increment:
+                print("kw1")
+                if not Question.objects.filter(
+                    voted_by__id=self.temp_user
+                ).exists():
+                    question.vote_count += 1
+                    question.voted_by.add(student)
+                    question.unvoted_by.remove(student)
+                    print("kw2 ")
+                print("kw3")
+            else:
+                if not Question.objects.filter(
+                    unvoted_by__id=self.temp_user
+                ).exists():
+                    question.vote_count -= 1
+                    question.unvoted_by.add(student)
+                    question.voted_by.remove(student)
+
+            if question.vote_count < 0:
+                raise ValidationError(
+                    {
+                        "action": "update_question_vote",
+                        "errors": ["Vote count cannot be less than 0"],
+                        "status": status.HTTP_403_FORBIDDEN,
+                    }
+                )
+            question.save()
+
+            print("vote updated")
+
+        except ObjectDoesNotExist:
+            raise ValidationError(
+                {
+                    "action": "update_question_vote",
+                    "errors": ["Question not found"],
+                    "status": status.HTTP_404_NOT_FOUND,
+                }
+            )
+
+    @database_sync_to_async
     def create_student(self, session: Session, display_name: str):
         return Student.objects.create(
             session=session, display_name=display_name
@@ -217,8 +276,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "leave_session",
-                    "errors": "This session does not belong to you",
-                    "status": 403,
+                    "errors": ["This session does not belong to you"],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -290,8 +349,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     raise ValidationError(
                         {
                             "action": "join_session",
-                            "errors": "Display name cannot be empty",
-                            "status": 403,
+                            "errors": ["Display name cannot be empty"],
+                            "status": status.HTTP_403_FORBIDDEN,
                         }
                     )
                 await self.student_join_session(
@@ -340,8 +399,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "join_session",
-                    "errors": "This session does not belong to you",
-                    "status": 403,
+                    "errors": ["This session does not belong to you"],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -353,8 +412,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "join_session",
-                    "errors": "This session is currently closed",
-                    "status": 403,
+                    "errors": ["This session is currently closed"],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -362,8 +421,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "join_session",
-                    "errors": "You have already joined a session. Please leave your current session first",
-                    "status": 403,
+                    "errors": [
+                        "You have already joined a session. Please leave your current session first"
+                    ],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -509,20 +570,89 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
-        if not self.temp_user:
+        if self.temp_user is None:
             return await self.notify_failure(
                 action="post_question",
                 errors=["You have not joined a session yet"],
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
+        # TODO: rename
         await self.create_question(
             student_pk=self.temp_user, question_content=question_content
         )
 
     @action()
+    async def vote_question(self, question_pk: int, **kwargs):
+        user: UserProfile = self.scope["user"]
+
+        if user.is_authenticated:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=["Only student can vote a question"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        if self.temp_user is None:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=["You have not joined a session yet"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        session = await self._get_question_session(question_pk=question_pk)
+
+        if session is None or session.pk != self.session_subscribe:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=[
+                    "This question does not belong to your current session"
+                ],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        try:
+            await self.update_question_vote(
+                question_pk=question_pk, increment=True
+            )
+        except ValidationError as e:
+            await self.notify_failure(**e.args[0])
+
+    @action()
+    async def unvote_question(self, question_pk: int, **kwargs):
+        user: UserProfile = self.scope["user"]
+
+        if user.is_authenticated:
+            return await self.notify_failure(
+                action="unvote_question",
+                errors=["Only student can unvote a question"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        if self.temp_user is None:
+            return await self.notify_failure(
+                action="unvote_question",
+                errors=["You have not joined a session yet"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        session = await self._get_question_session(question_pk=question_pk)
+        if session.pk != self.session_subscribe:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=[
+                    "This question does not belong to your current session"
+                ],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        await self.update_question_vote(
+            question_pk=question_pk, increment=False
+        )
+
+    @action()
     async def put_reaction(self, reaction_type_pk: Optional[int], **kwargs):
-        if not self.temp_user:
+        if self.temp_user is None:
             return await self.notify_failure(
                 action="put_reaction",
                 errors=["You have not joined a session yet"],
@@ -543,7 +673,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         **kwargs,
     ):
         print("kw fire off question", action)
-        if action == "create":
+        if action == "create" or action == "update":
             await self._handle_question_create(
                 message=message,
                 observer=observer,
@@ -560,25 +690,19 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     ):
 
         question_pk = message.get("id")
-        print("kw1", message)
         if question_pk is None:
             return
-        print("kw12")
         session = await self._get_question_session(question_pk=question_pk)
         if session is None:
             return
-        print("kw3")
         if session.pk != self.session_subscribe:
             return
-        print("kw4")
 
         await self.reply(data=message, action="create_question")
 
     # TODO: fix question observer not working
     @handle_question_change.serializer
     def handle_question_change(self, question: Question, action, **kwargs):
-        print("kw serialize question", action)
-        # raise ValidationError("test")
         return dict(
             **QuestionSerializer(question).data,
         )

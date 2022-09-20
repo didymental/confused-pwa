@@ -9,6 +9,12 @@ class Question(models.Model):
 
     student = models.ForeignKey("Student", on_delete=models.CASCADE)
     vote_count = models.IntegerField(default=0)
+    voted_by = models.ManyToManyField(
+        "Student", blank=True, related_name="voted_question_set"
+    )
+    unvoted_by = models.ManyToManyField(
+        "Student", blank=True, related_name="unvoted_question_set"
+    )
 
     # no submitting empty questions
     question_content = models.CharField(
