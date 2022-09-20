@@ -7,7 +7,7 @@ const Splash: React.FC = () => {
   const history = useHistory();
   return (
     <IonPage>
-      <IonContent className="splash">
+      <IonContent className="content">
         <div className="page">
           <IonGrid>
             <IonRow className="grid__row">
