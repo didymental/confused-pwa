@@ -6,6 +6,7 @@ export const REFRESH_TOKEN = `${CONFUSED_PREFIX} REFRESH_TOKEN`;
 export const USER_ID = `${CONFUSED_PREFIX} USER_ID`;
 export const USER_EMAIL = `${CONFUSED_PREFIX} USER_EMAIL`;
 export const USER_NAME = `${CONFUSED_PREFIX} USER_NAME`;
+export const STORAGE_EVENT = "STORAGE_EVENT";
 
 export function getAccessToken(): string | null {
   return localStorage.getItem(ACCESS_TOKEN);
@@ -52,4 +53,5 @@ export function setUser(data: ProfileData | null): void {
     localStorage.removeItem(USER_EMAIL);
     localStorage.removeItem(USER_NAME);
   }
+  window.dispatchEvent(new Event(STORAGE_EVENT));
 }
