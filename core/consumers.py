@@ -9,6 +9,7 @@ from djangochannelsrestframework.observer.generics import (
     action,
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import status
 
 from core.models.Session import Session
 from core.models.Student import Student
@@ -60,7 +61,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @database_sync_to_async
     def create_student(self, session: Session, display_name: str):
-        Student.objects.create(session=session, display_name=display_name)
+        return Student.objects.create(
+            session=session, display_name=display_name
+        )
 
     @database_sync_to_async
     def delete_student(self, student: Student):
@@ -84,14 +87,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self._leave_session(silent=False)
 
     async def _leave_session(self, silent=False, **kwargs):
-
         if self.session_subscribe is None:
             if silent:
                 return
             return await self.notify_failure(
                 action="leave_session",
                 errors="You have not joined a session yet",
-                status=405,
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         session: Session = await self.get_session(pk=self.session_subscribe)
@@ -102,13 +104,18 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             return await self.notify_failure(
                 action="leave_session",
                 errors="The session no longer exists",
-                status=404,
+                status=status.HTTP_404_NOT_FOUND,
             )
+
         try:
             user: UserProfile = self.scope["user"]
+
+            print("kw check user", user, self.temp_user)
             if user.is_authenticated:
+                print("instructor leaving")
                 await self.instructor_leave_session(session=session, user=user)
             elif self.temp_user is not None:
+                print("student leaving")
                 await self.student_leave_session(student=self.temp_user)
                 self.temp_user = None
 
@@ -120,13 +127,16 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 session=session, consumer=self
             )
 
-            await self.notify_joiners()
+            if not silent:
+                await self.notify_joiners()
 
             if self.channel_layer:
                 await self.channel_layer.group_discard(
                     str(self.session_subscribe), self.channel_name
                 )
 
+            # TODO: need to silence this?
+            print("notifying success", user.is_authenticated, self.temp_user)
             await self.notify_success(
                 action="leave_session",
                 message=f"You have left or been removed from session {self.session_subscribe}",
@@ -177,11 +187,15 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         return await self.reply(
             data=data,
             action=action,
-            status=200,
+            status=status.HTTP_200_OK,
         )
 
     async def notify_failure(
-        self, action: str, errors: str, message: str = "", status=403
+        self,
+        action: str,
+        errors: str,
+        message: str = "",
+        status=status.HTTP_403_FORBIDDEN,
     ):
         data = {
             "type": "failed",
@@ -200,11 +214,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         session: Session = await self.get_session(pk=pk)
 
         if session is None:
-
             return await self.notify_failure(
                 action="join_session",
                 errors=f"Session of id {pk} does not exist",
-                status=404,
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         try:
@@ -280,7 +293,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 }
             )
 
-        await self.create_student(session=session, display_name=display_name)
+        self.temp_user = await self.create_student(
+            session=session, display_name=display_name
+        )
+        print("kw assigned temp user")
 
     async def notify_joiners(self):
         if self.session_subscribe is None:
@@ -333,23 +349,50 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             pk=student.pk,
         )
 
+    # TODO: fix groups_for_signal doesn't work
     @model_observer(Session)
     async def handle_session_change(  # type: ignore
         self,
-        message: Dict,
-        action="",
+        message,
+        observer=None,
+        action=None,
+        subscribing_request_ids=[],
         **kwargs,
     ):
-        is_open: Optional[bool] = message.get("is_open")
-        print("kw fire handle session change", is_open)
-        if not is_open:
+        if action != "update":
+            return
+
+        if message.get("pk") != self.session_subscribe:
+            return
+
+        session: Optional[Session] = await self.get_session(
+            pk=self.session_subscribe
+        )
+
+        if session is None:
+            return
+
+        print(
+            "kw fire handle session change", message, action, session.is_open
+        )
+
+        # print("kw fire handle session change", is_open)
+        if not session.is_open:
             await self._leave_session(silent=True)
 
-    # TODO: remove none check, debug later
-    @handle_session_change.groups
-    def handle_session_change(
-        self, session: Optional[Session] = None, *args, **kwargs
-    ):
-        if session:
-            print("kw subbing to session change")
-            yield f"pk__{session.pk}"
+    # # TODO: remove none check, debug later
+    # # TODO: copy from subscribe instance
+    # @handle_session_change.groups_for_signal
+    # def handle_session_change(  # type: ignore
+    #     self, session: Optional[Session] = None, **kwargs
+    # ):
+    #     if session:
+    #         yield f"pk__{session.pk}"
+
+    # @handle_session_change.groups_for_consumer  # type: ignore
+    # def handle_session_change(
+    #     self, session: Optional[Session] = None, **kwargs
+    # ):
+    #     if session:
+    #         print("kw subbing to session change")
+    #         yield f"pk__{session.pk}"
