@@ -104,6 +104,26 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             return None
 
     @database_sync_to_async
+    def update_question_vote(
+        self, question_pk: int, increment: bool
+    ) -> Optional[Question]:
+
+        try:
+            question = Question.objects.get(pk=question_pk)
+
+            if increment:
+                question.vote_count += 1
+            else:
+                question.vote_count -= 1
+
+            question.save()
+
+            print("vote updated")
+
+        except ObjectDoesNotExist:
+            return None
+
+    @database_sync_to_async
     def create_student(self, session: Session, display_name: str):
         return Student.objects.create(
             session=session, display_name=display_name
@@ -516,9 +536,50 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
+        # TODO: rename
         await self.create_question(
             student_pk=self.temp_user, question_content=question_content
         )
+
+    @action()
+    async def vote_question(self, question_pk: int, **kwargs):
+        user: UserProfile = self.scope["user"]
+
+        if user.is_authenticated:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=["Only student can vote a question"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        if not self.temp_user:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=["You have not joined a session yet"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        await self.update_question_vote(question_pk=question_pk, increment=True)
+
+    @action()
+    async def unvote_question(self, question_pk: int, **kwargs):
+        user: UserProfile = self.scope["user"]
+
+        if user.is_authenticated:
+            return await self.notify_failure(
+                action="unvote_question",
+                errors=["Only student can unvote a question"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        if not self.temp_user:
+            return await self.notify_failure(
+                action="unvote_question",
+                errors=["You have not joined a session yet"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        await self.update_question_vote(question_pk=question_pk, increment=False)
 
     @action()
     async def put_reaction(self, reaction_type_pk: Optional[int], **kwargs):
@@ -543,7 +604,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         **kwargs,
     ):
         print("kw fire off question", action)
-        if action == "create":
+        if action == "create" or action == "update":
             await self._handle_question_create(
                 message=message,
                 observer=observer,
@@ -560,25 +621,19 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     ):
 
         question_pk = message.get("id")
-        print("kw1", message)
         if question_pk is None:
             return
-        print("kw12")
         session = await self._get_question_session(question_pk=question_pk)
         if session is None:
             return
-        print("kw3")
         if session.pk != self.session_subscribe:
             return
-        print("kw4")
 
         await self.reply(data=message, action="create_question")
 
     # TODO: fix question observer not working
     @handle_question_change.serializer
     def handle_question_change(self, question: Question, action, **kwargs):
-        print("kw serialize question", action)
-        # raise ValidationError("test")
         return dict(
             **QuestionSerializer(question).data,
         )
