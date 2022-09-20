@@ -200,6 +200,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             session=session, consumer=self
         )
 
+        await self.handle_question_change.unsubscribe(
+            session=session, consumer=self
+        )
+
         if self.channel_layer:
             await self.channel_layer.group_discard(
                 str(self.session_subscribe), self.channel_name
@@ -307,6 +311,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
             await self.handle_session_change.subscribe(
+                session=session, consumer=self
+            )
+
+            await self.handle_question_change.subscribe(
                 session=session, consumer=self
             )
 
@@ -439,6 +447,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
+        # raise ValidationError("test")
         print("kw fire off student", message, action)
 
         if action == "delete":
@@ -464,7 +473,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
-        student_pk = message.get("pk")
+        student_pk = message.get("id")
         print("kw handle delete", student_pk, self.temp_user)
         if student_pk == self.temp_user:
             print("kw leave session")
@@ -565,6 +574,33 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         )
 
     # FIXME: question observer doesnt get fired off
+    # @model_observer(Question)
+    # async def handle_question_change(  # type: ignore
+    #     self,
+    #     message: Dict,
+    #     observer=None,
+    #     action=None,
+    #     subscribing_request_ids=[],
+    #     **kwargs,
+    # ):
+    # print("kw fire off question", action)
+
+    # if action == "delete":
+    #     await self._handle_student_delete(
+    #         message=message,
+    #         observer=observer,
+    #         subscribing_request_ids=subscribing_request_ids,
+    #         **kwargs,
+    #     )
+
+    # if action == "update":
+    #     await self._handle_student_update(
+    #         message=message,
+    #         observer=observer,
+    #         subscribing_request_ids=subscribing_request_ids,
+    #         **kwargs,
+    #     )
+
     @model_observer(Question)
     async def handle_question_change(  # type: ignore
         self,
@@ -575,46 +611,36 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         **kwargs,
     ):
         print("kw fire off question", action)
+        if action == "create":
+            await self._handle_question_create(
+                message=message,
+                observer=observer,
+                subscribing_request_ids=subscribing_request_ids,
+                **kwargs,
+            )
 
-        # if action == "delete":
-        #     await self._handle_student_delete(
-        #         message=message,
-        #         observer=observer,
-        #         subscribing_request_ids=subscribing_request_ids,
-        #         **kwargs,
-        #     )
+    async def _handle_question_create(
+        self,
+        message: Dict,
+        observer=None,
+        subscribing_request_ids=[],
+        **kwargs,
+    ):
 
-        # if action == "update":
-        #     await self._handle_student_update(
-        #         message=message,
-        #         observer=observer,
-        #         subscribing_request_ids=subscribing_request_ids,
-        #         **kwargs,
-        #     )
+        question_pk = message.get("id")
+        print("kw1", message)
+        if question_pk is None:
+            return
+        print("kw12")
+        session = await self._get_question_session(question_pk=question_pk)
+        if session is None:
+            return
+        print("kw3")
+        if session.pk != self.session_subscribe:
+            return
+        print("kw4")
 
-    # @model_observer(Question)
-    # async def handle_question_change(  # type: ignore
-    #     self,
-    #     message: Dict,
-    #     observer=None,
-    #     action=None,
-    #     subscribing_request_ids=[],
-    #     **kwargs,
-    # ):
-    #     print("kw fire off question", action)
-    # if action != "create":
-    #     return
-
-    # question_pk = message.get("pk")
-    # if question_pk is None:
-    #     return
-    # session = await self._get_question_session(question_pk=question_pk)
-    # if session is None:
-    #     return
-    # if session.pk != self.session_subscribe:
-    #     return
-
-    # await self.reply(data=message, action=action)
+        await self.reply(data=message, action="create_question")
 
     # @handle_question_change.serializer
     # def handle_question_change(self, question: Question, action, **kwargs):
@@ -625,11 +651,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     #         pk=question.pk,
     #     )
 
+    # TODO: fix question observer not working
     @handle_question_change.serializer
     def handle_question_change(self, question: Question, action, **kwargs):
         print("kw serialize question", action)
+        # raise ValidationError("test")
         return dict(
-            data=QuestionSerializer(question).data,
-            action=action.value,
-            pk=question.pk,
+            **QuestionSerializer(question).data,
+            # action=action.value,
+            # pk=question.pk,
         )
