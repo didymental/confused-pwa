@@ -9,6 +9,7 @@ import {
   IonLabel,
   IonPage,
   IonRow,
+  useIonLoading,
 } from "@ionic/react";
 import { useState } from "react";
 import Navbar from "../../../component/Navbar";
@@ -26,11 +27,12 @@ function validateEmail(email: string) {
 }
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("eve.holt@reqres.in");
-  const [password, setPassword] = useState<string>("cityslicka");
+  const [email, setEmail] = useState<string>("admin@gmail.com");
+  const [password, setPassword] = useState<string>("123456");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { user, login } = useAuthentication();
+  const [present, dismiss] = useIonLoading();
 
   const handleLogin = async () => {
     if (!email) {
@@ -55,7 +57,11 @@ const LoginPage: React.FC = () => {
       password: password,
     };
 
+    present({
+      message: "Logging in",
+    });
     await login(loginRequest);
+    dismiss();
   };
 
   if (user) {

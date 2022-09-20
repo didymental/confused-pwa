@@ -10,6 +10,7 @@ import {
   IonLabel,
   IonPage,
   IonRow,
+  useIonLoading,
 } from "@ionic/react";
 import { useState } from "react";
 import "./index.scss";
@@ -32,6 +33,7 @@ const SignUpPage: React.FC = () => {
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { user, signUp } = useAuthentication();
+  const [present, dismiss] = useIonLoading();
 
   const handleSignUp = async () => {
     if (!email) {
@@ -56,8 +58,11 @@ const SignUpPage: React.FC = () => {
       password: password,
       name: displayName,
     };
-
+    present({
+      message: "Signing up",
+    });
     await signUp(signUpRequest);
+    dismiss();
   };
 
   if (user) {

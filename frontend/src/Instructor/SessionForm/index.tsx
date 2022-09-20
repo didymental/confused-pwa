@@ -10,13 +10,13 @@ import {
   IonRow,
   IonGrid,
   IonText,
+  useIonLoading,
 } from "@ionic/react";
 
 import "./index.scss";
 
 import Navbar from "../../component/Navbar";
 import { useHistory, useLocation } from "react-router";
-import { useToast } from "../../hooks/util/useToast";
 import { useSessions } from "../../hooks/session/useSession";
 import { SessionEntity } from "../../types/session";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
@@ -29,7 +29,7 @@ const SessionForm: React.FunctionComponent = () => {
   const [sessionName, setSessionName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const { presentToast } = useToast();
+  const [present, dismiss] = useIonLoading();
   const { user } = useAuthentication();
   const { sessions, createSession, updateSession } = useSessions();
 
@@ -50,6 +50,7 @@ const SessionForm: React.FunctionComponent = () => {
       name: sessionName,
       is_open: false,
     });
+    dismiss();
   };
 
   const handleEdit = async () => {
@@ -69,6 +70,7 @@ const SessionForm: React.FunctionComponent = () => {
       name: sessionName,
       is_open: old_session!.is_open,
     });
+    dismiss();
   };
 
   const onSubmit = () => {
@@ -84,20 +86,18 @@ const SessionForm: React.FunctionComponent = () => {
     }
     setIserror(false);
 
+    present({
+      message: isEdit ? "Editing Session" : "Creating Session",
+    });
     if (isEdit) {
       handleEdit();
     } else {
       handleCreate();
     }
 
-    presentToast({
-      header: `${isEdit ? "Edited" : "Created"} session successfully!`,
-      color: "success",
-    });
-
     setTimeout(() => {
       history.push("/instructor/dashboard");
-    }, 800);
+    }, 500);
   };
 
   return (
@@ -113,7 +113,7 @@ const SessionForm: React.FunctionComponent = () => {
               </IonCol>
             </IonRow>
             <IonRow>
-              <IonCol>
+              <IonCol className="session-form__description">
                 <IonItem fill="outline">
                   {/* <IonLabel position="floating"> Email</IonLabel> */}
                   <IonInput
@@ -133,7 +133,7 @@ const SessionForm: React.FunctionComponent = () => {
 
             <IonRow>
               <IonCol className="session-form__button">
-                <IonButton onClick={onSubmit}>submit</IonButton>
+                <IonButton onClick={onSubmit}>SUBMIT</IonButton>
               </IonCol>
             </IonRow>
           </IonGrid>

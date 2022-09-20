@@ -6,6 +6,11 @@ import AuthenticatedApp from "../AuthenticatedApp";
 import UnauthenticatedApp from "../UnauthenticatedApp";
 import { getUser, STORAGE_EVENT } from "../localStorage";
 import { useEffect, useState } from "react";
+import ReactGA from "react-ga";
+
+const TRACKING_ID = "UA-XXXXX-X";
+
+ReactGA.initialize(TRACKING_ID);
 
 const ActiveApp: React.FC = () => {
   const [user, setUser] = useState(getUser());
@@ -28,6 +33,10 @@ const ActiveApp: React.FC = () => {
 
 function App() {
   setupIonicReact();
+
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+  }, []);
 
   return (
     <RecoilRoot>
