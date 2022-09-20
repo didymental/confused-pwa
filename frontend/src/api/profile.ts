@@ -10,5 +10,5 @@ export async function updateProfile(
   id: string,
   data: PutProfileData,
 ): Promise<AxiosResponse<ProfileData>> {
-  return client.put(`/profile/${id}`, data);
+  return client.patch(`/profile/${id}/`, data);
 }
