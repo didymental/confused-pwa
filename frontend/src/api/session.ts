@@ -14,7 +14,7 @@ export async function createSession(
 
 export async function updateSession(data: SessionEntity): Promise<AxiosResponse<SessionEntity>> {
   const session_id = data.id;
-  return client.put(`/sessions/${session_id}`, data);
+  return client.put(`/sessions/${session_id}/`, data);
 }
 
 export async function deleteSession(session_id: number): Promise<AxiosResponse<void>> {
