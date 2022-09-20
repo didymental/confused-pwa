@@ -121,7 +121,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             print("vote updated")
 
         except ObjectDoesNotExist:
-            return None
+            raise ValidationError(
+                {
+                    "action": "update_question_vote",
+                    "errors": ["Question not found"],
+                    "status": status.HTTP_404_NOT_FOUND,
+                }
+            )
 
     @database_sync_to_async
     def create_student(self, session: Session, display_name: str):
@@ -237,8 +243,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "leave_session",
-                    "errors": "This session does not belong to you",
-                    "status": 403,
+                    "errors": ["This session does not belong to you"],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -310,8 +316,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                     raise ValidationError(
                         {
                             "action": "join_session",
-                            "errors": "Display name cannot be empty",
-                            "status": 403,
+                            "errors": ["Display name cannot be empty"],
+                            "status": status.HTTP_403_FORBIDDEN,
                         }
                     )
                 await self.student_join_session(
@@ -360,8 +366,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "join_session",
-                    "errors": "This session does not belong to you",
-                    "status": 403,
+                    "errors": ["This session does not belong to you"],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -373,8 +379,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "join_session",
-                    "errors": "This session is currently closed",
-                    "status": 403,
+                    "errors": ["This session is currently closed"],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -382,8 +388,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             raise ValidationError(
                 {
                     "action": "join_session",
-                    "errors": "You have already joined a session. Please leave your current session first",
-                    "status": 403,
+                    "errors": [
+                        "You have already joined a session. Please leave your current session first"
+                    ],
+                    "status": status.HTTP_403_FORBIDDEN,
                 }
             )
 
@@ -559,7 +567,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
-        await self.update_question_vote(question_pk=question_pk, increment=True)
+        await self.update_question_vote(
+            question_pk=question_pk, increment=True
+        )
 
     @action()
     async def unvote_question(self, question_pk: int, **kwargs):
@@ -579,7 +589,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
-        await self.update_question_vote(question_pk=question_pk, increment=False)
+        await self.update_question_vote(
+            question_pk=question_pk, increment=False
+        )
 
     @action()
     async def put_reaction(self, reaction_type_pk: Optional[int], **kwargs):
