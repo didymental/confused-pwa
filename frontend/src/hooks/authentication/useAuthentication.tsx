@@ -13,6 +13,7 @@ import { useInterval } from "usehooks-ts";
 import { sleep } from "../../utils/time";
 import { ProfileData } from "../../types/profiles";
 import useAnalyticsTracker from "../util/useAnalyticsTracker";
+import { useSessions } from "../session/useSession";
 
 const useAuthenticatedUserState = () => {
   const setAuthenthicationData = async (accessToken: string, refreshToken: string) => {
@@ -52,6 +53,8 @@ export const useAuthentication = (): UpdateAuthenticationState => {
   const { presentToast } = useToast();
   const userAnalyticsTracker = useAnalyticsTracker("User");
 
+  const { createSampleSessions, getSessions } = useSessions();
+
   const signUp = async (signUpRequest: SignUpRequest) => {
     try {
       const signUpResponse = await api.auth.signUp(signUpRequest);
@@ -60,8 +63,12 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       const { access, refresh } = loginResponse.data;
       await setAuthenthicationData(access, refresh);
 
-      userAnalyticsTracker("Signed up");
-      history.push("/instructor/dashboard");
+      await createSampleSessions();
+      await getSessions();
+      await userAnalyticsTracker("Signed up");
+      setTimeout(() => {
+        history.push("/instructor/dashboard");
+      }, 2000);
       presentToast({ header: "Sign up success!", color: "success" });
     } catch (err: any) {
       presentToast({
