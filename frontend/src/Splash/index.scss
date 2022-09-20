@@ -1,4 +1,7 @@
 .page {
+  transition: background 0.3s ease-in-out;
+  background-color: var(--ion-color-primary);
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,5 +36,24 @@ ion-content.splash {
   }
   to {
     transform: rotate(10deg);
+  }
+}
+
+.app-animation-outer {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.app-animation {
+  margin: auto;
+}
+
+.app-lottie-animation {
+  height: 400px;
+  background-color: var(--primary-color);
+
+  @media screen and (max-width: 1100px) {
+    height: 300px;
   }
 }

@@ -10,25 +10,33 @@ import {
   IonPopover,
   IonRow,
   useIonAlert,
+  useIonLoading,
 } from "@ionic/react";
 import { createOutline, trashOutline, ellipsisVertical } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { useSessions } from "../../../hooks/session/useSession";
 import { SessionEntity } from "../../../types/session";
 import "./index.scss";
+import moment from "moment";
 
 const SessionViewCard: React.FC<SessionEntity> = (session) => {
   const sessionId = session.id;
   const name = session.name;
   const isOpen = session.is_open;
   // TODO: convert to correct date format
-  const createdAt = session.created_date_time ?? null;
+  const createdAt = moment(session.created_date_time ?? null).format("YYYY/MM/DD kk:mm:ss");
 
   const history = useHistory();
-  const { deleteSession } = useSessions();
+  const { getSessions, deleteSession } = useSessions();
+  const [present, dismiss] = useIonLoading();
 
   const deleteHandler = async (sessionId: number) => {
+    present({
+      message: "Deleting",
+    });
     await deleteSession(sessionId);
+    await getSessions();
+    dismiss();
   };
 
   const editClickHandler = (sessionId: number) => {

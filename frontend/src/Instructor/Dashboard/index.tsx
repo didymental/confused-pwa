@@ -7,21 +7,41 @@ import {
   IonIcon,
   IonPage,
   IonRow,
+  IonSpinner,
 } from "@ionic/react";
 import Navbar from "../../component/Navbar";
 import "./index.scss";
 import SessionViewCard from "./SessionViewCard";
 import { add } from "ionicons/icons";
 import { useHistory } from "react-router";
+import { Redirect } from "react-router-dom";
 import { useSessions } from "../../hooks/session/useSession";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const DashboardPage: React.FC = () => {
   const history = useHistory();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { sessions, getSessions } = useSessions();
 
+  const renderMainContent = () => {
+    if (sessions) {
+      return sessions.map((sessionData) => (
+        <SessionViewCard key={sessionData.id} {...sessionData} />
+      ));
+    } else {
+      return (
+        <p>You have not created any sessions, press the `&quot;`+`&quot;` button to create one!</p>
+      );
+    }
+  };
+
+  const handleRendering = async () => {
+    await getSessions();
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    getSessions();
+    handleRendering();
   }, []);
 
   return (
@@ -30,16 +50,11 @@ const DashboardPage: React.FC = () => {
       <IonContent fullscreen>
         <IonGrid className="dashboard__grid">
           <IonRow>
-            <IonCol>
-              {sessions &&
-                sessions.map((sessionData) => (
-                  <SessionViewCard key={sessionData.id} {...sessionData} />
-                ))}
-              {!sessions && (
-                <p>
-                  You have not created any sessions, press the `&quot;`+`&quot;` button to create
-                  one!
-                </p>
+            <IonCol className={isLoading ? "dashboard__column" : ""}>
+              {isLoading ? (
+                <IonSpinner color="primary" name="crescent"></IonSpinner>
+              ) : (
+                renderMainContent()
               )}
             </IonCol>
           </IonRow>
