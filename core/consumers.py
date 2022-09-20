@@ -124,14 +124,17 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             student = Student.objects.get(id=self.temp_user)
 
             if increment:
-                if Question.objects.filter(
+                print("kw1")
+                if not Question.objects.filter(
                     voted_by__id=self.temp_user
                 ).exists():
                     question.vote_count += 1
                     question.voted_by.add(student)
                     question.unvoted_by.remove(student)
+                    print("kw2 ")
+                print("kw3")
             else:
-                if Question.objects.filter(
+                if not Question.objects.filter(
                     unvoted_by__id=self.temp_user
                 ).exists():
                     question.vote_count -= 1
@@ -598,7 +601,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
         session = await self._get_question_session(question_pk=question_pk)
-        if session.pk != self.session_subscribe:
+
+        if session is None or session.pk != self.session_subscribe:
             return await self.notify_failure(
                 action="vote_question",
                 errors=[
