@@ -3,8 +3,7 @@
  * is received from the backend.
  */
 export interface QuestionData {
-    student: number;
-    question_content: string;
-    vote_count: number;
+  student: number;
+  question_content: string;
+  vote_count: number;
 }
-  

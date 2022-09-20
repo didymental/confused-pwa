@@ -1,5 +1,5 @@
-import axios, { AxiosRequestConfig } from "axios";
-import { BASE_URL, WS_BASE_URL } from "./client";
+import axios from "axios";
+import { BASE_URL } from "./client";
 
 const client = axios.create({
   baseURL: `${BASE_URL}/api`,

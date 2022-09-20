@@ -17,10 +17,8 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonTextarea,
   IonList,
   IonItem,
-  IonActionSheet,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 import { powerSharp, qrCode, shareSocialSharp, linkSharp } from "ionicons/icons";

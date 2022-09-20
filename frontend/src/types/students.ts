@@ -3,8 +3,8 @@
  * is received from the backend.
  */
 export interface StudentData {
-    id: number;
-    display_name: string;
-    session: number;
-    reaction_type: number | null;
+  id: number;
+  display_name: string;
+  session: number;
+  reaction_type: number | null;
 }

@@ -11,9 +11,7 @@ import {
   IonSlide,
   IonSlides,
   IonTextarea,
-  isPlatform,
   CreateAnimation,
-  IonCol,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 
@@ -26,7 +24,6 @@ import { useToast } from "../../hooks/util/useToast";
 import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
-import { toUSVString } from "util";
 
 interface ReactionState {
   title: string;
