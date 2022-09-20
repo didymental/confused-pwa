@@ -388,16 +388,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
         await self.reply(data=message, action=action)
 
-    # @handle_student_change.groups_for_signal
-    # def handle_student_change(self, student: Optional[Student] = None, **kwargs):  # type: ignore
-    #     if student:
-    #         session: Session = student.session
-    #         yield f"session__{session.pk}"
-
-    # @handle_student_change.groups_for_consumer  # type: ignore
-    # def handle_student_change(self, session: Session, **kwargs):  # type: ignore
-    #     yield f"session__{session.pk}"
-
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
         return dict(
