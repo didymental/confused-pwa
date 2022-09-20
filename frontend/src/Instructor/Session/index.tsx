@@ -25,6 +25,8 @@ import confused_1 from "../../assets/confused-1-bg.svg";
 import confused_2 from "../../assets/confused-2-bg.svg";
 import confused_reaction from "../../assets/confused-face.svg";
 import clear_reaction from "../../assets/thumbs-up.svg";
+import { StudentData } from "../../types/students";
+import { QuestionData } from "../../types/questions";
 
 const CLEAR_STATE = "clear";
 const CONFUSED_1_STATE = "confused-1";
@@ -51,6 +53,7 @@ const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) =
           (x: { session: number }) => x.session === sessionId,
         );
         setStudents(studentsInCurrSession);
+        
 
         let setOfStudents: Set<number> = new Set();
         studentsInCurrSession.forEach((student) => setOfStudents.add(student.id));
@@ -211,27 +214,6 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
     </>
   );
 };
-
-/**
- * Defines the structure of the QuestionData that
- * is received from the backend.
- */
-interface QuestionData {
-  student: number;
-  question_content: string;
-  vote_count: number;
-}
-
-/**
- * Defines the structure of the StudentData that
- * is received from the backend.
- */
-interface StudentData {
-  id: number;
-  display_name: string;
-  session: number;
-  reaction_type: number | null;
-}
 
 const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questions }) => {
   return questions.length === 0 ? null : (

@@ -12,7 +12,6 @@ import {
   IonSlides,
   IonTextarea,
   isPlatform,
-  TextareaChangeEventDetail,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 
@@ -22,6 +21,8 @@ import confused_reaction from "../../assets/confused-face.svg";
 import clear_reaction from "../../assets/thumbs-up.svg";
 import client from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
+import { StudentData } from "../../types/students";
+import { QuestionData } from "../../types/questions";
 
 interface ReactionState {
   title: string;
@@ -47,19 +48,34 @@ const StudentSessionPage: React.FC<{
   // displayName = "Test User";
   // sessionId = 3;
 
+  // on mount, reset all reactions to false
+  useEffect(() => {
+    updateStudentReaction("", studentId);
+
+    // on dismount, clear all reactions from student
+    return () => {
+      updateStudentReaction("", studentId);
+    };
+  }, []);
+
   const askQuestion = () => {
-    let toSend = {
+    let toSend: QuestionData = {
       student: studentId,
       question_content: question,
       vote_count: 0,
     };
-    client.post("/questions/", toSend).catch((err) => {
-      presentToast({
-        header: "Error occurred!",
-        message: err.response.data.detail,
-        color: "danger",
+    client
+      .post("/questions/", toSend)
+      .then((res) => {
+        setQuestion("");
+      })
+      .catch((err) => {
+        presentToast({
+          header: "Error occurred!",
+          message: err.response.data.detail,
+          color: "danger",
+        });
       });
-    });
   };
 
   const handleReactionStateChange = (index: number) => {
@@ -135,26 +151,5 @@ const StudentSessionPage: React.FC<{
     </IonPage>
   );
 };
-
-/**
- * Defines the structure of the QuestionData that
- * is received from the backend.
- */
-interface QuestionData {
-  student: number;
-  question_content: string;
-  vote_count: number;
-}
-
-/**
- * Defines the structure of the StudentData that
- * is received from the backend.
- */
-interface StudentData {
-  id: number;
-  display_name: string;
-  session: number;
-  reaction_type: number | null;
-}
 
 export default StudentSessionPage;
