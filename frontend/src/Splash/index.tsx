@@ -6,10 +6,12 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Lottie from "lottie-react";
 import splash from "../assets/question-splash-2.json";
+import useAnalyticsTracker from "../hooks/util/useAnalyticsTracker";
 
 const Splash: React.FC = () => {
   const history = useHistory();
   const [isAnimationPlaying, setIsAnimationPlaying] = useState(true);
+  const eventTracker = useAnalyticsTracker("Splash Page");
 
   useEffect(() => {
     const loadImage = (imageUrl: string) => {
@@ -69,6 +71,7 @@ const Splash: React.FC = () => {
                   <IonButton
                     color="secondary"
                     onClick={() => {
+                      eventTracker("Clicked button", "Instructor");
                       history.push("/login");
                     }}
                   >
@@ -82,6 +85,7 @@ const Splash: React.FC = () => {
                   <IonButton
                     color="secondary"
                     onClick={() => {
+                      eventTracker("Clicked button", "Student");
                       history.push("/student");
                     }}
                   >

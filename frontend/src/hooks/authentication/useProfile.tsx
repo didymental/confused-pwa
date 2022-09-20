@@ -1,6 +1,7 @@
 import api from "../../api";
 import { setUser } from "../../localStorage";
 import { PutProfileData } from "../../types/profiles";
+import useAnalyticsTracker from "../util/useAnalyticsTracker";
 import { useToast } from "../util/useToast";
 
 interface UpdateAuthenticationState {
@@ -9,6 +10,7 @@ interface UpdateAuthenticationState {
 
 export const useProfile = (): UpdateAuthenticationState => {
   const { presentToast } = useToast();
+  const profileAnalyticsTracker = useAnalyticsTracker("Profile");
 
   const editProfile = async (id: string, data: PutProfileData) => {
     try {
@@ -16,6 +18,7 @@ export const useProfile = (): UpdateAuthenticationState => {
       const profileData = response.data;
       setUser(profileData);
 
+      profileAnalyticsTracker("Updated nickname");
       presentToast({ header: "Update nickname success!", color: "success" });
     } catch (err: any) {
       presentToast({

@@ -3,6 +3,7 @@ import { useHistory } from "react-router";
 import { CreateSessionRequest, SessionEntity } from "../../types/session";
 import api from "../../api";
 import { useToast } from "../util/useToast";
+import useAnalyticsTracker from "../util/useAnalyticsTracker";
 
 const sessionsState = atom({
   key: "SESSIONS_ATOM",
@@ -47,6 +48,8 @@ export const useSessions = (): UpdateSessionsState => {
   const history = useHistory();
   const { sessions, setSessions, setSession } = useSessionsState();
   const { presentToast } = useToast();
+  const sessionAnalyticsTracker = useAnalyticsTracker("Session");
+
   const getSessions = async () => {
     try {
       const response = await api.session.getSessions();
@@ -65,6 +68,8 @@ export const useSessions = (): UpdateSessionsState => {
       const response = await api.session.createSession(createSessionRequest);
       const session = response.data;
       setSession(session);
+
+      sessionAnalyticsTracker("Created session");
       history.push("/instructor/dashboard");
       presentToast({ header: "Create session successfully!", color: "success" });
     } catch (err: any) {
@@ -80,6 +85,8 @@ export const useSessions = (): UpdateSessionsState => {
       const response = await api.session.updateSession(sessionEntity);
       const session = response.data;
       setSession(session);
+
+      sessionAnalyticsTracker("Updated session");
       history.push("/instructor/dashboard");
       presentToast({ header: "Edit session successfully!", color: "success" });
     } catch (err: any) {
@@ -93,6 +100,8 @@ export const useSessions = (): UpdateSessionsState => {
   const deleteSession = async (session_id: number) => {
     try {
       await api.session.deleteSession(session_id);
+
+      sessionAnalyticsTracker("Deleted session");
       presentToast({ header: "Delete session successfully!", color: "success" });
     } catch (err: any) {
       presentToast({
