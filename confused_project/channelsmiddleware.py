@@ -37,8 +37,15 @@ class JwtAuthMiddleware(BaseMiddleware):
         # Close old database connections to prevent usage of timed out connections
         close_old_connections()
 
+        parsed_qs = parse_qs(scope["query_string"].decode("utf8"))
+        tokens = parsed_qs.get("token") or []
+
+        if not tokens:
+            scope["user"] = AnonymousUser()
+            return await super().__call__(scope, receive, send)
+
         # Get the token
-        token = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
+        token = tokens[0]
 
         # Try to authenticate the user
         try:

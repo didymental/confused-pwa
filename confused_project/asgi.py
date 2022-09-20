@@ -11,10 +11,6 @@ import os
 from django.core.asgi import get_asgi_application
 
 from channels.routing import ProtocolTypeRouter, URLRouter
-from .channelsmiddleware import JwtAuthMiddlewareStack
-
-import core.urls
-
 
 if "DYNO" in os.environ:
     os.environ.setdefault(
@@ -25,11 +21,16 @@ else:
         "DJANGO_SETTINGS_MODULE", "confused_project.settings.development"
     )
 
+django_asgi_app = get_asgi_application()
+
+from .channelsmiddleware import JwtAuthMiddlewareStack
+import core.urls
+
 
 # TODO: https
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "http": django_asgi_app,
         "websocket": JwtAuthMiddlewareStack(
             URLRouter(core.urls.websocket_urlpatterns)
         ),
