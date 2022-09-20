@@ -79,7 +79,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     # TODO: handle unexpected disconnection
     async def disconnect(self, code):
-        await self._leave_session(silent=True)
+        await self._leave_session(silent=False)
         return await super().disconnect(code)
 
     @action()
