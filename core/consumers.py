@@ -14,6 +14,7 @@ from core.models.Question import Question
 
 from core.models.Session import Session
 from core.models.Student import Student
+from core.models.ReactionType import ReactionType
 from core.models.UserProfile import UserProfile
 from core.serializers.SessionSerializer import SessionSerializer
 from core.serializers.StudentSerializer import StudentSerializer
@@ -31,7 +32,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     serializer_class: Type[SessionSerializer] = SessionSerializer
     lookup_field: str = "pk"
     session_subscribe: Optional[int] = None
-    temp_user: Optional[Student] = None
+    temp_user: Optional[int] = None
     authentication_classes = (JWTAuthentication,)
 
     @database_sync_to_async
@@ -39,6 +40,31 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if not Session.objects.filter(pk=pk).exists():
             return None
         return Session.objects.get(pk=pk)
+
+    @database_sync_to_async
+    def get_student(self, pk: int) -> Optional[Student]:
+        if not Student.objects.filter(pk=pk).exists():
+            return None
+        return Student.objects.get(pk=pk)
+
+    @database_sync_to_async
+    def create_question(
+        self, student_pk: int, question_content: str
+    ) -> Optional[Question]:
+        Question.objects.create(
+            student=self.get_student(pk=student_pk),
+            question_content=question_content,
+        )
+
+    @database_sync_to_async
+    def update_student(
+        self, student_pk: int, reaction_type_pk: Optional[int]
+    ) -> Optional[Student]:
+        student = Student.objects.get(pk=student_pk)
+        reaction = ReactionType.objects.get(pk=reaction_type_pk)
+
+        student.reaction_type = reaction
+        student.save()
 
     @database_sync_to_async
     def get_question_session(self, question: Question) -> Optional[Session]:
@@ -52,6 +78,11 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def open_session(self, session: Session):
         session.is_open = True
         session.save()
+
+    @database_sync_to_async
+    def empty_session(self, session: Session):
+        students = Student.objects.filter(session=session)
+        students.delete()
 
     @database_sync_to_async
     def close_session(self, session: Session):
@@ -97,6 +128,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self._leave_session(silent=False)
 
     async def _leave_session(self, silent=False, **kwargs):
+
+        print("kw checkpoint0")
         if self.session_subscribe is None:
             if silent:
                 return
@@ -107,6 +140,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
         session: Session = await self.get_session(pk=self.session_subscribe)
+        print("kw checkpoint1")
 
         if session is None:
             if silent:
@@ -117,6 +151,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        print("kw checkpoint2")
+
         try:
             user: UserProfile = self.scope["user"]
 
@@ -126,38 +162,42 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 await self.instructor_leave_session(session=session, user=user)
             elif self.temp_user is not None:
                 print("student leaving")
-                await self.student_leave_session(student=self.temp_user)
-                self.temp_user = None
+                student = await self.get_student(pk=self.temp_user)
+                await self.student_leave_session(student=student)
 
-            await self.handle_student_change.unsubscribe(
-                session=session, consumer=self
-            )
-
-            await self.handle_session_change.unsubscribe(
-                session=session, consumer=self
-            )
+            await self._leave_session_cleanup()
 
             if not silent:
                 await self.notify_joiners()
-
-            if self.channel_layer:
-                await self.channel_layer.group_discard(
-                    str(self.session_subscribe), self.channel_name
-                )
-
-            # TODO: need to silence this?
-            print("notifying success", user.is_authenticated, self.temp_user)
-            await self.notify_success(
-                action="leave_session",
-                message=f"You have left or been removed from session {self.session_subscribe}",
-            )
-
-            self.session_subscribe = None
 
         except ValidationError as e:
             if silent:
                 return
             await self.notify_failure(**e.args[0])
+
+    async def _leave_session_cleanup(self):
+        session: Session = await self.get_session(pk=self.session_subscribe)
+
+        await self.handle_student_change.unsubscribe(
+            session=session, consumer=self
+        )
+
+        await self.handle_session_change.unsubscribe(
+            session=session, consumer=self
+        )
+
+        if self.channel_layer:
+            await self.channel_layer.group_discard(
+                str(self.session_subscribe), self.channel_name
+            )
+
+        await self.notify_success(
+            action="leave_session",
+            message=f"You have left or been removed from session {self.session_subscribe}",
+        )
+
+        self.temp_user = None
+        self.session_subscribe = None
 
     async def instructor_leave_session(
         self, session: Session, user: UserProfile
@@ -291,7 +331,17 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 }
             )
 
+        # if session.is_open:
+        #     raise ValidationError(
+        #         {
+        #             "action": "join_session",
+        #             "errors": "This session is already open. Please close the session before joining",
+        #             "status": 403,
+        #         }
+        #     )
+
         await self.open_session(session=session)
+        await self.empty_session(session=session)
 
     async def student_join_session(self, session: Session, display_name: str):
         if not session.is_open:
@@ -303,14 +353,25 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 }
             )
 
-        self.temp_user = await self.create_student(
+        if self.session_subscribe is not None:
+            raise ValidationError(
+                {
+                    "action": "join_session",
+                    "errors": "You have already joined a session. Please leave your current session first",
+                    "status": 403,
+                }
+            )
+
+        student = await self.create_student(
             session=session, display_name=display_name
         )
+        self.temp_user = student.pk
         print("kw assigned temp user")
 
     async def notify_joiners(self):
         if self.session_subscribe is None:
             return
+
         session: Session = await self.get_session(pk=self.session_subscribe)
 
         if self.channel_layer is not None:
@@ -374,9 +435,43 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         **kwargs,
     ):
         print("kw fire off student", action)
-        if action != "update":
-            return
 
+        if action == "delete":
+            await self._handle_student_delete(
+                message=message,
+                observer=observer,
+                subscribing_request_ids=subscribing_request_ids,
+                **kwargs,
+            )
+
+        if action == "update":
+            await self._handle_student_update(
+                message=message,
+                observer=observer,
+                subscribing_request_ids=subscribing_request_ids,
+                **kwargs,
+            )
+
+    async def _handle_student_delete(
+        self,
+        message: Dict,
+        observer=None,
+        subscribing_request_ids=[],
+        **kwargs,
+    ):
+        student_pk = message.get("pk")
+        print("kw handle delete", student_pk, self.temp_user)
+        if student_pk == self.temp_user:
+            print("kw leave session")
+            await self._leave_session_cleanup()
+
+    async def _handle_student_update(
+        self,
+        message: Dict,
+        observer=None,
+        subscribing_request_ids=[],
+        **kwargs,
+    ):
         student = message.get("data")
         if student is None:
             return
@@ -386,7 +481,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if session != self.session_subscribe:
             return
 
-        await self.reply(data=message, action=action)
+        await self.reply(data=message, action="update")
 
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
@@ -423,6 +518,32 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             "kw fire handle session change", message, action, session.is_open
         )
 
-        # print("kw fire handle session change", is_open)
         if not session.is_open:
             await self._leave_session(silent=True)
+
+    # For testing
+    @action()
+    async def post_question(self, question_content: str, **kwargs):
+        if not self.temp_user:
+            return await self.notify_failure(
+                action="post_question",
+                errors="You have not joined a session yet",
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        await self.create_question(
+            student_pk=self.temp_user, question_content=question_content
+        )
+
+    @action()
+    async def put_reaction(self, reaction_type_pk: Optional[int], **kwargs):
+        if not self.temp_user:
+            return await self.notify_failure(
+                action="put_reaction",
+                errors="You have not joined a session yet",
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        await self.update_student(
+            student_pk=self.temp_user, reaction_type_pk=reaction_type_pk
+        )
