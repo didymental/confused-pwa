@@ -14,7 +14,6 @@ import "./index.scss";
 import SessionViewCard from "./SessionViewCard";
 import { add } from "ionicons/icons";
 import { useHistory } from "react-router";
-import { Redirect } from "react-router-dom";
 import { useSessions } from "../../hooks/session/useSession";
 import { useEffect, useState } from "react";
 
