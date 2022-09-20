@@ -12,3 +12,14 @@
     margin-top: 0.5rem;
   }
 }
+
+.profile-dropdown {
+  &__name {
+    margin: 1rem;
+    display: flex;
+    justify-content: center;
+    font-size: large;
+    font-weight: 700;
+    color: grey;
+  }
+}

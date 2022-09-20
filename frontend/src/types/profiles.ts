@@ -3,3 +3,7 @@ export interface ProfileData {
   email: string;
   name: string;
 }
+
+export interface PutProfileData {
+  name: string;
+}
