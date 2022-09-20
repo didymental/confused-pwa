@@ -1,0 +1,31 @@
+/** BLOCK **/
+.questions {
+    width: 100%;
+    height: 30vh;
+    max-height: 30vh;
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+
+    /**ELEMENT**/
+    &__list-header-label {
+        font-size: large;
+        font-weight: bolder;
+        color: black;
+    }
+
+    &__list {
+        max-height: 100%;
+        overflow-y: scroll;
+        min-width: 90%;
+        background-color: transparent;
+    }
+
+    &__item {
+        font-size: medium;
+        --background: transparent;
+    }
+}

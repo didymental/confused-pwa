@@ -1,9 +1,20 @@
+.student-session {
+
+  &__grid {
+    max-width: 800px;
+    width: 90vw;
+  }
+  
+}
+
 .container {
   padding: 10vh;
 }
 
 .container__questions-container {
   height: 40vh;
+  max-width: 800px;
+  width: 90vw;
 }
 
 ion-slides.slides {
@@ -13,11 +24,15 @@ ion-slides.slides {
 .card {
   height: 30vh;
   width: 30vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .card__content {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .textarea {
@@ -27,4 +42,5 @@ ion-slides.slides {
   justify-content: center;
   padding-left: 1em;
   border-radius: 1em;
+  
 }
