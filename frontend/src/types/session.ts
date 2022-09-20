@@ -10,7 +10,7 @@ export interface SessionEntity {
   instructor: string;
   name: string;
   is_open: boolean;
-  created_date_time?: Date;
+  created_date_time?: string;
 }
 
 export interface CreateSessionRequest {
