@@ -8,7 +8,7 @@ import { getUser, STORAGE_EVENT } from "../localStorage";
 import { useEffect, useState } from "react";
 import ReactGA from "react-ga";
 
-const TRACKING_ID = "UA-XXXXX-X";
+const TRACKING_ID = "UA-241949846-1";
 
 ReactGA.initialize(TRACKING_ID);
 
