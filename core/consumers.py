@@ -116,6 +116,14 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             else:
                 question.vote_count -= 1
 
+            if question.vote_count < 0:
+                raise ValidationError(
+                    {
+                        "action": "update_question_vote",
+                        "errors": ["Vote count cannot be less than 0"],
+                        "status": status.HTTP_403_FORBIDDEN,
+                    }
+                )
             question.save()
 
             print("vote updated")
