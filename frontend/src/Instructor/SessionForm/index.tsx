@@ -113,7 +113,7 @@ const SessionForm: React.FunctionComponent = () => {
               </IonCol>
             </IonRow>
             <IonRow>
-              <IonCol>
+              <IonCol className="session-form__description">
                 <IonItem fill="outline">
                   {/* <IonLabel position="floating"> Email</IonLabel> */}
                   <IonInput
@@ -133,7 +133,7 @@ const SessionForm: React.FunctionComponent = () => {
 
             <IonRow>
               <IonCol className="session-form__button">
-                <IonButton onClick={onSubmit}>submit</IonButton>
+                <IonButton onClick={onSubmit}>SUBMIT</IonButton>
               </IonCol>
             </IonRow>
           </IonGrid>

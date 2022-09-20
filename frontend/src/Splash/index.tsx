@@ -75,7 +75,7 @@ const Splash: React.FC = () => {
                       history.push("/login");
                     }}
                   >
-                    Instructor
+                    INSTRUCTOR
                   </IonButton>
                 </IonRow>
                 <IonRow className="grid__row">
@@ -89,7 +89,7 @@ const Splash: React.FC = () => {
                       history.push("/student");
                     }}
                   >
-                    Student
+                    STUDENT
                   </IonButton>
                 </IonRow>
               </IonGrid>

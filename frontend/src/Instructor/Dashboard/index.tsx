@@ -41,6 +41,7 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     handleRendering();
+    // eslint-disable-next-line
   }, []);
 
   return (
