@@ -1,0 +1,165 @@
+.ion-content-instructor-session {
+    &__clear {
+        --ion-background-color: #6bf178;
+    }
+
+    &__confused-1 {
+        --ion-background-color: #ffe74c;
+    }
+
+    &__confused-2 {
+        --ion-background-color: #ff5964;
+    }
+}
+
+.ion-grid-instructor-session {
+    &__overall {
+        max-width: 800px;
+        width: 90vw;
+    }
+}
+
+.ion-card-instructor-session {
+    &__clear {
+        padding-top: 3rem;
+        padding-left: 0rem;
+        padding-right: 0rem;
+        padding-bottom: 3rem;
+        height: 100%;
+        background-color: transparent;
+        box-shadow: none;
+    }
+    
+    &__confused-1 {
+        padding-top: 3rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-bottom: 3rem;
+        height: 100%;
+        background-color: transparent;
+        box-shadow: none;
+        
+    }
+
+    &__confused-2 {
+        padding-top: 3rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-bottom: 3rem;
+        height: fit-content;
+        background-color: transparent;
+        box-shadow: none;
+        
+    }
+}
+
+.ion-row-instructor-session {
+    display: flex;
+    justify-content: center;
+
+    &__reactions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: -0.75rem;
+    }
+}
+
+.ion-btn-instructor-session {
+
+    &__reactions {
+        font-size: small;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.75);
+        color: #FF6242;
+        border-radius: 0.25rem;
+        width: 100%;
+        max-width: 75vw;
+        
+        &:hover {
+            text-decoration: underline;
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+        }
+    }
+
+    &__end-session {
+        width: 100%;
+        max-width: 75vw;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+        }
+    }
+
+    &__share {
+        font-size: small;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.75);
+        color: #1877F2;
+        border-radius: 0.25rem;
+        width: 100%;
+        max-width: 75vw;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+        }
+    }
+}
+
+
+.ion-label-instructor-session {
+    &__header {
+        font-size: large;
+        font-weight: bolder;
+        color: black;
+    }
+}
+
+.ion-col-instructor-session {
+    &__reactions {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__share {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.ion-badge-instructor-session {
+    &__reactions {
+        margin: 1.25rem;
+        border-radius: 0.25rem;
+        min-width: 5rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        font-size: medium;
+        font-weight: 550;
+        color: black;
+        --background: rgba(255, 255, 255, 0.3);
+    }
+}
+
+.ion-progress-bar-instructor-session {
+    min-height: 10px;
+}
+
+.ion-text-instructor-session {
+    color: black;
+    font-size: x-large;
+    font-weight: 550;
+    margin-top: 10px;
+}
