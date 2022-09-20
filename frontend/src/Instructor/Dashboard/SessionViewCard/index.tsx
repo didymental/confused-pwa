@@ -10,6 +10,7 @@ import {
   IonPopover,
   IonRow,
   useIonAlert,
+  useIonLoading,
 } from "@ionic/react";
 import { createOutline, trashOutline, ellipsisVertical } from "ionicons/icons";
 import { useHistory } from "react-router";
@@ -24,10 +25,16 @@ const SessionViewCard: React.FC<SessionEntity> = (session) => {
   const createdDate = dateTime ? getFormattedDate(dateTime) : null;
 
   const history = useHistory();
-  const { deleteSession } = useSessions();
+  const { getSessions, deleteSession } = useSessions();
+  const [present, dismiss] = useIonLoading();
 
   const deleteHandler = async (sessionId: number) => {
+    present({
+      message: "Deleting",
+    });
     await deleteSession(sessionId);
+    await getSessions();
+    dismiss();
   };
 
   const editClickHandler = (sessionId: number) => {

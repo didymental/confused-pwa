@@ -9,6 +9,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  --ion-background-color: var(--ion-color-primary);
+}
+
+.join_page__background {
+  --ion-background-color: var(--ion-color-primary);
 }
 
 .login-form__icon {
@@ -33,6 +38,10 @@
   }
 }
 
+.join-page__input {
+  --background: white;
+}
+
 .join-page__button {
   color: var(--ion-color-secondary);
 }
@@ -42,10 +51,12 @@
 }
 
 .join-page__qr-scan-box {
-  width: 98vw;
+  width: 99vw;
   // width: 100%;
 }
 
-.join-page_qr-container {
-  text-align: center;
+.join-page__qr-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

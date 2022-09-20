@@ -75,8 +75,8 @@ const Scanner: React.FC = (props) => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className="join-page__container splash">
-        <IonGrid className="join-page_qr-container">
+      <IonContent fullscreen className="join-page__container">
+        <IonGrid className="join-page__container">
           <IonRow>
             <IonCol>
               <video id="qr-video" className="join-page__qr-scan-box"></video>

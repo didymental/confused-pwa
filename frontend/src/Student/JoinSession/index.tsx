@@ -56,6 +56,7 @@ const JoinPage: React.FC = () => {
     setStudentName(studentName.trim().substring(0, MAX_STUDENT_NAME_LEN));
 
     if (!isNumericalOnly(sessionIdInput)) {
+      setSessionIdInput("");
       setMessage(invalidPINMsg);
       setIsError(true);
       return;
@@ -120,7 +121,7 @@ const JoinPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className="join-page__container splash">
+      <IonContent fullscreen className="join-page__container">
         <IonGrid className="join-page__content">
           <IonRow>
             <IonCol>
@@ -141,7 +142,7 @@ const JoinPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonItem fill="outline">
+              <IonItem fill="outline" className="join-page__input">
                 <IonLabel position="stacked">Session Code</IonLabel>
                 <IonInput
                   type="tel"
@@ -157,7 +158,7 @@ const JoinPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonItem fill="outline">
+              <IonItem fill="outline" className="join-page__input">
                 <IonLabel position="stacked">Display Name</IonLabel>
                 <IonInput
                   type="text"

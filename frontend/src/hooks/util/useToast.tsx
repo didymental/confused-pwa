@@ -17,9 +17,9 @@ export const useToast = (): ToastState => {
     present({
       header: header,
       message: message,
-      duration: 1500,
+      duration: 1000,
       position: "top",
-      color: color,
+      color: color === "success" ? "toastsuccess" : color,
     });
   };
 

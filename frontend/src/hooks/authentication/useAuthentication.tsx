@@ -12,6 +12,8 @@ import { useToast } from "../util/useToast";
 import { useInterval } from "usehooks-ts";
 import { sleep } from "../../utils/time";
 import { ProfileData } from "../../types/profiles";
+import useAnalyticsTracker from "../util/useAnalyticsTracker";
+import { useSessions } from "../session/useSession";
 
 const useAuthenticatedUserState = () => {
   const setAuthenthicationData = async (accessToken: string, refreshToken: string) => {
@@ -49,6 +51,9 @@ export const useAuthentication = (): UpdateAuthenticationState => {
   const history = useHistory();
   const { setAuthenthicationData, clearAuthenticationData } = useAuthenticatedUserState();
   const { presentToast } = useToast();
+  const userAnalyticsTracker = useAnalyticsTracker("User");
+
+  const { createSampleSessions, getSessions } = useSessions();
 
   const signUp = async (signUpRequest: SignUpRequest) => {
     try {
@@ -58,7 +63,12 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       const { access, refresh } = loginResponse.data;
       await setAuthenthicationData(access, refresh);
 
-      history.push("/instructor/dashboard");
+      await createSampleSessions();
+      await getSessions();
+      await userAnalyticsTracker("Signed up");
+      setTimeout(() => {
+        history.push("/instructor/dashboard");
+      }, 2000);
       presentToast({ header: "Sign up success!", color: "success" });
     } catch (err: any) {
       presentToast({
@@ -76,6 +86,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       const { access, refresh } = data;
       await setAuthenthicationData(access, refresh);
 
+      userAnalyticsTracker("Logged in");
       history.push("/instructor/dashboard");
       presentToast({ header: "Login success!", color: "success" });
     } catch (err: any) {
@@ -98,6 +109,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       const { access, refresh } = response.data;
       await setAuthenthicationData(access, refresh);
 
+      userAnalyticsTracker("Logged in with refreshed token");
       history.push("/instructor/dashboard");
       presentToast({ header: "Login success!", color: "success" });
     } catch (err: any) {
@@ -112,6 +124,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
 
   const logout = () => {
     clearAuthenticationData();
+    userAnalyticsTracker("Logged out");
     history.push("/");
     presentToast({ header: "Logout success!", color: "success" });
   };
