@@ -27,9 +27,9 @@ function validateEmail(email: string) {
 }
 
 const SignUpPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("eve.holt@reqres.in");
-  const [password, setPassword] = useState<string>("cityslicka");
-  const [displayName, setDisplayName] = useState<string>("ailing35");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [displayName, setDisplayName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { user, signUp } = useAuthentication();

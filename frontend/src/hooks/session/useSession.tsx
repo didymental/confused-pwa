@@ -40,9 +40,25 @@ interface UpdateSessionsState {
   sessions: SessionEntity[] | null;
   getSessions: () => Promise<void>;
   createSession: (createSessionRequest: CreateSessionRequest) => Promise<void>;
+  createSampleSessions: () => Promise<void>;
   updateSession: (updateSessionRequest: SessionEntity) => Promise<void>;
   deleteSession: (sessionId: number) => Promise<void>;
 }
+
+const sampleSessions = [
+  {
+    name: "Welcome to Confused!",
+    is_open: false,
+  },
+  {
+    name: 'Click "+" to create session',
+    is_open: false,
+  },
+  {
+    name: 'Click "Start" to start and share session',
+    is_open: false,
+  },
+];
 
 export const useSessions = (): UpdateSessionsState => {
   const history = useHistory();
@@ -72,6 +88,19 @@ export const useSessions = (): UpdateSessionsState => {
       sessionAnalyticsTracker("Created session");
       history.push("/instructor/dashboard");
       presentToast({ header: "Create session successfully!", color: "success" });
+    } catch (err: any) {
+      presentToast({
+        header: "Create sessions failed!",
+        color: "danger",
+      });
+    }
+  };
+
+  const createSampleSessions = async () => {
+    try {
+      await api.session.createSession(sampleSessions[2]);
+      await api.session.createSession(sampleSessions[1]);
+      await api.session.createSession(sampleSessions[0]);
     } catch (err: any) {
       presentToast({
         header: "Create sessions failed!",
@@ -114,6 +143,7 @@ export const useSessions = (): UpdateSessionsState => {
     sessions,
     getSessions,
     createSession,
+    createSampleSessions,
     updateSession,
     deleteSession,
   };
