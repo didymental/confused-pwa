@@ -2,12 +2,12 @@ import "./index.scss";
 import { IonApp, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { RecoilRoot } from "recoil";
-import { useAuthenticatedUser } from "../hooks/authentication/useAuthentication";
 import AuthenticatedApp from "../AuthenticatedApp";
 import UnauthenticatedApp from "../UnauthenticatedApp";
+import { getUser } from "../localStorage";
 
 const ActiveApp: React.FC = () => {
-  const user = useAuthenticatedUser();
+  const user = getUser();
   return user ? <AuthenticatedApp /> : <UnauthenticatedApp />;
 };
 
