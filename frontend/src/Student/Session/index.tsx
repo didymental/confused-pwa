@@ -12,6 +12,10 @@ import {
   IonSlides,
   IonTextarea,
   isPlatform,
+  IonListHeader,
+  IonItem,
+  IonLabel,
+  IonList,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 
@@ -23,6 +27,7 @@ import client from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
+import QuestionsDisplay from "../../component/QuestionsDisplay";
 
 interface ReactionState {
   title: string;
@@ -44,9 +49,6 @@ const StudentSessionPage: React.FC<{
   const { presentToast } = useToast();
 
   /* TO DELETE - FOR TESTING ONLY */
-  // studentId = 3;
-  // displayName = "Test User";
-  // sessionId = 3;
 
   // on mount, reset all reactions to false
   useEffect(() => {
@@ -58,12 +60,22 @@ const StudentSessionPage: React.FC<{
     };
   }, []);
 
+  const getQuestionsInSession = () => {
+    // To change to GET_QUESTION action from websocket
+  };
+
+  const upVoteQuestion = () => {
+    // To change to PUT_QUESTION action from websocket
+  };
+
   const askQuestion = () => {
     let toSend: QuestionData = {
       student: studentId,
       question_content: question,
       vote_count: 0,
     };
+
+    // To change to POST_QUESTION action on websocket
     client
       .post("/questions/", toSend)
       .then((res) => {
@@ -102,6 +114,7 @@ const StudentSessionPage: React.FC<{
       reaction_type: reactionId,
     };
 
+    // To change to PUT_REACTION on Websocket
     client.put(`/students/${studentId}`, toSend).catch((err) => {
       presentToast({
         header: "Error occurred!",
@@ -115,7 +128,9 @@ const StudentSessionPage: React.FC<{
     <IonPage>
       <Navbar title={"Session Title"} />
       <IonContent>
-        <IonGrid className="container__questions-container"></IonGrid>
+        <IonGrid className="container__questions-container">
+          <QuestionsDisplay questions={[]} />
+        </IonGrid>
         <IonSlides className="slides" options={{ slidesPerView: isPlatform("mobile") ? 1.5 : 5 }}>
           {reactionStates.map((item, index) => {
             return (

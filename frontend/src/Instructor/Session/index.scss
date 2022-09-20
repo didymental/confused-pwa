@@ -51,17 +51,6 @@
         box-shadow: none;
         
     }
-
-    &__questions {
-        width: 100%;
-        max-height: 30vh;
-        background: rgba(255, 255, 255, 0.3);
-        box-shadow: none;
-        margin-top: 1.25rem;
-        margin-bottom: 1.25rem;
-        display: flex;
-        flex-direction: column;
-    }
 }
 
 .ion-row-instructor-session {
@@ -122,30 +111,11 @@
 }
 
 
-.ion-list-instructor-session {
-    &__questions {
-        max-height: 100%;
-        overflow-y: scroll;
-        min-width: 90%;
-        border-radius: 25px;
-        background: transparent;
-    }
-    
-}
-
 .ion-label-instructor-session {
     &__header {
         font-size: large;
         font-weight: bolder;
         color: black;
-    }
-}
-
-.ion-item-instructor-session {
-    &__questions {
-        font-size: medium;
-        margin-bottom: 0.15rem;
-        --background: transparent;
     }
 }
 

@@ -27,6 +27,7 @@ import confused_reaction from "../../assets/confused-face.svg";
 import clear_reaction from "../../assets/thumbs-up.svg";
 import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
+import QuestionsDisplay from "../../component/QuestionsDisplay";
 
 const CLEAR_STATE = "clear";
 const CONFUSED_1_STATE = "confused-1";
@@ -53,7 +54,6 @@ const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) =
           (x: { session: number }) => x.session === sessionId,
         );
         setStudents(studentsInCurrSession);
-        
 
         let setOfStudents: Set<number> = new Set();
         studentsInCurrSession.forEach((student) => setOfStudents.add(student.id));
@@ -212,28 +212,6 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
         </IonRow>
       </IonGrid>
     </>
-  );
-};
-
-const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questions }) => {
-  return questions.length === 0 ? null : (
-    <IonCard className="ion-card-instructor-session__questions">
-      <IonListHeader lines="full">
-        <IonLabel className="ion-label-instructor-session__header">
-          Questions from Students
-        </IonLabel>
-      </IonListHeader>
-      <IonList className="ion-list-instructor-session__questions">
-        {questions.map((question: QuestionData) => (
-          <IonItem
-            className="ion-item-instructor-session__questions"
-            key={question.question_content}
-          >
-            {'"' + question.question_content + '"'}
-          </IonItem>
-        ))}
-      </IonList>
-    </IonCard>
   );
 };
 
