@@ -1,6 +1,7 @@
 import "./index.scss";
 import { IonApp, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
+
 import { RecoilRoot } from "recoil";
 import AuthenticatedApp from "../AuthenticatedApp";
 import UnauthenticatedApp from "../UnauthenticatedApp";
