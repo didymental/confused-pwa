@@ -477,24 +477,24 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
-        student = message.get("data")
-        if student is None:
-            return
+        # student = message.get("data")
+        # if student is None:
+        #     return
 
-        session: int = student.get("session")
+        session = message.get("session")
 
         if session != self.session_subscribe:
             return
 
-        await self.reply(data=message, action="update")
+        await self.reply(data=message, action="update_student")
 
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
         print("kw serialize student", action)
         return dict(
-            data=StudentSerializer(student).data,
-            action=action.value,
-            pk=student.pk,
+            **StudentSerializer(student).data
+            # action=action.value,
+            # pk=student.pk,
         )
 
     # TODO: fix groups_for_signal doesn't work
