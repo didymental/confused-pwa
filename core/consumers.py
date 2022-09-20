@@ -109,12 +109,34 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     ) -> Optional[Question]:
 
         try:
+            # TODO: double check?
+            if self.temp_user is None:
+                raise ValidationError(
+                    {
+                        "action": "update_question_vote",
+                        "errors": ["You have not joined a session yet"],
+                        "status": status.HTTP_403_FORBIDDEN,
+                    }
+                )
+
             question = Question.objects.get(pk=question_pk)
+            # TODO: check if stu exists?
+            student = Student.objects.get(id=self.temp_user)
 
             if increment:
-                question.vote_count += 1
+                if Question.objects.filter(
+                    voted_by__id=self.temp_user
+                ).exists():
+                    question.vote_count += 1
+                    question.voted_by.add(student)
+                    question.unvoted_by.remove(student)
             else:
-                question.vote_count -= 1
+                if Question.objects.filter(
+                    unvoted_by__id=self.temp_user
+                ).exists():
+                    question.vote_count -= 1
+                    question.unvoted_by.add(student)
+                    question.voted_by.remove(student)
 
             if question.vote_count < 0:
                 raise ValidationError(
@@ -545,7 +567,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
-        if not self.temp_user:
+        if self.temp_user is None:
             return await self.notify_failure(
                 action="post_question",
                 errors=["You have not joined a session yet"],
@@ -568,7 +590,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
-        if not self.temp_user:
+        if self.temp_user is None:
             return await self.notify_failure(
                 action="vote_question",
                 errors=["You have not joined a session yet"],
@@ -585,9 +607,12 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
-        await self.update_question_vote(
-            question_pk=question_pk, increment=True
-        )
+        try:
+            await self.update_question_vote(
+                question_pk=question_pk, increment=True
+            )
+        except ValidationError as e:
+            await self.notify_failure(**e.args[0])
 
     @action()
     async def unvote_question(self, question_pk: int, **kwargs):
@@ -600,7 +625,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
-        if not self.temp_user:
+        if self.temp_user is None:
             return await self.notify_failure(
                 action="unvote_question",
                 errors=["You have not joined a session yet"],
@@ -623,7 +648,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @action()
     async def put_reaction(self, reaction_type_pk: Optional[int], **kwargs):
-        if not self.temp_user:
+        if self.temp_user is None:
             return await self.notify_failure(
                 action="put_reaction",
                 errors=["You have not joined a session yet"],
