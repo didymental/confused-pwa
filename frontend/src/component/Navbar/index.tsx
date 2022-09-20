@@ -6,8 +6,10 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
+  IonItem,
   IonPopover,
   IonRow,
+  IonText,
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
@@ -16,6 +18,8 @@ import logo from "../../assets/logo.svg";
 import { personCircle, logOutOutline, createOutline } from "ionicons/icons";
 import { useToast } from "../../hooks/util/useToast";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
+import { useProfile } from "../../hooks/authentication/useProfile";
+import { getUser } from "../../localStorage";
 
 interface NavbarProps {
   title?: string;
@@ -28,11 +32,16 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   const { title = "", showProfileIcon = false, showBackButton = false, showLogo = false } = props;
   const location = useLocation();
   const history = useHistory();
+  const user = getUser();
   const [presentAlert] = useIonAlert();
   const { presentToast } = useToast();
   const { logout } = useAuthentication();
+  const { editProfile } = useProfile();
 
   const handleChangeName = () => {
+    if (!user) {
+      return;
+    }
     presentAlert({
       header: "Enter your new nickname",
       buttons: [
@@ -49,12 +58,12 @@ const Navbar: React.FC<NavbarProps> = (props) => {
           handler: (value) => {
             const name = value?.name;
             if (name) {
-              presentToast({ header: "Update nickname success!", color: "success" });
+              editProfile(user.id, { name: name });
               return;
             }
             presentToast({
               header: "Update nickname failed!",
-              message: "Please key in nickname.",
+              message: "Please key in your nickname.",
               color: "danger",
             });
           },
@@ -76,7 +85,8 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   if (
     location.pathname === "/" ||
     location.pathname === "/login" ||
-    location.pathname === "/signup"
+    location.pathname === "/signup" ||
+    !user
   ) {
     return null;
   }
@@ -103,7 +113,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
           </IonRow>
         </IonGrid>
 
-        {/* TODO: Check if user is logged in */}
         {showProfileIcon && (
           <>
             <IonButtons slot="end">
@@ -117,11 +126,14 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             </IonButtons>
 
             <IonPopover dismiss-on-select trigger={"profile-button"} triggerAction="click">
+              <IonItem>
+                <IonText className="profile-dropdown__name">{user.name}</IonText>
+              </IonItem>
               <IonButton fill="clear" onClick={handleChangeName}>
                 <IonIcon slot="start" icon={createOutline} />
                 Edit nickname
               </IonButton>
-              <IonButton className="navbar__profile-menu" fill="clear" onClick={logout}>
+              <IonButton fill="clear" onClick={logout}>
                 <IonIcon slot="start" icon={logOutOutline} />
                 Log out
               </IonButton>
