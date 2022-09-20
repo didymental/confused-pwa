@@ -1,4 +1,7 @@
 .page {
+  transition: background 0.3s ease-in-out;
+  background-color: var(--ion-color-primary);
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7,14 +10,14 @@
   font-size: large;
 }
 
+.content {
+  --background: var(--ion-color-primary);
+}
+
 .grid__row {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-ion-content.splash {
-  --background: var(--ion-color-primary);
 }
 
 .logo {
@@ -23,15 +26,34 @@ ion-content.splash {
 
 @media (prefers-reduced-motion: no-preference) {
   .logo {
-    animation: App-logo-spin infinite alternate 1s linear;
+    animation: logo--turn-left-right infinite alternate 1s linear;
   }
 }
 
-@keyframes App-logo-spin {
+@keyframes logo--turn-left-right {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(10deg);
+  }
+}
+
+.app-animation {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+
+  &__container {
+    margin: auto;
+  }
+
+  &__lottie {
+    height: 400px;
+    background-color: var(--primary-color);
+
+    @media screen and (max-width: 1100px) {
+      height: 300px;
+    }
   }
 }

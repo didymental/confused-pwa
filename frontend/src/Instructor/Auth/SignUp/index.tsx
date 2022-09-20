@@ -10,6 +10,7 @@ import {
   IonLabel,
   IonPage,
   IonRow,
+  useIonLoading,
 } from "@ionic/react";
 import { useState } from "react";
 import "./index.scss";
@@ -26,12 +27,13 @@ function validateEmail(email: string) {
 }
 
 const SignUpPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("eve.holt@reqres.in");
-  const [password, setPassword] = useState<string>("cityslicka");
-  const [displayName, setDisplayName] = useState<string>("ailing35");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [displayName, setDisplayName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { user, signUp } = useAuthentication();
+  const [present, dismiss] = useIonLoading();
 
   const handleSignUp = async () => {
     if (!email) {
@@ -56,8 +58,11 @@ const SignUpPage: React.FC = () => {
       password: password,
       name: displayName,
     };
-
+    present({
+      message: "Signing up",
+    });
     await signUp(signUpRequest);
+    dismiss();
   };
 
   if (user) {

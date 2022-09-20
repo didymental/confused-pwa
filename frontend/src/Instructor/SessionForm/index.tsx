@@ -10,41 +10,70 @@ import {
   IonRow,
   IonGrid,
   IonText,
+  useIonLoading,
 } from "@ionic/react";
 
 import "./index.scss";
 
 import Navbar from "../../component/Navbar";
 import { useHistory, useLocation } from "react-router";
-import { useToast } from "../../hooks/util/useToast";
+import { useSessions } from "../../hooks/session/useSession";
+import { SessionEntity } from "../../types/session";
+import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 
 const SessionForm: React.FunctionComponent = () => {
   const location = useLocation();
   const history = useHistory();
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [sessionId, setSessionId] = useState<string>();
+  const [sessionId, setSessionId] = useState<number>();
   const [sessionName, setSessionName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const { presentToast } = useToast();
-
-  console.log(sessionId);
+  const [present, dismiss] = useIonLoading();
+  const { user } = useAuthentication();
+  const { sessions, createSession, updateSession } = useSessions();
 
   useEffect(() => {
     if (location.pathname === "/instructor/session/create") {
-      console.log("create");
       setIsEdit(false);
       return;
     }
     setIsEdit(true);
     const id = new URLSearchParams(location.search).get("id");
     const name = new URLSearchParams(location.search).get("name");
-    setSessionId(id ?? "");
+    setSessionId(Number(id));
     setSessionName(name ?? "");
   }, [location.pathname, location.search]);
 
+  const handleCreate = async () => {
+    await createSession({
+      name: sessionName,
+      is_open: false,
+    });
+    dismiss();
+  };
+
+  const handleEdit = async () => {
+    let old_session: SessionEntity;
+    if (!sessions || !sessionId) {
+      return;
+    }
+    for (let i = 0; i < sessions?.length; i++) {
+      if (sessions[i].id === sessionId) {
+        old_session = sessions[i];
+        break;
+      }
+    }
+    await updateSession({
+      id: sessionId,
+      instructor: user!.id,
+      name: sessionName,
+      is_open: old_session!.is_open,
+    });
+    dismiss();
+  };
+
   const onSubmit = () => {
-    // TODO
     if (!sessionName) {
       setMessage("Please enter a session name.");
       setIserror(true);
@@ -57,20 +86,18 @@ const SessionForm: React.FunctionComponent = () => {
     }
     setIserror(false);
 
-    // if (isEdit) {
-    //     handleEdit();
-    // } else {
-    //     handleCreate();
-    // }
-
-    presentToast({
-      header: `${isEdit ? "Edited" : "Created"} session successfully!`,
-      color: "success",
+    present({
+      message: isEdit ? "Editing Session" : "Creating Session",
     });
+    if (isEdit) {
+      handleEdit();
+    } else {
+      handleCreate();
+    }
 
     setTimeout(() => {
       history.push("/instructor/dashboard");
-    }, 800);
+    }, 500);
   };
 
   return (
@@ -86,7 +113,7 @@ const SessionForm: React.FunctionComponent = () => {
               </IonCol>
             </IonRow>
             <IonRow>
-              <IonCol>
+              <IonCol className="session-form__description">
                 <IonItem fill="outline">
                   {/* <IonLabel position="floating"> Email</IonLabel> */}
                   <IonInput
@@ -106,7 +133,7 @@ const SessionForm: React.FunctionComponent = () => {
 
             <IonRow>
               <IonCol className="session-form__button">
-                <IonButton onClick={onSubmit}>submit</IonButton>
+                <IonButton onClick={onSubmit}>SUBMIT</IonButton>
               </IonCol>
             </IonRow>
           </IonGrid>

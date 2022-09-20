@@ -1,32 +1,28 @@
-import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { useHistory } from "react-router";
 import { LoginRequest, SignUpRequest } from "../../types/auth";
-import { ProfileData } from "../../types/profiles";
 import api from "../../api";
-import { getRefreshToken, setAccessToken, setRefreshToken } from "../../localStorage";
+import {
+  getRefreshToken,
+  getUser,
+  setAccessToken,
+  setRefreshToken,
+  setUser,
+} from "../../localStorage";
 import { useToast } from "../util/useToast";
 import { useInterval } from "usehooks-ts";
 import { sleep } from "../../utils/time";
-
-const authenticatedUserState = atom({
-  key: "AUTHENTICATED_USER_ATOM",
-  default: null as ProfileData | null,
-});
-
-export const useAuthenticatedUser = () => {
-  const user = useRecoilValue(authenticatedUserState);
-  return user;
-};
+import { ProfileData } from "../../types/profiles";
+import useAnalyticsTracker from "../util/useAnalyticsTracker";
+import { useSessions } from "../session/useSession";
 
 const useAuthenticatedUserState = () => {
-  const [user, setUser] = useRecoilState(authenticatedUserState);
-
   const setAuthenthicationData = async (accessToken: string, refreshToken: string) => {
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);
 
-    const response = await api.profile.getProfile();
-    const { id, email, name } = response.data;
+    const response = await api.profile.getProfiles();
+    const { id, email, name } = response.data[0];
+
     setUser({ id: id, email: email, name: name });
   };
 
@@ -37,8 +33,6 @@ const useAuthenticatedUserState = () => {
   };
 
   return {
-    user,
-    setUser,
     setAuthenthicationData,
     clearAuthenticationData,
   };
@@ -53,9 +47,13 @@ interface UpdateAuthenticationState {
 }
 
 export const useAuthentication = (): UpdateAuthenticationState => {
+  const user = getUser();
   const history = useHistory();
-  const { user, setAuthenthicationData, clearAuthenticationData } = useAuthenticatedUserState();
+  const { setAuthenthicationData, clearAuthenticationData } = useAuthenticatedUserState();
   const { presentToast } = useToast();
+  const userAnalyticsTracker = useAnalyticsTracker("User");
+
+  const { createSampleSessions, getSessions } = useSessions();
 
   const signUp = async (signUpRequest: SignUpRequest) => {
     try {
@@ -65,7 +63,12 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       const { access, refresh } = loginResponse.data;
       await setAuthenthicationData(access, refresh);
 
-      history.push("/instructor/dashboard");
+      await createSampleSessions();
+      await getSessions();
+      await userAnalyticsTracker("Signed up");
+      setTimeout(() => {
+        history.push("/instructor/dashboard");
+      }, 2000);
       presentToast({ header: "Sign up success!", color: "success" });
     } catch (err: any) {
       presentToast({
@@ -83,6 +86,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       const { access, refresh } = data;
       await setAuthenthicationData(access, refresh);
 
+      userAnalyticsTracker("Logged in");
       history.push("/instructor/dashboard");
       presentToast({ header: "Login success!", color: "success" });
     } catch (err: any) {
@@ -105,6 +109,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       const { access, refresh } = response.data;
       await setAuthenthicationData(access, refresh);
 
+      userAnalyticsTracker("Logged in with refreshed token");
       history.push("/instructor/dashboard");
       presentToast({ header: "Login success!", color: "success" });
     } catch (err: any) {
@@ -119,6 +124,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
 
   const logout = () => {
     clearAuthenticationData();
+    userAnalyticsTracker("Logged out");
     history.push("/");
     presentToast({ header: "Logout success!", color: "success" });
   };
@@ -133,10 +139,10 @@ export const useAuthentication = (): UpdateAuthenticationState => {
 };
 
 export const useAuthenticationRefresh = () => {
-  const { user, loginWithAccessToken } = useAuthentication();
+  const { loginWithAccessToken } = useAuthentication();
 
   const getNewAccessToken = async () => {
-    if (!user) {
+    if (!getUser()) {
       return;
     }
     const oneSecond = 1000; // ms

@@ -1,7 +1,11 @@
 .navbar {
+  &__back-button {
+    padding: 0em 1em;
+  }
+
   &__logo {
-    max-width: 35px;
-    margin: 0rem 1rem 0rem 0.25rem;
+    max-width: 25px;
+    margin: 0rem 1rem 0rem 1rem;
   }
 
   &__profile-icon {
@@ -10,5 +14,16 @@
 
   &__title {
     margin-top: 0.5rem;
+  }
+}
+
+.profile-dropdown {
+  &__name {
+    margin: 1rem;
+    display: flex;
+    justify-content: center;
+    font-size: large;
+    font-weight: 700;
+    color: grey;
   }
 }
