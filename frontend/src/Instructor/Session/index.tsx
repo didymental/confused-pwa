@@ -14,6 +14,7 @@ import {
   IonBadge,
   IonText,
   CreateAnimation,
+  IonLabel,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { powerSharp, qrCode, shareSocialSharp } from "ionicons/icons";
@@ -155,7 +156,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   return (
     <>
       <IonCard />
-      <IonGrid>
+      <IonGrid className="ion-grid-instructor-session__overall">
         <CreateAnimation
           duration={2000}
           iterations={1}
@@ -235,16 +236,18 @@ interface StudentData {
 const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questions }) => {
   return questions.length === 0 ? null : (
     <IonCard className="ion-card-instructor-session__questions">
-      <IonList className="ion-list-instructor-session__questions">
-        <IonListHeader className="ion-list-header-instructor-session__questions">
+      <IonListHeader lines="full">
+        <IonLabel className="ion-label-instructor-session__header">
           Questions from Students
-        </IonListHeader>
+        </IonLabel>
+      </IonListHeader>
+      <IonList className="ion-list-instructor-session__questions">
         {questions.map((question: QuestionData) => (
           <IonItem
             className="ion-item-instructor-session__questions"
             key={question.question_content}
           >
-            {question.question_content}
+            {'"' + question.question_content + '"'}
           </IonItem>
         ))}
       </IonList>
@@ -331,16 +334,16 @@ const ReactionsDisplay: React.FC<{
             </IonBadge>
           </IonRow>
         </IonCol>
+        <IonCol className="ion-col-instructor-session__reactions">
+          <IonButton
+            className="ion-btn-instructor-session__reactions"
+            onClick={clearReactions}
+            fill="clear"
+          >
+            <IonText>Reset Reactions</IonText>
+          </IonButton>
+        </IonCol>
       </IonRow>
-      <IonCol className="ion-col-instructor-session__reactions">
-        <IonButton
-          className="ion-btn-instructor-session__reactions"
-          onClick={clearReactions}
-          fill="clear"
-        >
-          <IonText>Reset Reactions</IonText>
-        </IonButton>
-      </IonCol>
     </IonGrid>
   );
 };

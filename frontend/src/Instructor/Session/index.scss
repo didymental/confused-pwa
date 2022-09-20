@@ -12,6 +12,13 @@
     }
 }
 
+.ion-grid-instructor-session {
+    &__overall {
+        max-width: 800px;
+        width: 90vw;
+    }
+}
+
 .ion-card-instructor-session {
     &__clear {
         padding-top: 3rem;
@@ -47,6 +54,7 @@
 
     &__questions {
         width: 100%;
+        max-height: 30vh;
         background: rgba(255, 255, 255, 0.3);
         box-shadow: none;
         margin-top: 1.25rem;
@@ -76,10 +84,11 @@
         justify-content: center;
         align-items: center;
         background: rgba(255, 255, 255, 0.75);
-        color: #1877F2;
+        color: #FF6242;
         text-transform: capitalize;
         border-radius: 0.25rem;
         width: 100%;
+        max-width: 300px;
         
         &:hover {
             text-decoration: underline;
@@ -115,7 +124,7 @@
 
 .ion-list-instructor-session {
     &__questions {
-        max-height: 15rem;
+        max-height: 100%;
         overflow-y: scroll;
         min-width: 90%;
         border-radius: 25px;
@@ -124,11 +133,11 @@
     
 }
 
-.ion-list-header-instructor-session {
-    &__questions {
-        margin-bottom: 0.5rem;
+.ion-label-instructor-session {
+    &__header {
         font-size: large;
-        font-weight: 650;
+        font-weight: bolder;
+        color: black;
     }
 }
 
@@ -159,7 +168,7 @@
     &__reactions {
         margin: 1.25rem;
         border-radius: 0.25rem;
-        min-width: 2.5rem;
+        min-width: 5rem;
         display: flex;
         flex-direction: row;
         justify-content: center;
