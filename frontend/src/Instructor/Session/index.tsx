@@ -6,18 +6,24 @@ import {
   IonGrid,
   IonPage,
   IonRow,
-  IonList,
-  IonListHeader,
-  IonItem,
   IonCol,
   IonIcon,
   IonBadge,
   IonText,
   CreateAnimation,
-  IonLabel,
+  useIonAlert,
+  IonCardContent,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonTextarea,
+  IonList,
+  IonItem,
+  IonActionSheet,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
-import { powerSharp, qrCode, shareSocialSharp } from "ionicons/icons";
+import React, { useEffect, useState, useRef } from "react";
+import { powerSharp, qrCode, shareSocialSharp, linkSharp } from "ionicons/icons";
 import client from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import clear from "../../assets/clear-bg.svg";
@@ -117,6 +123,10 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   let { levelOfConfusion, questions, students, sessionId, setLevelOfConfusion } = props;
   const [hasAnimated, setHasAnimated] = useState(false);
   const { presentToast } = useToast();
+  const [presentAlert] = useIonAlert();
+
+  const [openModal, setOpenModal] = useState(false);
+  const modal = useRef<HTMLIonModalElement>(null);
 
   useEffect(() => {
     setHasAnimated(true);
@@ -150,11 +160,11 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
       });
   };
 
-  // TODO: share link to join session
-  const shareLink = () => {};
-
-  // TODO: open qr code to join session
-  const openQrCode = () => {};
+  const copyLinkToClipboard = () => {
+    let link = "url";
+    navigator.clipboard.writeText(link);
+    presentAlert("Copied to your clipboard!");
+  };
 
   return (
     <>
@@ -182,35 +192,54 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
           <ReactionsDisplay students={students} setLevelOfConfusion={setLevelOfConfusion} />
         </IonRow>
         <IonRow className="ion-row-instructor-session">
-          <IonCol className="ion-col-instructor-session__share">
-            <IonButton
-              onClick={shareLink}
-              className="ion-btn-instructor-session__share"
-              fill="clear"
-            >
-              <IonIcon icon={shareSocialSharp} size="small" />
-            </IonButton>
-          </IonCol>
-          <IonCol className="ion-col-instructor-session__share">
-            <IonButton
-              className="ion-btn-instructor-session__end-session"
-              fill="clear"
-              onClick={endSession}
-            >
-              <IonIcon icon={powerSharp} size="small" />
-            </IonButton>
-          </IonCol>
-          <IonCol className="ion-col-instructor-session__share">
-            <IonButton
-              onClick={openQrCode}
-              className="ion-btn-instructor-session__share"
-              fill="clear"
-            >
-              <IonIcon icon={qrCode} size="small" />
-            </IonButton>
-          </IonCol>
+          <IonButton
+            className="ion-btn-instructor-session__share"
+            onClick={() => setOpenModal(true)}
+            fill="clear"
+          >
+            <IonIcon icon={shareSocialSharp} size="small" color="tertiary" />
+            <IonCardContent>Share to students</IonCardContent>
+          </IonButton>
         </IonRow>
+        <IonRow className="ion-row-instructor-session">
+          <IonButton
+            onClick={endSession}
+            className="ion-btn-instructor-session__end-session"
+            color="primary"
+          >
+            <IonIcon icon={powerSharp} color="secondary" size="medium" />
+            <IonCardContent>End Session</IonCardContent>
+          </IonButton>
+        </IonRow>
+
+        <IonModal
+          isOpen={openModal}
+          initialBreakpoint={0.5}
+          breakpoints={[0, 0.25, 0.5, 0.75]}
+          onIonModalWillDismiss={() => setOpenModal(false)}
+        >
+          <IonContent>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Share via ...</IonTitle>
+              </IonToolbar>
+            </IonHeader>
+            <IonList>
+              <IonItem>
+                <IonButton onClick={copyLinkToClipboard} fill="clear">
+                  <IonIcon icon={linkSharp} size="large" />
+                </IonButton>
+                <IonCardContent>URL LINK</IonCardContent>
+              </IonItem>
+              <IonItem>
+                {/**placeholder for the QR code generator */}
+                <img src={confused_reaction} />
+              </IonItem>
+            </IonList>
+          </IonContent>
+        </IonModal>
       </IonGrid>
+      {}
     </>
   );
 };
@@ -279,7 +308,7 @@ const ReactionsDisplay: React.FC<{
             <img src={confused_reaction} alt={"confused"} onClick={() => {}} />
           </IonRow>
           <IonRow>
-            <IonBadge className="ion-badge-instructor-session__reactions" color="light">
+            <IonBadge className="ion-badge-instructor-session__reactions">
               <IonText>{countOfConfused}</IonText>
             </IonBadge>
           </IonRow>
@@ -289,7 +318,7 @@ const ReactionsDisplay: React.FC<{
             <img src={clear_reaction} alt={"clear"} onClick={() => {}} />
           </IonRow>
           <IonRow>
-            <IonBadge className="ion-badge-instructor-session__reactions" color="light">
+            <IonBadge className="ion-badge-instructor-session__reactions">
               <IonText>{countOfClear}</IonText>
             </IonBadge>
           </IonRow>
@@ -300,7 +329,7 @@ const ReactionsDisplay: React.FC<{
             onClick={clearReactions}
             fill="clear"
           >
-            <IonText>Reset Reactions</IonText>
+            <IonText>RESET</IonText>
           </IonButton>
         </IonCol>
       </IonRow>

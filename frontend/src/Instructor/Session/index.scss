@@ -74,10 +74,9 @@
         align-items: center;
         background: rgba(255, 255, 255, 0.75);
         color: #FF6242;
-        text-transform: capitalize;
         border-radius: 0.25rem;
         width: 100%;
-        max-width: 300px;
+        max-width: 75vw;
         
         &:hover {
             text-decoration: underline;
@@ -88,9 +87,7 @@
 
     &__end-session {
         width: 100%;
-        color: #190e28;
-        background: rgba(255, 255, 255, 0.75);
-        border-radius: 1.25rem;
+        max-width: 75vw;
 
         &:hover {
             background: rgba(0, 0, 0, 0.25);
@@ -99,9 +96,15 @@
     }
 
     &__share {
-        width: fit-content;
-        color: #190e28;
-        border-radius: 1.25rem;
+        font-size: small;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.75);
+        color: #1877F2;
+        border-radius: 0.25rem;
+        width: 100%;
+        max-width: 75vw;
 
         &:hover {
             background: rgba(0, 0, 0, 0.25);
@@ -145,6 +148,8 @@
         align-items: center;
         font-size: medium;
         font-weight: 550;
+        color: black;
+        --background: rgba(255, 255, 255, 0.3);
     }
 }
 

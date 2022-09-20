@@ -12,10 +12,8 @@ import {
   IonSlides,
   IonTextarea,
   isPlatform,
-  IonListHeader,
-  IonItem,
-  IonLabel,
-  IonList,
+  CreateAnimation,
+  IonCol,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 
@@ -28,6 +26,7 @@ import { useToast } from "../../hooks/util/useToast";
 import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
+import { toUSVString } from "util";
 
 interface ReactionState {
   title: string;
@@ -39,7 +38,8 @@ const StudentSessionPage: React.FC<{
   sessionId: number;
   studentId: number;
   displayName: string;
-}> = ({ sessionId, studentId, displayName }) => {
+}> = (props) => {
+  let { sessionId, studentId, displayName } = props;
   const initialReactionStates: ReactionState[] = [
     { title: "I'm confused!", isSelected: false, iconUrl: confused_reaction },
     { title: "I'm OK!", isSelected: false, iconUrl: clear_reaction },
@@ -49,6 +49,9 @@ const StudentSessionPage: React.FC<{
   const { presentToast } = useToast();
 
   /* TO DELETE - FOR TESTING ONLY */
+  sessionId = 3;
+  studentId = 3;
+  displayName = "Test User";
 
   // on mount, reset all reactions to false
   useEffect(() => {
@@ -125,31 +128,48 @@ const StudentSessionPage: React.FC<{
   };
 
   return (
-    <IonPage>
+    <IonPage className="student-session">
       <Navbar title={"Session Title"} />
       <IonContent>
         <IonGrid className="container__questions-container">
           <QuestionsDisplay questions={[]} />
         </IonGrid>
-        <IonSlides className="slides" options={{ slidesPerView: isPlatform("mobile") ? 1.5 : 5 }}>
+
+        <IonSlides
+          className="student-session__grid"
+          options={{
+            slidesPerView: 2,
+          }}
+        >
           {reactionStates.map((item, index) => {
             return (
               <IonSlide key={item.title}>
-                <IonCard
-                  onClick={() => handleReactionStateChange(index)} // database starts from 1-index
-                  color={item.isSelected ? "tertiary" : "light"}
-                  className="card"
+                <CreateAnimation
+                  play={item.isSelected}
+                  iterations={1}
+                  duration={400}
+                  keyframes={[
+                    { offset: 0, transform: "scale(1)", opacity: "1" },
+                    { offset: 0.2, transform: "scale(1.2)", opacity: "0.5" },
+                    { offset: 0.5, transform: "scale(1)", opacity: "1" },
+                  ]}
                 >
-                  <IonCardContent className="card__content">{item.title}</IonCardContent>
-                  <IonCardContent>
-                    <img src={item.iconUrl} />
-                  </IonCardContent>
-                </IonCard>
+                  <IonCard
+                    onClick={() => handleReactionStateChange(index)}
+                    color={item.isSelected ? "primary" : "light"}
+                    className="card"
+                  >
+                    <IonCardContent className="card__content">{item.title}</IonCardContent>
+                    <IonCardContent>
+                      <img src={item.iconUrl} />
+                    </IonCardContent>
+                  </IonCard>
+                </CreateAnimation>
               </IonSlide>
             );
           })}
         </IonSlides>
-        <IonGrid className="ion-padding">
+        <IonGrid className="student-session__grid">
           <IonRow className="textarea">
             <IonTextarea
               placeholder="Ask a question here..."
