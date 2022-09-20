@@ -1,7 +1,3 @@
-.splash {
-  background: var(--ion-color-primary);
-}
-
 .join-page__content {
   margin-top: 12vh;
   max-width: 800px;
@@ -13,6 +9,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.join-page__active-scanner {
+  --background: transparent;
+  --ion-background-color: transparent;
 }
 
 .join-page__auxilliary-text {
@@ -33,4 +34,9 @@
 
 .join-page__button {
   color: var(--ion-color-tertiary);
+}
+
+.join-page__qr-scan-box {
+  // width: auto;
+  width: 100%;
 }

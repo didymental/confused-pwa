@@ -3,6 +3,8 @@ import {
   IonButton,
   IonCol,
   IonContent,
+  IonFab,
+  IonFabButton,
   IonGrid,
   IonHeader,
   IonIcon,
@@ -13,17 +15,28 @@ import {
   IonRow,
   IonTitle,
   IonToolbar,
+  getPlatforms,
+  useIonToast,
 } from "@ionic/react";
+import { camera, person, resizeOutline, scan } from "ionicons/icons";
 import "../join-page.scss";
 import { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import logo from "../../Assets/logo.svg";
+import logo from "../../assets/logo-light.svg";
+import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useToast } from "../../hooks/util/useToast";
+import { useSessionCode } from "../../hooks/joinsession/useSessionCode";
+import { useStudentName } from "../../hooks/joinsession/useStudentName";
 
 const JoinPage: React.FC = () => {
-  const [sessionPIN, setSessionPIN] = useState<string>("");
+  const { sessionCode, setSessionCode } = useSessionCode();
+  const { studentName, setStudentName } = useStudentName();
+
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+
+  const [present] = useIonToast();
 
   const history = useHistory();
 
@@ -31,19 +44,36 @@ const JoinPage: React.FC = () => {
   const sessionNotFoundMsg: string = "Session not found";
   const unknownErrorMsg: string = "error. Please contact administrators for more details";
 
+  const displayToast = (message: string[] | string | undefined) => {
+    let messageString;
+    if (message === undefined) {
+      messageString = "Undefined message";
+    } else if (Array.isArray(message)) {
+      messageString = message.toString();
+    } else {
+      messageString = message;
+    }
+
+    present({
+      message: messageString,
+      duration: 1500,
+      position: "bottom",
+    });
+  };
+
   const handleJoinSession = () => {
-    if (!sessionPIN) {
+    if (sessionCode === "") {
       setMessage(invalidPINMsg);
       setIserror(true);
       return;
     }
 
     const api = axios.create({
-      baseURL: "https://confused-backend-3216.herokuapp.com/api/",
+      baseURL: "https://reqres.in/api/",
     });
-  
+
     let resStatus: number = 0;
-    if (sessionPIN === "VALIDCODE") {
+    if (sessionCode === "VALIDCODE") {
       //Simulating a valid session PIN
       api
         .get("/unknown/2")
@@ -72,9 +102,14 @@ const JoinPage: React.FC = () => {
         });
     }
   };
+
+  const scanQR = () => {
+    return;
+  };
+
   return (
     <IonPage>
-      <IonContent fullscreen className="join-page__container">
+      <IonContent fullscreen className="join-page__container splash">
         <IonGrid className="join-page__content">
           <IonRow>
             <IonCol>
@@ -93,15 +128,16 @@ const JoinPage: React.FC = () => {
               <img width="200em" src={logo} className="logo-noanim" alt="logo" />
             </IonCol>
           </IonRow>
+
           <IonRow>
             <IonCol>
               <IonItem fill="outline">
                 <IonLabel position="floating">Session Code</IonLabel>
                 <IonInput
                   type="text"
-                  value={sessionPIN}
+                  value={sessionCode}
                   placeholder={"1234"}
-                  onIonChange={(e) => setSessionPIN(e.detail.value!)}
+                  onIonChange={(e) => setSessionCode(e.detail.value!)}
                 ></IonInput>
               </IonItem>
             </IonCol>
@@ -109,12 +145,46 @@ const JoinPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonButton color="primary" expand="block" onClick={handleJoinSession}>
-                Enter
+              <IonItem fill="outline">
+                <IonLabel position="floating">Display Name</IonLabel>
+                <IonInput
+                  type="text"
+                  value={studentName}
+                  placeholder={"John Doe"}
+                  onIonChange={(e) => setStudentName(e.detail.value!)}
+                ></IonInput>
+              </IonItem>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
+            <IonCol>
+              <p
+                className="
+                join-page__auxilliary-text--medium
+                join-page__auxilliary-text--translucent
+              "
+              >
+                This name will be displayed to your instructor. You can&apos;t change this name
+                later.
+              </p>
+              <IonButton
+                color="secondary"
+                size="default"
+                expand="block"
+                onClick={handleJoinSession}
+              >
+                Join Session
               </IonButton>
             </IonCol>
           </IonRow>
         </IonGrid>
+
+        <IonFab vertical="bottom" horizontal="center" slot="fixed">
+          <IonFabButton color="secondary" routerLink="/scanner">
+            <IonIcon icon={scan} />
+          </IonFabButton>
+        </IonFab>
       </IonContent>
     </IonPage>
   );

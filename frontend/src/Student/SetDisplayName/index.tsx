@@ -18,7 +18,7 @@ import "../join-page.scss";
 import { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import logo from "../../Assets/logo-light.svg";
+import logo from "../../assets/logo-light.svg";
 
 const JoinDetailPage: React.FC = () => {
   const [name, setName] = useState<string>("");

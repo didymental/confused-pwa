@@ -9,6 +9,7 @@ import JoinPage from "../Student/JoinSession";
 import StudentSessionPage from "../Student/Session";
 import JoinDetailPage from "../Student/SetDisplayName";
 import DashboardPage from "../Instructor/Dashboard";
+import Scanner from "../Student/QRScanner";
 import { RecoilRoot } from "recoil";
 
 function App() {
@@ -22,8 +23,10 @@ function App() {
             <Route path="/login" exact component={LoginPage} />
             <Route path="/signup" exact component={SignUpPage} />
             <Route path="/student" exact component={JoinPage} />
+            <Route path="/student/:id" exact component={JoinDetailPage} />
             <Route path="/student/session/:id" exact component={StudentSessionPage} />
             <Route path="/instructor/dashboard" component={DashboardPage} />
+            <Route path="/scanner" component={Scanner} />
           </IonRouterOutlet>
         </IonReactRouter>
       </IonApp>
