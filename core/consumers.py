@@ -567,6 +567,16 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
+        session = await self._get_question_session(question_pk=question_pk)
+        if session.pk != self.session_subscribe:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=[
+                    "This question does not belong to your current session"
+                ],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
         await self.update_question_vote(
             question_pk=question_pk, increment=True
         )
@@ -586,6 +596,16 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             return await self.notify_failure(
                 action="unvote_question",
                 errors=["You have not joined a session yet"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        session = await self._get_question_session(question_pk=question_pk)
+        if session.pk != self.session_subscribe:
+            return await self.notify_failure(
+                action="vote_question",
+                errors=[
+                    "This question does not belong to your current session"
+                ],
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
