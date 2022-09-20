@@ -36,14 +36,14 @@ const Splash: React.FC = () => {
         {isAnimationPlaying && (
           <AnimatePresence>
             <motion.div
-              className="app-animation-outer"
+              className="app-animation"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="app-animation">
-                <Lottie autoPlay={true} className="app-lottie-animation" animationData={splash} />
+              <div className="app-animation__container">
+                <Lottie autoPlay={true} className="app-animation__lottie" animationData={splash} />
               </div>
             </motion.div>
           </AnimatePresence>

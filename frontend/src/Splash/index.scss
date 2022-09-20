@@ -39,21 +39,21 @@ ion-content.splash {
   }
 }
 
-.app-animation-outer {
+.app-animation {
   height: 100vh;
   display: flex;
   justify-content: center;
-}
 
-.app-animation {
-  margin: auto;
-}
+  &__container {
+    margin: auto;
+  }
 
-.app-lottie-animation {
-  height: 400px;
-  background-color: var(--primary-color);
+  &__lottie {
+    height: 400px;
+    background-color: var(--primary-color);
 
-  @media screen and (max-width: 1100px) {
-    height: 300px;
+    @media screen and (max-width: 1100px) {
+      height: 300px;
+    }
   }
 }
