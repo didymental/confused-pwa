@@ -59,14 +59,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         student.reaction_type = reaction
         student.save()
 
-    # @database_sync_to_async
-    # def get_question_session(self, question: Question) -> Optional[Session]:
-    #     student = question.student
-    #     if not student:
-    #         return None
-
-    #     return student.session
-
     @database_sync_to_async
     def open_session(self, session: Session):
         session.is_open = True
@@ -353,15 +345,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 }
             )
 
-        # if session.is_open:
-        #     raise ValidationError(
-        #         {
-        #             "action": "join_session",
-        #             "errors": "This session is already open. Please close the session before joining",
-        #             "status": 403,
-        #         }
-        #     )
-
         await self.open_session(session=session)
         await self.empty_session(session=session)
 
@@ -422,21 +405,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         except ObjectDoesNotExist:
             return None
 
-    # @handle_question_change.serializer
-    # def handle_question_change(
-    #     self, question: Question, action=None, **kwargs
-    # ):
-
-    #     if action is None:
-    #         return {}
-
-    #     return dict(
-    #         data=QuestionSerializer(question).data,
-    #         session=_get_question_session(question),
-    #         action=action.value,
-    #         pk=question.pk,
-    #     )
-
     # TODO: does it work if name differently
     @model_observer(Student)
     async def handle_student_change(  # type: ignore
@@ -447,7 +415,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
-        # raise ValidationError("test")
         print("kw fire off student", message, action)
 
         if action == "delete":
@@ -486,9 +453,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
-        # student = message.get("data")
-        # if student is None:
-        #     return
 
         session = message.get("session")
 
@@ -500,11 +464,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
         print("kw serialize student", action)
-        return dict(
-            **StudentSerializer(student).data
-            # action=action.value,
-            # pk=student.pk,
-        )
+        return dict(**StudentSerializer(student).data)
 
     # TODO: fix groups_for_signal doesn't work
     @model_observer(Session)
@@ -573,34 +533,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             student_pk=self.temp_user, reaction_type_pk=reaction_type_pk
         )
 
-    # FIXME: question observer doesnt get fired off
-    # @model_observer(Question)
-    # async def handle_question_change(  # type: ignore
-    #     self,
-    #     message: Dict,
-    #     observer=None,
-    #     action=None,
-    #     subscribing_request_ids=[],
-    #     **kwargs,
-    # ):
-    # print("kw fire off question", action)
-
-    # if action == "delete":
-    #     await self._handle_student_delete(
-    #         message=message,
-    #         observer=observer,
-    #         subscribing_request_ids=subscribing_request_ids,
-    #         **kwargs,
-    #     )
-
-    # if action == "update":
-    #     await self._handle_student_update(
-    #         message=message,
-    #         observer=observer,
-    #         subscribing_request_ids=subscribing_request_ids,
-    #         **kwargs,
-    #     )
-
     @model_observer(Question)
     async def handle_question_change(  # type: ignore
         self,
@@ -642,15 +574,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
         await self.reply(data=message, action="create_question")
 
-    # @handle_question_change.serializer
-    # def handle_question_change(self, question: Question, action, **kwargs):
-    #     print("kw serialize question", action)
-    #     return dict(
-    #         data=QuestionSerializer(question).data,
-    #         action=action.value,
-    #         pk=question.pk,
-    #     )
-
     # TODO: fix question observer not working
     @handle_question_change.serializer
     def handle_question_change(self, question: Question, action, **kwargs):
@@ -658,6 +581,4 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         # raise ValidationError("test")
         return dict(
             **QuestionSerializer(question).data,
-            # action=action.value,
-            # pk=question.pk,
         )
