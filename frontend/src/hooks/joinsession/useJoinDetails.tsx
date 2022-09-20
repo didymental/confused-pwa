@@ -1,8 +1,13 @@
 import { atom, useRecoilState, useSetRecoilState, useRecoilValue } from "recoil";
 
-const sessionCodeState = atom({
+const sessionIdInputState = atom({
   key: "SESSION_CODE",
   default: "",
+});
+
+const sessionIdState = atom({
+  key: "SESSION_ID",
+  default: 0,
 });
 
 const studentNameState = atom({
@@ -10,12 +15,26 @@ const studentNameState = atom({
   default: "",
 });
 
-export const useSessionCode = () => {
-  const [sessionCode, setSessionCode] = useRecoilState(sessionCodeState);
+const studentIdState = atom({
+  key: "STUDENT_ID",
+  default: 0,
+});
+
+export const useSessionIdInput = () => {
+  const [sessionIdInput, setSessionIdInput] = useRecoilState(sessionIdInputState);
 
   return {
-    sessionCode,
-    setSessionCode,
+    sessionIdInput,
+    setSessionIdInput,
+  };
+};
+
+export const useSessionId = () => {
+  const [sessionId, setSessionId] = useRecoilState(sessionIdState);
+
+  return {
+    sessionId,
+    setSessionId,
   };
 };
 
@@ -26,4 +45,23 @@ export const useStudentName = () => {
     studentName,
     setStudentName,
   };
+};
+
+export const useStudentId = () => {
+  const [studentId, setStudentId] = useRecoilState(studentIdState);
+
+  return {
+    studentId,
+    setStudentId,
+  };
+};
+
+export const useSessionDetails = () => {
+  const details = {
+    session: useRecoilValue(sessionIdState),
+    name: useRecoilValue(studentNameState),
+    id: useRecoilValue(studentIdState),
+  };
+
+  return details;
 };

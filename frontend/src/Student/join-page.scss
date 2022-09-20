@@ -11,6 +11,12 @@
   justify-content: center;
 }
 
+.login-form__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .join-page__auxilliary-text {
   &--small {
     font-size: small;

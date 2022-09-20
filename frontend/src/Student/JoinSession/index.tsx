@@ -3,51 +3,43 @@ import {
   IonButton,
   IonCol,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonGrid,
-  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonPage,
   IonRow,
-  IonTitle,
-  IonToolbar,
-  getPlatforms,
-  useIonToast,
   useIonLoading,
 } from "@ionic/react";
-import { returnDownBack, scan } from "ionicons/icons";
+import { scan } from "ionicons/icons";
 import "../join-page.scss";
 import { useState } from "react";
-import axios from "axios";
-import { useHistory } from "react-router-dom";
-import { useToast } from "../../hooks/util/useToast";
-import { useSessionCode, useStudentName } from "../../hooks/joinsession/useJoinDetails";
+import { useSessionIdInput, useStudentName } from "../../hooks/joinsession/useJoinDetails";
 import { useJoinSession } from "../../hooks/joinsession/useJoinSession";
 import ConfusedIcon from "../../component/ConfusedIcon";
 import { JoinSessionRequest } from "../../types/join";
-import { join } from "path";
 
 const JoinPage: React.FC = () => {
-  const { sessionCode, setSessionCode } = useSessionCode();
+  const MAX_SESSION_PIN_LEN = 6;
+  const MAX_STUDENT_NAME_LEN = 30;
+
+  const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
   const { studentName, setStudentName } = useStudentName();
   const { joinSession } = useJoinSession();
 
-  const [iserror, setIserror] = useState<boolean>(false);
+  const [present, dismiss] = useIonLoading();
+
+  const [isError, setIsError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const [shouldShowLoading, setShouldShowLoading] = useState<boolean>(false);
 
-  const history = useHistory();
-
-  const invalidPINMsg: string = "Session input should only contain numbers.";
-  const invalidNameMsg: string = "Name should only contain alphabets, numbers and spaces";
-  const sessionNotFoundMsg: string = "Session not found";
+  const invalidPINMsg: string = "Session code should only contain numbers.";
+  const invalidNameMsg: string =
+    "Name should only contain alphabets, numbers and spaces, and cannot be empty";
   const unknownErrorMsg: string = "error. Please contact administrators for more details";
 
   const isNumericalOnly = (input: string) => {
+    //Check that input consists of one or more numerical digits
     const res = /^[0-9]+$/.exec(input);
     const valid = !!res;
     return valid;
@@ -60,30 +52,32 @@ const JoinPage: React.FC = () => {
   };
 
   const handleJoinSession = async () => {
-    setSessionCode(sessionCode.trim());
-    setStudentName(studentName.trim());
+    setSessionIdInput(sessionIdInput.trim().substring(0, MAX_SESSION_PIN_LEN));
+    setStudentName(studentName.trim().substring(0, MAX_STUDENT_NAME_LEN));
 
-    if (!isNumericalOnly(sessionCode)) {
+    if (!isNumericalOnly(sessionIdInput)) {
       setMessage(invalidPINMsg);
-      setIserror(true);
+      setIsError(true);
       return;
     }
 
     if (!isNameValid(studentName)) {
       setMessage(invalidNameMsg);
-      setIserror(true);
+      setIsError(true);
       return;
     }
 
     const joinRequest: JoinSessionRequest = {
-      session: parseInt(sessionCode),
+      session: parseInt(sessionIdInput),
       display_name: studentName,
       reaction_type: null,
     };
 
-    setShouldShowLoading(true);
+    present({
+      message: "Joining session...",
+    });
     await joinSession(joinRequest);
-    setShouldShowLoading(false);
+    dismiss();
 
     /* Dummy API call for debugging purposes */
 
@@ -92,7 +86,7 @@ const JoinPage: React.FC = () => {
     // });
 
     // let resStatus: number = 0;
-    // if (sessionCode === "123456") {
+    // if (sessionIdInput === "123456") {
     //   //Simulating a valid session PIN
     //   api
     //     .get("/unknown/2")
@@ -104,7 +98,7 @@ const JoinPage: React.FC = () => {
     //     .catch((error) => {
     //       console.log(error);
     //       setMessage(error.message + unknownErrorMsg);
-    //       setIserror(true);
+    //       setIsError(true);
     //     });
     // } else {
     //   //Simulating session not found
@@ -117,7 +111,7 @@ const JoinPage: React.FC = () => {
     //     .catch((error) => {
     //       console.log(error);
     //       setMessage(sessionNotFoundMsg);
-    //       setIserror(true);
+    //       setIsError(true);
     //     });
     // }
 
@@ -131,16 +125,15 @@ const JoinPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <IonAlert
-                isOpen={iserror}
-                onDidDismiss={() => setIserror(false)}
-                cssClass="my-custom-class"
+                isOpen={isError}
+                onDidDismiss={() => setIsError(false)}
                 header={"Error!"}
                 message={message}
                 buttons={["Dismiss"]}
               />
             </IonCol>
           </IonRow>
-          <IonRow className="login-form__profile-icon">
+          <IonRow className="login-form__icon">
             <IonCol>
               <ConfusedIcon useLightLogo={true} />
             </IonCol>
@@ -153,10 +146,10 @@ const JoinPage: React.FC = () => {
                 <IonInput
                   type="tel"
                   inputMode="tel"
-                  maxlength={6}
-                  value={sessionCode}
+                  maxlength={MAX_SESSION_PIN_LEN}
+                  value={sessionIdInput}
                   placeholder={"123456"}
-                  onIonChange={(e) => setSessionCode(e.detail.value!)}
+                  onIonChange={(e) => setSessionIdInput(e.detail.value!)}
                 ></IonInput>
               </IonItem>
             </IonCol>
@@ -168,6 +161,7 @@ const JoinPage: React.FC = () => {
                 <IonLabel position="stacked">Display Name</IonLabel>
                 <IonInput
                   type="text"
+                  maxlength={MAX_STUDENT_NAME_LEN}
                   value={studentName}
                   placeholder={"John Doe"}
                   onIonChange={(e) => setStudentName(e.detail.value!)}

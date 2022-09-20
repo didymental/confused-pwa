@@ -1,37 +1,27 @@
 import {
-  IonAlert,
-  IonButton,
   IonCol,
   IonContent,
   IonFab,
   IonFabButton,
   IonGrid,
-  IonHeader,
   IonIcon,
-  IonInput,
-  IonItem,
-  IonLabel,
   IonPage,
   IonRow,
-  IonTitle,
-  IonToolbar,
-  getPlatforms,
-  useIonToast,
   NavContext,
-  useIonLoading,
 } from "@ionic/react";
 import { close } from "ionicons/icons";
 import "../join-page.scss";
 import { useState, useEffect, useContext } from "react";
 import QrScanner from "qr-scanner";
-import { useHistory } from "react-router-dom";
-import { useSessionCode } from "../../hooks/joinsession/useJoinDetails";
+import { useHistory, Redirect } from "react-router-dom";
+import { useSessionIdInput } from "../../hooks/joinsession/useJoinDetails";
 import { useToast } from "../../hooks/util/useToast";
 
 const Scanner: React.FC = (props) => {
-  const { presentToast } = useToast();
-  const { goBack } = useContext(NavContext);
-  const { sessionCode, setSessionCode } = useSessionCode();
+  // const { presentToast } = useToast();
+  // const { goBack } = useContext(NavContext);
+  const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
+  const [shouldGoBack, setShouldGoBack] = useState(false);
 
   const history = useHistory();
 
@@ -39,16 +29,20 @@ const Scanner: React.FC = (props) => {
 
   //Create scanner and start scanning on page load. No rerenders otherwise
   useEffect(() => {
-    // const listCameras = async () => {
-    //   const list = await QrScanner.listCameras();
-    //   presentToast({
-    //     header: "After list cameraS",
-    //     message: list.toString(),
-    //     color: "primary",
-    //   });
+    setShouldGoBack(false);
 
-    //   return list;
-    // };
+    /* Code to listt all available cameras
+    const listCameras = async () => {
+      const list = await QrScanner.listCameras();
+      presentToast({
+        header: "After list cameraS",
+        message: list.toString(),
+        color: "primary",
+      });
+
+      return list;
+    };
+    */
 
     const video = document.getElementById("qr-video") as HTMLVideoElement;
     if (qrScanner === undefined) {
@@ -56,8 +50,8 @@ const Scanner: React.FC = (props) => {
         new QrScanner(
           video,
           (result) => {
-            setSessionCode(result.data);
-            goBack();
+            setSessionIdInput(result.data);
+            setShouldGoBack(true);
           },
           {
             returnDetailedScanResult: true,
@@ -68,12 +62,6 @@ const Scanner: React.FC = (props) => {
 
     if (qrScanner !== undefined) {
       qrScanner.setCamera("environment");
-      // let list = listCameras().catch((e) =>
-      //   presentToast({
-      //     header: "Error",
-      //     color: "danger",
-      //   }),
-      // );
 
       qrScanner.start();
     }
@@ -83,7 +71,7 @@ const Scanner: React.FC = (props) => {
         qrScanner.stop();
       }
     };
-  }, [qrScanner, setSessionCode, goBack]);
+  }, [qrScanner, setSessionIdInput, setShouldGoBack]);
 
   return (
     <IonPage>
@@ -96,10 +84,11 @@ const Scanner: React.FC = (props) => {
           </IonRow>
         </IonGrid>
         <IonFab vertical="bottom" horizontal="center" slot="fixed">
-          <IonFabButton color="secondary" onClick={() => goBack()}>
+          <IonFabButton color="secondary" onClick={() => setShouldGoBack(true)}>
             <IonIcon icon={close} />
           </IonFabButton>
         </IonFab>
+        {shouldGoBack ? <Redirect to="/student" /> : <></>}
       </IonContent>
     </IonPage>
   );
