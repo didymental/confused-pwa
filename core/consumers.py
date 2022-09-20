@@ -10,12 +10,14 @@ from djangochannelsrestframework.observer.generics import (
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
+from core.models.Question import Question
 
 from core.models.Session import Session
 from core.models.Student import Student
 from core.models.UserProfile import UserProfile
 from core.serializers.SessionSerializer import SessionSerializer
 from core.serializers.StudentSerializer import StudentSerializer
+from core.serializers.QuestionSerializer import QuestionSerializer
 from core.serializers.UserProfileSerializer import UserProfileSerializer
 
 
@@ -37,6 +39,14 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if not Session.objects.filter(pk=pk).exists():
             return None
         return Session.objects.get(pk=pk)
+
+    @database_sync_to_async
+    def get_question_session(self, question: Question) -> Optional[Session]:
+        student = question.student
+        if not student:
+            return None
+
+        return student.session
 
     @database_sync_to_async
     def open_session(self, session: Session):
@@ -321,25 +331,72 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             action="notify_joiners",
         )
 
+    @model_observer(Question)
+    async def handle_question_change(  # type: ignore
+        self,
+        message: Dict,
+        observer=None,
+        action=None,
+        subscribing_request_ids=[],
+        **kwargs,
+    ):
+        print("kw fire off create question")
+        if action != "create":
+            return
+
+        session = message.get("session")
+        if session is None:
+            return
+
+        if session.pk != self.session_subscribe:
+            return
+
+        await self.reply(data=message, action=action)
+
+    @handle_question_change.serializer
+    def handle_question_change(self, question: Question, action, **kwargs):
+
+        return dict(
+            data=QuestionSerializer(question).data,
+            session=self.get_question_session(question),
+            action=action.value,
+            pk=question.pk,
+        )
+
     # TODO: does it work if name differently
     @model_observer(Student)
     async def handle_student_change(  # type: ignore
         self,
         message: Dict,
-        action="",
+        observer=None,
+        action=None,
+        subscribing_request_ids=[],
         **kwargs,
     ):
+        print("kw fire off student", action)
+        if action != "update":
+            return
+
+        student = message.get("data")
+        if student is None:
+            return
+
+        session: int = student.get("session")
+
+        if session != self.session_subscribe:
+            return
+
         await self.reply(data=message, action=action)
 
-    @handle_student_change.groups_for_signal
-    def handle_student_change(self, student: Optional[Student] = None, **kwargs):  # type: ignore
-        if student:
-            session: Session = student.session
-            yield f"session__{session.pk}"
+    # @handle_student_change.groups_for_signal
+    # def handle_student_change(self, student: Optional[Student] = None, **kwargs):  # type: ignore
+    #     if student:
+    #         session: Session = student.session
+    #         yield f"session__{session.pk}"
 
-    @handle_student_change.groups_for_consumer  # type: ignore
-    def handle_student_change(self, session: Session, **kwargs):  # type: ignore
-        yield f"session__{session.pk}"
+    # @handle_student_change.groups_for_consumer  # type: ignore
+    # def handle_student_change(self, session: Session, **kwargs):  # type: ignore
+    #     yield f"session__{session.pk}"
 
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
@@ -379,20 +436,3 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         # print("kw fire handle session change", is_open)
         if not session.is_open:
             await self._leave_session(silent=True)
-
-    # # TODO: remove none check, debug later
-    # # TODO: copy from subscribe instance
-    # @handle_session_change.groups_for_signal
-    # def handle_session_change(  # type: ignore
-    #     self, session: Optional[Session] = None, **kwargs
-    # ):
-    #     if session:
-    #         yield f"pk__{session.pk}"
-
-    # @handle_session_change.groups_for_consumer  # type: ignore
-    # def handle_session_change(
-    #     self, session: Optional[Session] = None, **kwargs
-    # ):
-    #     if session:
-    #         print("kw subbing to session change")
-    #         yield f"pk__{session.pk}"
