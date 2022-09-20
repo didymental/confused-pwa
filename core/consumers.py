@@ -384,7 +384,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 str(self.session_subscribe),
                 {
                     "type": "update_joiners",
-                    "instructor": await self.get_instructor(session=session),
+                    "session": SessionSerializer(session).data,
                     "students": await self.get_current_students(
                         session=session
                     ),
