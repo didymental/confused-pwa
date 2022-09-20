@@ -5,7 +5,6 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -13,9 +12,11 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useState } from "react";
-import { personCircle } from "ionicons/icons";
+import "./index.scss";
+import ConfusedIcon from "../../../component/ConfusedIcon";
 import Navbar from "../../../component/Navbar";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
+import { Redirect } from "react-router-dom";
 
 function validateEmail(email: string) {
   const re =
@@ -30,7 +31,7 @@ const SignUpPage: React.FC = () => {
   const [displayName, setDisplayName] = useState<string>("ailing35");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const { signUp } = useAuthentication();
+  const { user, signUp } = useAuthentication();
 
   const handleSignUp = async () => {
     if (!email) {
@@ -58,12 +59,15 @@ const SignUpPage: React.FC = () => {
 
     await signUp(signUpRequest);
   };
-  // TODO
+
+  if (user) {
+    return <Redirect to="/instructor/dashboard" />;
+  }
   return (
     <IonPage>
       <Navbar title={"Confused"} />
       <IonContent fullscreen className="signup-form__container">
-        <IonGrid className="signup-form__content">
+        <IonGrid className="signup-form__grid">
           <IonRow>
             <IonCol>
               <IonAlert
@@ -76,16 +80,16 @@ const SignUpPage: React.FC = () => {
               />
             </IonCol>
           </IonRow>
-          <IonRow>
+          <IonRow className="login-form__profile-icon">
             <IonCol>
-              <IonIcon className="signup-form__profile-icon" icon={personCircle} />
+              <ConfusedIcon />
             </IonCol>
           </IonRow>
 
           <IonRow>
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Email</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Email</IonLabel>
                 <IonInput
                   type="email"
                   value={email}
@@ -95,10 +99,10 @@ const SignUpPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="signup-form__field">
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Password</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Password</IonLabel>
                 <IonInput
                   type="password"
                   value={password}
@@ -108,10 +112,10 @@ const SignUpPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="signup-form__field">
             <IonCol>
-              <IonItem>
-                <IonLabel position="floating"> Display Name</IonLabel>
+              <IonItem fill="outline">
+                <IonLabel position="stacked"> Display Name</IonLabel>
                 <IonInput
                   type="text"
                   value={displayName}
@@ -125,7 +129,7 @@ const SignUpPage: React.FC = () => {
               <p className="signup-form__auxilliary-text--small">
                 By clicking SIGN UP you agree to our <a href="/">Policy</a>
               </p>
-              <IonButton expand="block" color="tertiary" onClick={handleSignUp}>
+              <IonButton expand="block" onClick={handleSignUp}>
                 Sign up
               </IonButton>
               <p className="signup-form__auxilliary-text--middle">

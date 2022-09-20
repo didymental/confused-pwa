@@ -4,7 +4,6 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -12,11 +11,12 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useState } from "react";
-import { personCircle } from "ionicons/icons";
 import Navbar from "../../../component/Navbar";
 import "./index.scss";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
 import { LoginRequest } from "../../../types/auth";
+import ConfusedIcon from "../../../component/ConfusedIcon";
+import { Redirect } from "react-router-dom";
 
 function validateEmail(email: string) {
   const re =
@@ -30,7 +30,8 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState<string>("cityslicka");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const { login } = useAuthentication();
+  const { user, login } = useAuthentication();
+
   const handleLogin = async () => {
     if (!email) {
       setMessage("Please enter a valid email");
@@ -50,37 +51,40 @@ const LoginPage: React.FC = () => {
     }
 
     const loginRequest: LoginRequest = {
-      username: email,
+      email: email,
       password: password,
     };
 
     await login(loginRequest);
   };
 
+  if (user) {
+    return <Redirect to="/instructor/dashboard" />;
+  }
   return (
     <IonPage>
       <Navbar title={"Confused"} />
       <IonContent fullscreen className="login-form__container">
-        <IonGrid className="login-form__content">
+        <IonGrid className="login-form__grid">
           <IonRow>
             <IonCol>
               <IonAlert
                 isOpen={iserror}
                 onDidDismiss={() => setIserror(false)}
-                cssClass="my-custom-class"
+                // cssClass="my-custom-class"
                 header={"Error!"}
                 message={message}
                 buttons={["Dismiss"]}
               />
             </IonCol>
           </IonRow>
-          <IonRow>
+          <IonRow className="login-form__profile-icon">
             <IonCol>
-              <IonIcon className="login-form__profile-icon" icon={personCircle} />
+              <ConfusedIcon />
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="login-form__field">
             <IonCol>
               <IonItem fill="outline">
                 <IonLabel position="floating"> Email</IonLabel>
@@ -93,9 +97,9 @@ const LoginPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
+          <IonRow className="login-form__field">
             <IonCol>
-              <IonItem>
+              <IonItem fill="outline">
                 <IonLabel position="floating"> Password</IonLabel>
                 <IonInput
                   type="password"

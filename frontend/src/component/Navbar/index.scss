@@ -1,6 +1,14 @@
 .navbar {
   &__logo {
     max-width: 35px;
-    margin: 0em 1em;
+    margin: 0rem 1rem 0rem 1rem;
+  }
+
+  &__profile-icon {
+    font-size: 35px;
+  }
+
+  &__title {
+    margin-top: 0.5rem;
   }
 }

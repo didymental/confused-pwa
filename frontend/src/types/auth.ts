@@ -5,17 +5,21 @@ export interface SignUpRequest {
 }
 
 export interface SignUpResponse {
-  id: string;
-  email: string;
-  name: string;
-  token: string;
+  refresh: string;
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface LoginResponse {
-  token: string;
+  refresh: string;
+  access: string;
 }
+
+export interface RefreshTokenRequest {
+  refresh: string;
+}
+
+export type RefreshTokenResponse = LoginResponse;
