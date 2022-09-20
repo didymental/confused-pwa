@@ -524,6 +524,15 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     # For testing
     @action()
     async def post_question(self, question_content: str, **kwargs):
+        user: UserProfile = self.scope["user"]
+
+        if user.is_authenticated:
+            return await self.notify_failure(
+                action="post_question",
+                errors="Only student can post a question",
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
         if not self.temp_user:
             return await self.notify_failure(
                 action="post_question",
