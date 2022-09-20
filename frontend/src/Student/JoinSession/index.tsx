@@ -17,94 +17,111 @@ import {
   IonToolbar,
   getPlatforms,
   useIonToast,
+  useIonLoading,
 } from "@ionic/react";
-import { camera, person, resizeOutline, scan } from "ionicons/icons";
+import { returnDownBack, scan } from "ionicons/icons";
 import "../join-page.scss";
 import { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import logo from "../../assets/logo-light.svg";
-import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useToast } from "../../hooks/util/useToast";
-import { useSessionCode } from "../../hooks/joinsession/useSessionCode";
-import { useStudentName } from "../../hooks/joinsession/useStudentName";
+import { useSessionCode, useStudentName } from "../../hooks/joinsession/useJoinDetails";
+import { useJoinSession } from "../../hooks/joinsession/useJoinSession";
+import ConfusedIcon from "../../component/ConfusedIcon";
+import { JoinSessionRequest } from "../../types/join";
+import { join } from "path";
 
 const JoinPage: React.FC = () => {
   const { sessionCode, setSessionCode } = useSessionCode();
   const { studentName, setStudentName } = useStudentName();
+  const { joinSession } = useJoinSession();
 
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-
-  const [present] = useIonToast();
+  const [shouldShowLoading, setShouldShowLoading] = useState<boolean>(false);
 
   const history = useHistory();
 
-  const invalidPINMsg: string = "Please enter a valid session code";
+  const invalidPINMsg: string = "Session input should only contain numbers.";
+  const invalidNameMsg: string = "Name should only contain alphabets, numbers and spaces";
   const sessionNotFoundMsg: string = "Session not found";
   const unknownErrorMsg: string = "error. Please contact administrators for more details";
 
-  const displayToast = (message: string[] | string | undefined) => {
-    let messageString;
-    if (message === undefined) {
-      messageString = "Undefined message";
-    } else if (Array.isArray(message)) {
-      messageString = message.toString();
-    } else {
-      messageString = message;
-    }
-
-    present({
-      message: messageString,
-      duration: 1500,
-      position: "bottom",
-    });
+  const isNumericalOnly = (input: string) => {
+    const res = /^[0-9]+$/.exec(input);
+    const valid = !!res;
+    return valid;
   };
 
-  const handleJoinSession = () => {
-    if (sessionCode === "") {
+  const isNameValid = (name: string) => {
+    const res = /^\s*(([A-Za-z0-9]|\d){1,}([-']| |))+[A-Za-z0-9]+\s*$/.exec(name);
+    const valid = !!res;
+    return valid;
+  };
+
+  const handleJoinSession = async () => {
+    setSessionCode(sessionCode.trim());
+    setStudentName(studentName.trim());
+
+    if (!isNumericalOnly(sessionCode)) {
       setMessage(invalidPINMsg);
       setIserror(true);
       return;
     }
 
-    const api = axios.create({
-      baseURL: "https://reqres.in/api/",
-    });
-
-    let resStatus: number = 0;
-    if (sessionCode === "VALIDCODE") {
-      //Simulating a valid session PIN
-      api
-        .get("/unknown/2")
-        .then((res) => {
-          console.log(res);
-          resStatus = res.status;
-          history.push("/student/join");
-        })
-        .catch((error) => {
-          console.log(error);
-          setMessage(error.message + unknownErrorMsg);
-          setIserror(true);
-        });
-    } else {
-      //Simulating session not found
-      api
-        .get("/unknown/23")
-        .then((res) => {
-          console.log(res);
-          resStatus = res.status;
-        })
-        .catch((error) => {
-          console.log(error);
-          setMessage(sessionNotFoundMsg + ". " + invalidPINMsg);
-          setIserror(true);
-        });
+    if (!isNameValid(studentName)) {
+      setMessage(invalidNameMsg);
+      setIserror(true);
+      return;
     }
-  };
 
-  const scanQR = () => {
-    return;
+    const joinRequest: JoinSessionRequest = {
+      session: parseInt(sessionCode),
+      display_name: studentName,
+      reaction_type: null,
+    };
+
+    setShouldShowLoading(true);
+    await joinSession(joinRequest);
+    setShouldShowLoading(false);
+
+    /* Dummy API call for debugging purposes */
+
+    // const api = axios.create({
+    //   baseURL: "https://reqres.in/api/",
+    // });
+
+    // let resStatus: number = 0;
+    // if (sessionCode === "123456") {
+    //   //Simulating a valid session PIN
+    //   api
+    //     .get("/unknown/2")
+    //     .then((res) => {
+    //       console.log(res);
+    //       resStatus = res.status;
+    //       history.push("/student/session/:id");
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //       setMessage(error.message + unknownErrorMsg);
+    //       setIserror(true);
+    //     });
+    // } else {
+    //   //Simulating session not found
+    //   api
+    //     .get("/unknown/23")
+    //     .then((res) => {
+    //       console.log(res);
+    //       resStatus = res.status;
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //       setMessage(sessionNotFoundMsg);
+    //       setIserror(true);
+    //     });
+    // }
+
+    /* End of dummy API call for debugging purposes */
   };
 
   return (
@@ -123,20 +140,22 @@ const JoinPage: React.FC = () => {
               />
             </IonCol>
           </IonRow>
-          <IonRow>
+          <IonRow className="login-form__profile-icon">
             <IonCol>
-              <img width="200em" src={logo} className="logo-noanim" alt="logo" />
+              <ConfusedIcon useLightLogo={true} />
             </IonCol>
           </IonRow>
 
           <IonRow>
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="floating">Session Code</IonLabel>
+                <IonLabel position="stacked">Session Code</IonLabel>
                 <IonInput
-                  type="text"
+                  type="tel"
+                  inputMode="tel"
+                  maxlength={6}
                   value={sessionCode}
-                  placeholder={"1234"}
+                  placeholder={"123456"}
                   onIonChange={(e) => setSessionCode(e.detail.value!)}
                 ></IonInput>
               </IonItem>
@@ -146,7 +165,7 @@ const JoinPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="floating">Display Name</IonLabel>
+                <IonLabel position="stacked">Display Name</IonLabel>
                 <IonInput
                   type="text"
                   value={studentName}
@@ -178,13 +197,20 @@ const JoinPage: React.FC = () => {
               </IonButton>
             </IonCol>
           </IonRow>
-        </IonGrid>
 
-        <IonFab vertical="bottom" horizontal="center" slot="fixed">
-          <IonFabButton color="secondary" routerLink="/scanner">
-            <IonIcon icon={scan} />
-          </IonFabButton>
-        </IonFab>
+          <IonRow>
+            <IonCol>
+              <IonButton
+                className="join-page__qr-button"
+                color="secondary"
+                shape="round"
+                routerLink="/student/scanner"
+              >
+                <IonIcon icon={scan} />
+              </IonButton>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
       </IonContent>
     </IonPage>
   );

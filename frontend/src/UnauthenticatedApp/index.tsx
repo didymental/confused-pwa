@@ -4,6 +4,7 @@ import LoginPage from "../Instructor/Auth/Login";
 import Splash from "../Splash";
 import SignUpPage from "../Instructor/Auth/SignUp";
 import JoinPage from "../Student/JoinSession";
+import Scanner from "../Student/QRScanner";
 import StudentSessionPage from "../Student/Session";
 import NotFoundPage from "../NotFound";
 
@@ -14,7 +15,8 @@ const UnauthenticatedApp: React.FC = () => {
       <Route path="/login" exact component={LoginPage} />
       <Route path="/signup" exact component={SignUpPage} />
       <Route path="/student" exact component={JoinPage} />
-      <Route path="/student/session/:id" exact component={StudentSessionPage} />
+      <Route path="/student/scanner" exact component={Scanner} />
+      <Route path="/student/session" exact component={StudentSessionPage} />
       <Route>
         <NotFoundPage />
       </Route>

@@ -1,10 +1,19 @@
 import "./index.scss";
 import logo from "../../assets/logo.svg";
+import logoLight from "../../assets/logo-light.svg";
 
-const ConfusedIcon: React.FC = () => {
+interface UseLightLogo {
+  useLightLogo?: boolean;
+}
+
+const ConfusedIcon: React.FC<UseLightLogo> = ({ useLightLogo = false }) => {
   return (
     <a href="/">
-      <img className="icon" src={logo} alt="logo" />
+      {useLightLogo ? (
+        <img className="icon" src={logoLight} alt="logo" />
+      ) : (
+        <img className="icon" src={logo} alt="logo" />
+      )}
     </a>
   );
 };

@@ -18,72 +18,88 @@ import {
   getPlatforms,
   useIonToast,
   NavContext,
+  useIonLoading,
 } from "@ionic/react";
-import { camera, person, resizeOutline, scan } from "ionicons/icons";
+import { close } from "ionicons/icons";
 import "../join-page.scss";
 import { useState, useEffect, useContext } from "react";
 import QrScanner from "qr-scanner";
-import { useSessionCode } from "../../hooks/joinsession/useSessionCode";
 import { useHistory } from "react-router-dom";
+import { useSessionCode } from "../../hooks/joinsession/useJoinDetails";
+import { useToast } from "../../hooks/util/useToast";
 
 const Scanner: React.FC = (props) => {
+  const { presentToast } = useToast();
   const { goBack } = useContext(NavContext);
-  const [iserror, setIserror] = useState<boolean>(false);
   const { sessionCode, setSessionCode } = useSessionCode();
 
-  let qrScanner: QrScanner | undefined = undefined;
+  const history = useHistory();
+
+  let [qrScanner, setQrScanner] = useState<QrScanner>();
 
   //Create scanner and start scanning on page load. No rerenders otherwise
   useEffect(() => {
+    // const listCameras = async () => {
+    //   const list = await QrScanner.listCameras();
+    //   presentToast({
+    //     header: "After list cameraS",
+    //     message: list.toString(),
+    //     color: "primary",
+    //   });
+
+    //   return list;
+    // };
+
     const video = document.getElementById("qr-video") as HTMLVideoElement;
-    let scanResult;
-    if (qrScanner == undefined) {
-      qrScanner = new QrScanner(
-        video,
-        (result) => {
-          setSessionCode(result.data);
-          goBack();
-        },
-        {
-          returnDetailedScanResult: true,
-        },
+    if (qrScanner === undefined) {
+      setQrScanner(
+        new QrScanner(
+          video,
+          (result) => {
+            setSessionCode(result.data);
+            goBack();
+          },
+          {
+            returnDetailedScanResult: true,
+          },
+        ),
       );
     }
 
-    qrScanner.start();
+    if (qrScanner !== undefined) {
+      qrScanner.setCamera("environment");
+      // let list = listCameras().catch((e) =>
+      //   presentToast({
+      //     header: "Error",
+      //     color: "danger",
+      //   }),
+      // );
 
-    console.log(sessionCode);
-
+      qrScanner.start();
+    }
     //Cleanup function to unload the qrScanner
     return () => {
-      if (qrScanner != undefined) {
-        qrScanner.destroy();
-        qrScanner = undefined;
+      if (qrScanner !== undefined) {
+        qrScanner.stop();
       }
     };
-  }, []);
+  }, [qrScanner, setSessionCode, goBack]);
 
   return (
     <IonPage>
-      <IonContent fullscreen className="join-page__container">
-        <IonGrid className="join-page__content">
+      <IonContent fullscreen className="join-page__container splash">
+        <IonGrid className="join-page_qr-container">
           <IonRow>
             <IonCol>
-              <IonAlert
-                isOpen={iserror}
-                onDidDismiss={() => setIserror(false)}
-                cssClass="my-custom-class"
-                header={"Error!"}
-                message={"message"}
-                buttons={["Dismiss"]}
-              />
+              <video id="qr-video" className="join-page__qr-scan-box"></video>
             </IonCol>
           </IonRow>
-          <video id="qr-video" className="join-page__qr-scan-box"></video>
-          <IonRow>
-            <IonCol>{sessionCode}</IonCol>
-          </IonRow>
         </IonGrid>
+        <IonFab vertical="bottom" horizontal="center" slot="fixed">
+          <IonFabButton color="secondary" onClick={() => goBack()}>
+            <IonIcon icon={close} />
+          </IonFabButton>
+        </IonFab>
       </IonContent>
     </IonPage>
   );
