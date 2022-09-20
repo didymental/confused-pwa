@@ -1,6 +1,7 @@
 import json
-from typing import Dict, Optional, Type
+from typing import Dict, List, Optional, Type
 
+from django.core.exceptions import ObjectDoesNotExist
 from channels.db import database_sync_to_async
 from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
 from djangochannelsrestframework.observer import model_observer
@@ -10,8 +11,9 @@ from djangochannelsrestframework.observer.generics import (
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
-from core.models.Question import Question
 
+
+from core.models.Question import Question
 from core.models.Session import Session
 from core.models.Student import Student
 from core.models.ReactionType import ReactionType
@@ -48,15 +50,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         return Student.objects.get(pk=pk)
 
     @database_sync_to_async
-    def create_question(
-        self, student_pk: int, question_content: str
-    ) -> Optional[Question]:
-        Question.objects.create(
-            student=self.get_student(pk=student_pk),
-            question_content=question_content,
-        )
-
-    @database_sync_to_async
     def update_student(
         self, student_pk: int, reaction_type_pk: Optional[int]
     ) -> Optional[Student]:
@@ -66,13 +59,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         student.reaction_type = reaction
         student.save()
 
-    @database_sync_to_async
-    def get_question_session(self, question: Question) -> Optional[Session]:
-        student = question.student
-        if not student:
-            return None
+    # @database_sync_to_async
+    # def get_question_session(self, question: Question) -> Optional[Session]:
+    #     student = question.student
+    #     if not student:
+    #         return None
 
-        return student.session
+    #     return student.session
 
     @database_sync_to_async
     def open_session(self, session: Session):
@@ -82,6 +75,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     @database_sync_to_async
     def empty_session(self, session: Session):
         students = Student.objects.filter(session=session)
+        if not students.exists():
+            return
         students.delete()
 
     @database_sync_to_async
@@ -99,6 +94,22 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             StudentSerializer(student).data
             for student in Student.objects.filter(session=session)
         ]
+
+    @database_sync_to_async
+    def create_question(
+        self, student_pk: int, question_content: str
+    ) -> Optional[Question]:
+
+        try:
+            student = Student.objects.get(pk=student_pk)
+
+            Question.objects.create(
+                student=student,
+                question_content=question_content,
+            )
+            print("kw question created")
+        except ObjectDoesNotExist:
+            return None
 
     @database_sync_to_async
     def create_student(self, session: Session, display_name: str):
@@ -135,7 +146,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 return
             return await self.notify_failure(
                 action="leave_session",
-                errors="You have not joined a session yet",
+                errors=["You have not joined a session yet"],
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -147,7 +158,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 return
             return await self.notify_failure(
                 action="leave_session",
-                errors="The session no longer exists",
+                errors=["The session no longer exists"],
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -165,10 +176,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 student = await self.get_student(pk=self.temp_user)
                 await self.student_leave_session(student=student)
 
-            await self._leave_session_cleanup()
+            print("kw leaving")
 
             if not silent:
+                print("kw notify leaving")
                 await self.notify_joiners()
+
+            await self._leave_session_cleanup()
 
         except ValidationError as e:
             if silent:
@@ -243,7 +257,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     async def notify_failure(
         self,
         action: str,
-        errors: str,
+        errors: List[str],
         message: str = "",
         status=status.HTTP_403_FORBIDDEN,
     ):
@@ -266,7 +280,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if session is None:
             return await self.notify_failure(
                 action="join_session",
-                errors=f"Session of id {pk} does not exist",
+                errors=[f"Session of id {pk} does not exist"],
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -392,37 +406,28 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             action="notify_joiners",
         )
 
-    @model_observer(Question)
-    async def handle_question_change(  # type: ignore
-        self,
-        message: Dict,
-        observer=None,
-        action=None,
-        subscribing_request_ids=[],
-        **kwargs,
-    ):
-        print("kw fire off create question")
-        if action != "create":
-            return
+    @database_sync_to_async
+    def _get_question_session(self, question_pk: int) -> Optional[Session]:
+        try:
+            question = Question.objects.get(pk=question_pk)
+            return question.student.session
+        except ObjectDoesNotExist:
+            return None
 
-        session = message.get("session")
-        if session is None:
-            return
+    # @handle_question_change.serializer
+    # def handle_question_change(
+    #     self, question: Question, action=None, **kwargs
+    # ):
 
-        if session.pk != self.session_subscribe:
-            return
+    #     if action is None:
+    #         return {}
 
-        await self.reply(data=message, action=action)
-
-    @handle_question_change.serializer
-    def handle_question_change(self, question: Question, action, **kwargs):
-
-        return dict(
-            data=QuestionSerializer(question).data,
-            session=self.get_question_session(question),
-            action=action.value,
-            pk=question.pk,
-        )
+    #     return dict(
+    #         data=QuestionSerializer(question).data,
+    #         session=_get_question_session(question),
+    #         action=action.value,
+    #         pk=question.pk,
+    #     )
 
     # TODO: does it work if name differently
     @model_observer(Student)
@@ -434,7 +439,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
-        print("kw fire off student", action)
+        print("kw fire off student", message, action)
 
         if action == "delete":
             await self._handle_student_delete(
@@ -485,6 +490,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
     @handle_student_change.serializer
     def handle_student_change(self, student: Student, action, **kwargs):
+        print("kw serialize student", action)
         return dict(
             data=StudentSerializer(student).data,
             action=action.value,
@@ -501,6 +507,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
+        print("kw fire off session", message, action)
         if action != "update":
             return
 
@@ -529,14 +536,14 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if user.is_authenticated:
             return await self.notify_failure(
                 action="post_question",
-                errors="Only student can post a question",
+                errors=["Only student can post a question"],
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         if not self.temp_user:
             return await self.notify_failure(
                 action="post_question",
-                errors="You have not joined a session yet",
+                errors=["You have not joined a session yet"],
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -549,10 +556,80 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if not self.temp_user:
             return await self.notify_failure(
                 action="put_reaction",
-                errors="You have not joined a session yet",
+                errors=["You have not joined a session yet"],
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         await self.update_student(
             student_pk=self.temp_user, reaction_type_pk=reaction_type_pk
+        )
+
+    # FIXME: question observer doesnt get fired off
+    @model_observer(Question)
+    async def handle_question_change(  # type: ignore
+        self,
+        message: Dict,
+        observer=None,
+        action=None,
+        subscribing_request_ids=[],
+        **kwargs,
+    ):
+        print("kw fire off question", action)
+
+        # if action == "delete":
+        #     await self._handle_student_delete(
+        #         message=message,
+        #         observer=observer,
+        #         subscribing_request_ids=subscribing_request_ids,
+        #         **kwargs,
+        #     )
+
+        # if action == "update":
+        #     await self._handle_student_update(
+        #         message=message,
+        #         observer=observer,
+        #         subscribing_request_ids=subscribing_request_ids,
+        #         **kwargs,
+        #     )
+
+    # @model_observer(Question)
+    # async def handle_question_change(  # type: ignore
+    #     self,
+    #     message: Dict,
+    #     observer=None,
+    #     action=None,
+    #     subscribing_request_ids=[],
+    #     **kwargs,
+    # ):
+    #     print("kw fire off question", action)
+    # if action != "create":
+    #     return
+
+    # question_pk = message.get("pk")
+    # if question_pk is None:
+    #     return
+    # session = await self._get_question_session(question_pk=question_pk)
+    # if session is None:
+    #     return
+    # if session.pk != self.session_subscribe:
+    #     return
+
+    # await self.reply(data=message, action=action)
+
+    # @handle_question_change.serializer
+    # def handle_question_change(self, question: Question, action, **kwargs):
+    #     print("kw serialize question", action)
+    #     return dict(
+    #         data=QuestionSerializer(question).data,
+    #         action=action.value,
+    #         pk=question.pk,
+    #     )
+
+    @handle_question_change.serializer
+    def handle_question_change(self, question: Question, action, **kwargs):
+        print("kw serialize question", action)
+        return dict(
+            data=QuestionSerializer(question).data,
+            action=action.value,
+            pk=question.pk,
         )
