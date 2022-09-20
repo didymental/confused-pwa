@@ -16,15 +16,13 @@ import { createOutline, trashOutline, ellipsisVertical } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { useSessions } from "../../../hooks/session/useSession";
 import { SessionEntity } from "../../../types/session";
+import { getFormattedDate } from "../../../utils/date";
 import "./index.scss";
-import moment from "moment";
 
 const SessionViewCard: React.FC<SessionEntity> = (session) => {
-  const sessionId = session.id;
-  const name = session.name;
-  const isOpen = session.is_open;
+  const { id: sessionId, name, is_open: isOpen, created_date_time: dateTime } = session;
   // TODO: convert to correct date format
-  const createdAt = moment(session.created_date_time ?? null).format("YYYY/MM/DD kk:mm:ss");
+  const createdDate = dateTime ? getFormattedDate(dateTime) : null;
 
   const history = useHistory();
   const { getSessions, deleteSession } = useSessions();
@@ -71,8 +69,8 @@ const SessionViewCard: React.FC<SessionEntity> = (session) => {
                 <IonRow>
                   <IonCardTitle>{name}</IonCardTitle>
                 </IonRow>
-                <IonRow>
-                  <IonCardSubtitle>{`Created at: ${createdAt}`}</IonCardSubtitle>
+                <IonRow className="card__subtitle">
+                  <IonCardSubtitle>{`Created on ${createdDate}`}</IonCardSubtitle>
                 </IonRow>
               </IonCol>
               <IonCol className="dashboard__menu" size="2">

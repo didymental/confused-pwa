@@ -13,7 +13,7 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import logo from "../../assets/logo.svg";
 import { personCircle, logOutOutline, createOutline } from "ionicons/icons";
 import { useToast } from "../../hooks/util/useToast";
@@ -31,7 +31,6 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = (props) => {
   const { title = "", showProfileIcon = false, showBackButton = false, showLogo = false } = props;
   const location = useLocation();
-  const history = useHistory();
   const user = getUser();
   const [presentAlert] = useIonAlert();
   const { presentToast } = useToast();
@@ -94,21 +93,14 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     <IonHeader>
       <IonToolbar>
         {showBackButton && (
-          <IonButtons slot="start">
-            <IonBackButton />
+          <IonButtons slot="start" className="navbar__back-button">
+            <IonBackButton text="" />
           </IonButtons>
         )}
 
         <IonGrid>
           <IonRow>
-            {showLogo && (
-              <img
-                src={logo}
-                alt="logo"
-                className="navbar navbar__logo"
-                onClick={() => history.push("/")}
-              />
-            )}
+            {showLogo && <img src={logo} alt="logo" className="navbar navbar__logo" />}
             <h2 className="navbar navbar__title">{title}</h2>
           </IonRow>
         </IonGrid>

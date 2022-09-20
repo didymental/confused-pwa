@@ -34,7 +34,7 @@ const Splash: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="splash">
+      <IonContent className="content">
         {isAnimationPlaying && (
           <AnimatePresence>
             <motion.div
