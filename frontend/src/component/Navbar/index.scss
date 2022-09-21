@@ -8,22 +8,11 @@
     margin: 0rem 1rem 0rem 1rem;
   }
 
-  &__profile-icon {
-    font-size: 35px;
+  &__menu-icon {
+    font-size: 30px;
   }
 
   &__title {
     margin-top: 0.5rem;
-  }
-}
-
-.profile-dropdown {
-  &__name {
-    margin: 1rem;
-    display: flex;
-    justify-content: center;
-    font-size: large;
-    font-weight: 700;
-    color: grey;
   }
 }
