@@ -28,6 +28,9 @@ precacheAndRoute(self.__WB_MANIFEST);
 // are fulfilled with your index.html shell. Learn more at
 // https://developers.google.com/web/fundamentals/architecture/app-shell
 const fileExtensionRegexp = new RegExp("/[^/?]+\\.[^/]+$");
+const CACHE_NAME = "confused_app_cache";
+const urlsToCache = ["/", "/index.scss"];
+
 registerRoute(
   // Return false to exempt requests from being fulfilled by index.html.
   ({ request, url }: { request: Request; url: URL }) => {
@@ -78,3 +81,56 @@ self.addEventListener("message", (event) => {
 });
 
 // Any other custom service worker logic can go here.
+
+// cache the static assets for the page
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      // Open a cache and cache our files
+      return cache.addAll(urlsToCache);
+    }),
+  );
+});
+
+// intercepting and caching requests
+// In fetch listener event.respondWith, we pass along a promise from caches.match()
+// which looks at the request and will find any cached results from entries the service worker created.
+// If there’s a matching response, the cached value is returned.
+self.addEventListener("fetch", (event) => {
+  console.log(event.request.url);
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    }),
+  );
+});
+
+// Remove old caches
+const deleteCache = async (key: string) => {
+  await caches.delete(key);
+};
+
+const deleteOldCaches = async () => {
+  const cacheKeepList = [CACHE_NAME];
+  const keyList = await caches.keys();
+  const cachesToDelete = keyList.filter((key) => !cacheKeepList.includes(key));
+  await Promise.all(cachesToDelete.map(deleteCache));
+};
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(deleteOldCaches());
+});
+
+// self.addEventListener("activate", (event) => {
+//   event.waitUntil(
+//     (async () => {
+//       const keys = await caches.keys();
+//       return keys.map(async (cache) => {
+//         if (cache !== CACHE_NAME) {
+//           console.log("Service Worker: Removing old cache: " + cache);
+//           return await caches.delete(cache);
+//         }
+//       });
+//     })(),
+//   );
+// });

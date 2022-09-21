@@ -20,6 +20,7 @@ import { useHistory, useLocation } from "react-router";
 import { useSessions } from "../../hooks/session/useSession";
 import { SessionEntity } from "../../types/session";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
+import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
 
 const SessionForm: React.FunctionComponent = () => {
   const location = useLocation();
@@ -32,6 +33,7 @@ const SessionForm: React.FunctionComponent = () => {
   const [present, dismiss] = useIonLoading();
   const { user } = useAuthentication();
   const { sessions, createSession, updateSession } = useSessions();
+  const isOnline = useOnlineStatus();
 
   useEffect(() => {
     if (location.pathname === "/instructor/session/create") {
@@ -86,9 +88,12 @@ const SessionForm: React.FunctionComponent = () => {
     }
     setIserror(false);
 
-    present({
-      message: isEdit ? "Editing Session" : "Creating Session",
-    });
+    if (isOnline) {
+      present({
+        message: isEdit ? "Editing Session" : "Creating Session",
+      });
+    }
+
     if (isEdit) {
       handleEdit();
     } else {
