@@ -602,6 +602,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
+        if self.session_subscribe is None:
+            return await self.notify_failure(
+                action="leave_session",
+                errors=["You have not joined a session yet"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
         await self._clear_reactions()
         await self.notify_success(
             action="clear_reactions",
