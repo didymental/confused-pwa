@@ -21,8 +21,10 @@ import {
   IonItem,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
-import { powerSharp, qrCode, shareSocialSharp, linkSharp } from "ionicons/icons";
-import client from "../../api/client";
+import { useHistory, useParams } from "react-router";
+import QRCode from "react-qr-code";
+import { powerSharp, shareSocialSharp, linkSharp } from "ionicons/icons";
+import client, { BASE_URL, getWebSocketClient } from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import clear from "../../assets/clear-bg.svg";
 import confused_1 from "../../assets/confused-1-bg.svg";
@@ -37,17 +39,41 @@ const CLEAR_STATE = "clear";
 const CONFUSED_1_STATE = "confused-1";
 const CONFUSED_2_STATE = "confused-2";
 
+// actions for the websocket
+const JOIN_SESSION = "join_session";
+const LEAVE_SESSION = "leave_session";
+const CLEAR_REACTIONS_ACTION = "clear_reactions";
+
 /**
  * Represents the page that shows the Instructor when the Instructor is
  * in view of the session.
- *
- * @param sessionId the id of the Session the Instructor is in view of.
  */
-const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) => {
+const InstructorSessionPage: React.FC = () => {
   const [levelOfConfusion, setLevelOfConfusion] = useState<string>();
   const [questions, setQuestions] = useState<QuestionData[] | []>([]);
   const [students, setStudents] = useState<StudentData[] | []>([]);
   const { presentToast } = useToast();
+  const ws = useRef<WebSocket | null>(null);
+  const { id }: any = useParams();
+  const sessionId = parseInt(id);
+  const history = useHistory();
+
+  useEffect(() => {
+    getStudentsAndQuestionsInSession(sessionId);
+    ws.current = getWebSocketClient(true);
+    ws.current.onopen = () => handleWsOpen(ws.current);
+    ws.current.onmessage = (e) => handleMessageListener(e);
+    ws.current.onclose = () => handleWsClose(ws.current);
+
+    const wsCurrent = ws.current;
+
+    return () => {
+      wsCurrent.close();
+    };
+  }, []);
+
+  // to re render screen for each update of student or questions
+  useEffect(() => {}, [students, questions]);
 
   // Gets all students and questions in the session
   const getStudentsAndQuestionsInSession = (sessionId: number) => {
@@ -88,11 +114,87 @@ const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) =
       });
   };
 
-  useEffect(() => {
-    sessionId = 3;
-    setLevelOfConfusion(CLEAR_STATE); // default to set as clear
-    getStudentsAndQuestionsInSession(sessionId);
-  }, []);
+  const handleWsOpen = (wsCurrent: WebSocket | null) => {
+    if (!wsCurrent) {
+      return;
+    }
+    wsCurrent.send(
+      JSON.stringify({
+        action: JOIN_SESSION,
+        pk: sessionId,
+        request_id: Math.random(),
+      }),
+    );
+  };
+
+  const handleWsClose = (wsCurrent: WebSocket | null) => {
+    if (!wsCurrent) {
+      return;
+    }
+  };
+
+  const handleMessageListener = (response: MessageEvent<any>) => {
+    let res = JSON.parse(response.data);
+
+    if (res.data.type === "failed") {
+      res.errors.map((err: string) => handleError(err));
+    }
+
+    // student post or vote question
+    if (res.action === "create_question") {
+      setQuestions((questionsParam) => {
+        let questionsCopy = [...questionsParam];
+        let isExistingQuestion = false;
+        questionsCopy.forEach((question, index) => {
+          if (question.question_content === res.data.question_content) {
+            questionsCopy[index] = res.data;
+            isExistingQuestion = true;
+            return;
+          }
+        });
+
+        if (!isExistingQuestion) {
+          questionsCopy = [res.data, ...questionsParam];
+        }
+
+        return questionsCopy;
+      });
+    }
+
+    // student post reaction
+    if (res.action === "update_student") {
+      setStudents((studentsParam) => {
+        let studentsCopy = [...studentsParam];
+        studentsCopy.forEach((student, index) => {
+          if (student.id === res.data.id) {
+            studentsCopy[index] = res.data;
+            return;
+          }
+        });
+        return studentsCopy;
+      });
+    }
+
+    if (res.action === "notify_joiners") {
+      setStudents((studentsParam) => {
+        let studentsCopy = [...studentsParam];
+        for (let i = 0; i < res.data.students.length; i++) {
+          studentsCopy.push(res.data.students[i]);
+        }
+
+        return studentsCopy;
+      });
+    }
+  };
+
+  const handleError = (msg: string) => {
+    presentToast({
+      header: "Error occurred",
+      message: msg,
+      color: "danger",
+    });
+    history.push("/instructor/dashboard");
+  };
 
   return (
     <IonPage>
@@ -103,6 +205,8 @@ const InstructorSessionPage: React.FC<{ sessionId: number }> = ({ sessionId }) =
           students={students || []}
           sessionId={sessionId}
           setLevelOfConfusion={setLevelOfConfusion}
+          setStudents={setStudents}
+          ws={ws.current}
         />
       </IonContent>
     </IonPage>
@@ -115,16 +219,18 @@ interface ConfusionDisplayProps {
   students: StudentData[] | [];
   sessionId: number;
   setLevelOfConfusion: (levelOfConfusion: string) => void;
+  setStudents: (students: StudentData[]) => void;
+  ws: WebSocket | null;
 }
 
 const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
-  let { levelOfConfusion, questions, students, sessionId, setLevelOfConfusion } = props;
+  let { levelOfConfusion, questions, students, sessionId, setLevelOfConfusion, setStudents, ws } =
+    props;
   const [hasAnimated, setHasAnimated] = useState(false);
-  const { presentToast } = useToast();
   const [presentAlert] = useIonAlert();
-
+  const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
-  const modal = useRef<HTMLIonModalElement>(null);
+  const shareableLink = `${BASE_URL}/student/session/` + sessionId;
 
   useEffect(() => {
     setHasAnimated(true);
@@ -137,31 +243,45 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   }, [hasAnimated]);
 
   const endSession = () => {
-    client
-      .get(`/sessions/${sessionId}/`)
-      .then((res) => {
-        let toSend = { ...res.data, is_open: false };
-        client.put(`/sessions/${sessionId}/`, toSend).catch((err) => {
-          presentToast({
-            header: "Error occurred!",
-            message: err.response.data.detail,
-            color: "danger",
-          });
-        });
-      })
-      .catch((err) => {
-        presentToast({
-          header: "Error occurred!",
-          message: err.response.data.detail,
-          color: "danger",
-        });
-      });
+    if (!ws) {
+      return;
+    }
+    clearReactions();
+    ws.send(
+      JSON.stringify({
+        action: LEAVE_SESSION,
+        pk: sessionId,
+        request_id: Math.random(),
+      }),
+    );
+
+    ws.close();
+
+    history.push("/instructor/dashboard");
   };
 
   const copyLinkToClipboard = () => {
-    let link = "url";
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(shareableLink);
     presentAlert("Copied to your clipboard!");
+  };
+  const clearReactions = () => {
+    if (!ws) {
+      return;
+    }
+    ws.send(
+      JSON.stringify({
+        action: CLEAR_REACTIONS_ACTION,
+        request_id: Math.random(),
+      }),
+    );
+
+    let updatedStudents = [];
+    for (let i = 0; i < students.length; i++) {
+      let studentCopy = { ...students[i] };
+      studentCopy.reaction_type = null;
+      updatedStudents.push(studentCopy);
+    }
+    setStudents(updatedStudents);
   };
 
   return (
@@ -191,6 +311,15 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
         </IonRow>
         <IonRow className="ion-row-instructor-session">
           <IonButton
+            className="ion-btn-instructor-session__reactions"
+            onClick={clearReactions}
+            fill="clear"
+          >
+            <IonCardContent>RESET</IonCardContent>
+          </IonButton>
+        </IonRow>
+        <IonRow className="ion-row-instructor-session">
+          <IonButton
             className="ion-btn-instructor-session__share"
             onClick={() => setOpenModal(true)}
             fill="clear"
@@ -212,7 +341,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
 
         <IonModal
           isOpen={openModal}
-          initialBreakpoint={0.5}
+          initialBreakpoint={0.75}
           breakpoints={[0, 0.25, 0.5, 0.75]}
           onIonModalWillDismiss={() => setOpenModal(false)}
         >
@@ -222,17 +351,16 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
                 <IonTitle>Share via ...</IonTitle>
               </IonToolbar>
             </IonHeader>
-            <IonList>
-              <IonItem>
-                <IonButton onClick={copyLinkToClipboard} fill="clear">
-                  <IonIcon icon={linkSharp} size="large" />
-                </IonButton>
-                <IonCardContent>URL LINK</IonCardContent>
-              </IonItem>
-              <IonItem>
-                {/**placeholder for the QR code generator */}
-                <img src={confused_reaction} />
-              </IonItem>
+            <IonItem className="modal__item">
+              <IonButton onClick={copyLinkToClipboard} fill="clear">
+                <IonIcon icon={linkSharp} size="large" />
+              </IonButton>
+              <IonCardContent>
+                <IonText>{shareableLink}</IonText>
+              </IonCardContent>
+            </IonItem>
+            <IonList className="modal__list">
+              <QRCode value={shareableLink} />
             </IonList>
           </IonContent>
         </IonModal>
@@ -288,16 +416,6 @@ const ReactionsDisplay: React.FC<{
     setLevelOfConfusion(CLEAR_STATE);
   }, [ratio]);
 
-  const clearReactions = () => {
-    let toSend = [];
-    for (let i = 0; i < students.length; i++) {
-      let studentCopy = { ...students[i] };
-      studentCopy.reaction_type = null;
-      toSend.push(studentCopy);
-    }
-    client.put("/students/", toSend);
-  };
-
   return (
     <IonGrid>
       <IonRow>
@@ -320,15 +438,6 @@ const ReactionsDisplay: React.FC<{
               <IonText>{countOfClear}</IonText>
             </IonBadge>
           </IonRow>
-        </IonCol>
-        <IonCol className="ion-col-instructor-session__reactions">
-          <IonButton
-            className="ion-btn-instructor-session__reactions"
-            onClick={clearReactions}
-            fill="clear"
-          >
-            <IonText>RESET</IonText>
-          </IonButton>
         </IonCol>
       </IonRow>
     </IonGrid>

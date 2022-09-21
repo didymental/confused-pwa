@@ -163,3 +163,20 @@
     font-weight: 550;
     margin-top: 10px;
 }
+
+.modal {
+    &__list {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2.5rem;
+    }
+
+    &__item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: medium;
+    }
+}
