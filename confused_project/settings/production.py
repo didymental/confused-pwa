@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
 
 
 DATABASES = {}
-DATABASES["default"] = dj_database_url.config(conn_max_age=600)
+DATABASES["default"] = dj_database_url.config()
 django_heroku.settings(locals())
 options = DATABASES["default"].get("OPTIONS", {})
 if options:
