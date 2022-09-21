@@ -9,10 +9,6 @@ import { getUser, STORAGE_EVENT } from "../localStorage";
 import { useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 
-const TRACKING_ID = "G-NN5DW2VQ4G";
-
-ReactGA.initialize(TRACKING_ID);
-
 const ActiveApp: React.FC = () => {
   const [user, setUser] = useState(getUser());
 
