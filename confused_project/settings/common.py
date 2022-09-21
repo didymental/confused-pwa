@@ -140,8 +140,14 @@ WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = "core.UserProfile"
 
+# production
 EMAIL_USE_TLS = True
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
+
+# development
+# EMAIL_USE_SSL = True
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 465
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")

@@ -45,6 +45,8 @@ class UserSignUpView(generics.CreateAPIView):
             "to_email": user.email,
         }
 
+        Util.send_email(data)
+
         try:
             Util.send_email(data)
 
@@ -54,7 +56,6 @@ class UserSignUpView(generics.CreateAPIView):
                 headers=headers,
             )
         except SMTPAuthenticationError:
-            # serializer.data will serialize all the readable fields
             return Response(
                 {
                     **serializer.data,
