@@ -413,7 +413,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 "questions": await self.get_current_questions(),
             }
 
-            return await self.reply(
+            await self.reply(
                 data=data,
                 action="join_session",
                 status=status.HTTP_200_OK,
@@ -584,7 +584,30 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if not session.is_open:
             await self._leave_session(silent=True)
 
-    # For testing
+    @database_sync_to_async
+    def _clear_reactions(self):
+        students = Student.objects.filter(session__pk=self.session_subscribe)
+        if not students.exists():
+            return
+        # students.delete()
+        students.update(reaction_type=None)
+
+    @action()
+    async def clear_reactions(self, **kwargs):
+        user: UserProfile = self.scope["user"]
+        if not user.is_authenticated:
+            return await self.notify_failure(
+                action="post_question",
+                errors=["Only instructor can clear reactions"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        await self._clear_reactions()
+        await self.notify_success(
+            action="clear_reactions",
+            message="You have successfully cleared the reactions",
+        )
+
     @action()
     async def post_question(self, question_content: str, **kwargs):
         user: UserProfile = self.scope["user"]
