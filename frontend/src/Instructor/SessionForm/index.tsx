@@ -21,7 +21,7 @@ import { useSessions } from "../../hooks/session/useSession";
 import { SessionEntity } from "../../types/session";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 
-const SessionForm: React.FunctionComponent = () => {
+const SessionForm: React.FC = () => {
   const location = useLocation();
   const history = useHistory();
   const [isEdit, setIsEdit] = useState<boolean>(false);
