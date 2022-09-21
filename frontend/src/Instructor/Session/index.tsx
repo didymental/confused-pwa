@@ -22,8 +22,9 @@ import {
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router";
+import QRCode from "react-qr-code";
 import { powerSharp, shareSocialSharp, linkSharp } from "ionicons/icons";
-import client, { getWebSocketClient } from "../../api/client";
+import client, { BASE_URL, getWebSocketClient } from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import clear from "../../assets/clear-bg.svg";
 import confused_1 from "../../assets/confused-1-bg.svg";
@@ -135,7 +136,6 @@ const InstructorSessionPage: React.FC = () => {
   const handleMessageListener = (response: MessageEvent<any>) => {
     let res = JSON.parse(response.data);
 
-    console.log(res);
     if (res.data.type === "failed") {
       res.errors.map((err: string) => handleError(err));
     }
@@ -230,6 +230,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
+  const shareableLink = `${BASE_URL}/student/session/` + sessionId;
 
   useEffect(() => {
     setHasAnimated(true);
@@ -245,6 +246,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
     if (!ws) {
       return;
     }
+    clearReactions();
     ws.send(
       JSON.stringify({
         action: LEAVE_SESSION,
@@ -252,15 +254,34 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
         request_id: Math.random(),
       }),
     );
+
     ws.close();
 
     history.push("/instructor/dashboard");
   };
 
   const copyLinkToClipboard = () => {
-    let link = "url";
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(shareableLink);
     presentAlert("Copied to your clipboard!");
+  };
+  const clearReactions = () => {
+    if (!ws) {
+      return;
+    }
+    ws.send(
+      JSON.stringify({
+        action: CLEAR_REACTIONS_ACTION,
+        request_id: Math.random(),
+      }),
+    );
+
+    let updatedStudents = [];
+    for (let i = 0; i < students.length; i++) {
+      let studentCopy = { ...students[i] };
+      studentCopy.reaction_type = null;
+      updatedStudents.push(studentCopy);
+    }
+    setStudents(updatedStudents);
   };
 
   return (
@@ -286,12 +307,16 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
           <QuestionsDisplay questions={questions} />
         </IonRow>
         <IonRow className="ion-row-instructor-session">
-          <ReactionsDisplay
-            students={students}
-            setLevelOfConfusion={setLevelOfConfusion}
-            setStudents={setStudents}
-            ws={ws}
-          />
+          <ReactionsDisplay students={students} setLevelOfConfusion={setLevelOfConfusion} />
+        </IonRow>
+        <IonRow className="ion-row-instructor-session">
+          <IonButton
+            className="ion-btn-instructor-session__reactions"
+            onClick={clearReactions}
+            fill="clear"
+          >
+            <IonCardContent>RESET</IonCardContent>
+          </IonButton>
         </IonRow>
         <IonRow className="ion-row-instructor-session">
           <IonButton
@@ -316,7 +341,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
 
         <IonModal
           isOpen={openModal}
-          initialBreakpoint={0.5}
+          initialBreakpoint={0.75}
           breakpoints={[0, 0.25, 0.5, 0.75]}
           onIonModalWillDismiss={() => setOpenModal(false)}
         >
@@ -326,17 +351,16 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
                 <IonTitle>Share via ...</IonTitle>
               </IonToolbar>
             </IonHeader>
-            <IonList>
-              <IonItem>
-                <IonButton onClick={copyLinkToClipboard} fill="clear">
-                  <IonIcon icon={linkSharp} size="large" />
-                </IonButton>
-                <IonCardContent>URL LINK</IonCardContent>
-              </IonItem>
-              <IonItem>
-                {/**placeholder for the QR code generator */}
-                <img src={confused_reaction} alt={"confused"} />
-              </IonItem>
+            <IonItem className="modal__item">
+              <IonButton onClick={copyLinkToClipboard} fill="clear">
+                <IonIcon icon={linkSharp} size="large" />
+              </IonButton>
+              <IonCardContent>
+                <IonText>{shareableLink}</IonText>
+              </IonCardContent>
+            </IonItem>
+            <IonList className="modal__list">
+              <QRCode value={shareableLink} />
             </IonList>
           </IonContent>
         </IonModal>
@@ -349,9 +373,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
 const ReactionsDisplay: React.FC<{
   students: StudentData[] | [];
   setLevelOfConfusion: (levelOfConfusion: string) => void;
-  setStudents: (students: StudentData[]) => void;
-  ws: WebSocket | null;
-}> = ({ students, setLevelOfConfusion, setStudents, ws }) => {
+}> = ({ students, setLevelOfConfusion }) => {
   const [countOfClear, setCountOfClear] = useState<number>(0);
   const [countOfConfused, setCountOfConfused] = useState<number>(0);
   const [ratio, setRatio] = useState<number>(0.5);
@@ -394,26 +416,6 @@ const ReactionsDisplay: React.FC<{
     setLevelOfConfusion(CLEAR_STATE);
   }, [ratio]);
 
-  const clearReactions = () => {
-    if (!ws) {
-      return;
-    }
-    ws.send(
-      JSON.stringify({
-        action: CLEAR_REACTIONS_ACTION,
-        request_id: Math.random(),
-      }),
-    );
-
-    let updatedStudents = [];
-    for (let i = 0; i < students.length; i++) {
-      let studentCopy = { ...students[i] };
-      studentCopy.reaction_type = null;
-      updatedStudents.push(studentCopy);
-    }
-    setStudents(updatedStudents);
-  };
-
   return (
     <IonGrid>
       <IonRow>
@@ -436,15 +438,6 @@ const ReactionsDisplay: React.FC<{
               <IonText>{countOfClear}</IonText>
             </IonBadge>
           </IonRow>
-        </IonCol>
-        <IonCol className="ion-col-instructor-session__reactions">
-          <IonButton
-            className="ion-btn-instructor-session__reactions"
-            onClick={clearReactions}
-            fill="clear"
-          >
-            <IonText>RESET</IonText>
-          </IonButton>
         </IonCol>
       </IonRow>
     </IonGrid>

@@ -3,7 +3,7 @@ import { getAccessToken } from "../localStorage";
 
 export const BASE_URL =
   process.env.REACT_APP_BASE_URL || "https://confused-backend-3216.herokuapp.com";
-export const WS_BASE_URL = BASE_URL.replace(/^https/, "ws") + "/ws/session/";
+export const WS_BASE_URL = BASE_URL.replace(/^http/, "ws") + "/ws/session/";
 
 /**
  * Creates a connection to the WebSocket.

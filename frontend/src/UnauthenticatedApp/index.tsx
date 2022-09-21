@@ -17,6 +17,7 @@ const UnauthenticatedApp: React.FC = () => {
       <Route path="/student" exact component={JoinPage} />
       <Route path="/student/scanner" exact component={Scanner} />
       <Route path="/student/session" exact component={StudentSessionPage} />
+      <Route path="/student/session/:id" exact component={JoinPage} />
       <Route>
         <NotFoundPage />
       </Route>

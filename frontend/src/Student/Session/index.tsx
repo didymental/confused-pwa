@@ -14,6 +14,10 @@ import {
   CreateAnimation,
   IonTitle,
   IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonSpinner,
+  IonProgressBar,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 
@@ -30,7 +34,7 @@ import { useHistory } from "react-router";
 const POST_QUESTION = "post_question";
 const PUT_REACTION = "put_reaction";
 const JOIN_SESSION = "join_session";
-const LEAVE_SESSION = "leave_session";
+const LEAVE_SESSION_ACTION = "leave_session";
 
 interface ReactionState {
   title: string;
@@ -48,6 +52,7 @@ const StudentSessionPage: React.FC<void> = () => {
   const { sessionId, displayName, studentId } = useSessionDetails();
   const [questions, setQuestions] = useState<QuestionData[] | []>([]);
   const [sessionName, setSessionName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { presentToast } = useToast();
   const ws = useRef<WebSocket | null>(null);
   const history = useHistory();
@@ -64,7 +69,7 @@ const StudentSessionPage: React.FC<void> = () => {
     return () => {
       wsCurrent.close();
     };
-  }, []);
+  }, [history]);
 
   const askQuestion = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
@@ -94,17 +99,31 @@ const StudentSessionPage: React.FC<void> = () => {
         request_id: Math.random(),
       }),
     );
+    setIsLoading(false);
   };
 
   const handleWsClose = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
       return;
     }
+    setIsLoading(true);
   };
 
   const handleWsMessageListener = (msg: MessageEvent<any>) => {
     let res = JSON.parse(msg.data);
-    console.log(res);
+
+    if (res.data.message === "You have left or been removed from session " + sessionId) {
+      leaveSession(ws.current);
+      presentToast({
+        header: "Notification",
+        message: "You have left or been removed from session",
+        color: "success",
+      });
+    }
+
+    if (res.data.type === "update_clear_reactions") {
+      setReactionStates(initialReactionStates);
+    }
 
     if (res.data.type === "success" && res.data.questions) {
       setQuestions((questionsParam) => res.data.questions);
@@ -146,7 +165,7 @@ const StudentSessionPage: React.FC<void> = () => {
       message: msg,
       color: "danger",
     });
-    history.push("/student/");
+    history.goBack();
   };
 
   const handleReactionStateChange = (index: number) => {
@@ -178,66 +197,94 @@ const StudentSessionPage: React.FC<void> = () => {
     );
   };
 
+  const leaveSession = (wsCurrent: WebSocket | null) => {
+    if (!wsCurrent) {
+      return null;
+    }
+
+    updateStudentReaction("", wsCurrent);
+
+    wsCurrent.send(
+      JSON.stringify({
+        action: LEAVE_SESSION_ACTION,
+        request_id: Math.random(),
+      }),
+    );
+    wsCurrent.close();
+    history.goBack();
+  };
+
   return (
     <IonPage className="student-session">
-      <IonHeader>
-        <IonCardContent>
-          <IonTitle>{sessionName}</IonTitle>
-        </IonCardContent>
-      </IonHeader>
-      <IonContent>
-        <IonGrid className="container__questions-container">
-          <QuestionsDisplay questions={questions} />
-        </IonGrid>
+      {isLoading ? (
+        <IonProgressBar type="indeterminate" color="tertiary" />
+      ) : (
+        <>
+          <IonHeader>
+            <IonToolbar>
+              <IonCardContent>
+                <IonTitle>{sessionName}</IonTitle>
+              </IonCardContent>
+              <IonButtons slot="end">
+                <IonButton onClick={() => leaveSession(ws.current)}>Leave Session</IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent>
+            <IonGrid className="container__questions-container">
+              <QuestionsDisplay questions={questions} />
+            </IonGrid>
 
-        <IonSlides
-          className="student-session__grid"
-          options={{
-            slidesPerView: 2,
-          }}
-        >
-          {reactionStates.map((item, index) => {
-            return (
-              <IonSlide key={item.title}>
-                <CreateAnimation
-                  play={item.isSelected}
-                  iterations={1}
-                  duration={400}
-                  keyframes={[
-                    { offset: 0, transform: "scale(1)", opacity: "1" },
-                    { offset: 0.2, transform: "scale(1.2)", opacity: "0.5" },
-                    { offset: 0.5, transform: "scale(1)", opacity: "1" },
-                  ]}
-                >
-                  <IonCard
-                    onClick={() => handleReactionStateChange(index)}
-                    color={item.isSelected ? "primary" : "light"}
-                    className="card"
-                  >
-                    <IonCardContent className="card__content">{item.title}</IonCardContent>
-                    <IonCardContent>
-                      <img src={item.iconUrl} alt={"reaction"} />
-                    </IonCardContent>
-                  </IonCard>
-                </CreateAnimation>
-              </IonSlide>
-            );
-          })}
-        </IonSlides>
-        <IonGrid className="student-session__grid">
-          <IonRow className="textarea">
-            <IonTextarea
-              placeholder="Ask a question here..."
-              value={question.length === 0 ? null : question}
-              onIonChange={(e) => setQuestion(e.detail.value || "")}
-              rows={1}
-            />
-            <IonButton fill="clear" onClick={() => askQuestion(ws.current)}>
-              <IonIcon icon={send} />
-            </IonButton>
-          </IonRow>
-        </IonGrid>
-      </IonContent>
+            <IonSlides
+              className="student-session__grid"
+              options={{
+                slidesPerView: 2,
+              }}
+            >
+              {reactionStates.map((item, index) => {
+                return (
+                  <IonSlide key={item.title}>
+                    <CreateAnimation
+                      play={item.isSelected}
+                      iterations={1}
+                      duration={400}
+                      keyframes={[
+                        { offset: 0, transform: "scale(1)", opacity: "1" },
+                        { offset: 0.2, transform: "scale(1.2)", opacity: "0.5" },
+                        { offset: 0.5, transform: "scale(1)", opacity: "1" },
+                      ]}
+                    >
+                      <IonCard
+                        onClick={() => handleReactionStateChange(index)}
+                        color={item.isSelected ? "primary" : "light"}
+                        className="card"
+                      >
+                        <IonCardContent className="card__content">{item.title}</IonCardContent>
+                        <IonCardContent>
+                          <img src={item.iconUrl} alt={"reaction"} />
+                        </IonCardContent>
+                      </IonCard>
+                    </CreateAnimation>
+                  </IonSlide>
+                );
+              })}
+            </IonSlides>
+            <IonGrid className="student-session__grid">
+              <IonRow className="textarea">
+                <IonTextarea
+                  placeholder="Ask a question here..."
+                  value={question.length === 0 ? null : question}
+                  onIonChange={(e) => setQuestion(e.detail.value || "")}
+                  rows={1}
+                />
+                <IonButton fill="clear" onClick={() => askQuestion(ws.current)}>
+                  <IonIcon icon={send} />
+                </IonButton>
+              </IonRow>
+            </IonGrid>
+          </IonContent>
+        </>
+      )}
     </IonPage>
   );
 };
