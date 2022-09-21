@@ -21,7 +21,7 @@ import {
   IonItem,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import { powerSharp, shareSocialSharp, linkSharp } from "ionicons/icons";
 import client, { getWebSocketClient } from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
@@ -33,7 +33,6 @@ import clear_reaction from "../../assets/thumbs-up.svg";
 import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
-import { WSAEACCES } from "constants";
 
 const CLEAR_STATE = "clear";
 const CONFUSED_1_STATE = "confused-1";
@@ -56,12 +55,10 @@ const InstructorSessionPage: React.FC = () => {
   const ws = useRef<WebSocket | null>(null);
   const { id }: any = useParams();
   const sessionId = parseInt(id);
+  const history = useHistory();
 
   useEffect(() => {
     getStudentsAndQuestionsInSession(sessionId);
-  }, []);
-
-  useEffect(() => {
     ws.current = getWebSocketClient(true);
     ws.current.onopen = () => handleWsOpen(ws.current);
     ws.current.onmessage = (e) => handleMessageListener(e);
@@ -123,7 +120,7 @@ const InstructorSessionPage: React.FC = () => {
     wsCurrent.send(
       JSON.stringify({
         action: JOIN_SESSION,
-        pk: 3,
+        pk: sessionId,
         request_id: Math.random(),
       }),
     );
@@ -139,6 +136,9 @@ const InstructorSessionPage: React.FC = () => {
     let res = JSON.parse(response.data);
 
     console.log(res);
+    if (res.data.type === "failed") {
+      res.errors.map((err: string) => handleError(err));
+    }
 
     // student post or vote question
     if (res.action === "create_question") {
@@ -185,6 +185,15 @@ const InstructorSessionPage: React.FC = () => {
         return studentsCopy;
       });
     }
+  };
+
+  const handleError = (msg: string) => {
+    presentToast({
+      header: "Error occurred",
+      message: msg,
+      color: "danger",
+    });
+    history.push("/instructor/dashboard");
   };
 
   return (
@@ -239,7 +248,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
     ws.send(
       JSON.stringify({
         action: LEAVE_SESSION,
-        pk: 3,
+        pk: sessionId,
         request_id: Math.random(),
       }),
     );
@@ -324,7 +333,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
               </IonItem>
               <IonItem>
                 {/**placeholder for the QR code generator */}
-                <img src={confused_reaction} />
+                <img src={confused_reaction} alt={"confused"} />
               </IonItem>
             </IonList>
           </IonContent>

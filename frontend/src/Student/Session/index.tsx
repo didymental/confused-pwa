@@ -25,6 +25,7 @@ import { useToast } from "../../hooks/util/useToast";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
 import { useSessionDetails } from "../../hooks/joinsession/useJoinDetails";
+import { useHistory } from "react-router";
 
 const POST_QUESTION = "post_question";
 const PUT_REACTION = "put_reaction";
@@ -49,6 +50,7 @@ const StudentSessionPage: React.FC<void> = () => {
   const [sessionName, setSessionName] = useState<string>("");
   const { presentToast } = useToast();
   const ws = useRef<WebSocket | null>(null);
+  const history = useHistory();
 
   useEffect(() => {
     ws.current = getWebSocketClient(false);
@@ -144,6 +146,7 @@ const StudentSessionPage: React.FC<void> = () => {
       message: msg,
       color: "danger",
     });
+    history.push("/student/");
   };
 
   const handleReactionStateChange = (index: number) => {
@@ -213,7 +216,7 @@ const StudentSessionPage: React.FC<void> = () => {
                   >
                     <IonCardContent className="card__content">{item.title}</IonCardContent>
                     <IonCardContent>
-                      <img src={item.iconUrl} />
+                      <img src={item.iconUrl} alt={"reaction"} />
                     </IonCardContent>
                   </IonCard>
                 </CreateAnimation>
