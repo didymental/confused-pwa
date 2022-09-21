@@ -2,6 +2,7 @@ import json
 from typing import Dict, List, Optional, Type
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.query import QuerySet
 from channels.db import database_sync_to_async
 from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
 from djangochannelsrestframework.observer import model_observer
@@ -90,6 +91,23 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             StudentSerializer(student).data
             for student in Student.objects.filter(
                 session=session, is_online=True
+            )
+        ]
+
+    @database_sync_to_async
+    def _get_question_session(self, question_pk: int) -> Optional[Session]:
+        try:
+            question = Question.objects.get(pk=question_pk)
+            return question.student.session
+        except ObjectDoesNotExist:
+            return None
+
+    @database_sync_to_async
+    def get_current_questions(self):
+        return [
+            QuestionSerializer(question).data
+            for question in Question.objects.filter(
+                student__session__pk=self.session_subscribe
             )
         ]
 
@@ -389,9 +407,16 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 print("kw channels", self.channel_layer.channels)
                 print("kw groups", self.channel_layer.groups)
 
-            await self.notify_success(
+            data = {
+                "type": "success",
+                "message": "You have successfully joined the session",
+                "questions": await self.get_current_questions(),
+            }
+
+            return await self.reply(
+                data=data,
                 action="join_session",
-                message="You have successfully joined the session",
+                status=status.HTTP_200_OK,
             )
 
             await self.notify_joiners()
@@ -465,14 +490,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             data=event,
             action="notify_joiners",
         )
-
-    @database_sync_to_async
-    def _get_question_session(self, question_pk: int) -> Optional[Session]:
-        try:
-            question = Question.objects.get(pk=question_pk)
-            return question.student.session
-        except ObjectDoesNotExist:
-            return None
 
     # TODO: does it work if name differently
     @model_observer(Student)
