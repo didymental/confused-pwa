@@ -3,7 +3,20 @@ import { getAccessToken } from "../localStorage";
 
 export const BASE_URL =
   process.env.REACT_APP_BASE_URL || "https://confused-backend-3216.herokuapp.com";
-export const WS_BASE_URL = BASE_URL.replace(/^http/, "ws");
+export const WS_BASE_URL = BASE_URL.replace(/^http/, "ws") + "/ws/session/";
+
+/**
+ * Creates a connection to the WebSocket.
+ * Provides a way to exchange data between browser and server via a persistent connection
+ */
+export const getWebSocketClient = (isInstructor: boolean) => {
+  if (!isInstructor) {
+    return new WebSocket(WS_BASE_URL);
+  }
+  let token = getAccessToken();
+  let ws = new WebSocket(WS_BASE_URL + "?token=" + token);
+  return ws;
+};
 
 const client = axios.create({
   baseURL: `${BASE_URL}/api`,

@@ -18,5 +18,5 @@ export async function updateSession(data: SessionEntity): Promise<AxiosResponse<
 }
 
 export async function deleteSession(session_id: number): Promise<AxiosResponse<void>> {
-  return client.delete(`/sessions/${session_id}`);
+  return client.delete(`/sessions/${session_id}/`);
 }

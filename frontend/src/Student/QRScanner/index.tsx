@@ -7,19 +7,15 @@ import {
   IonIcon,
   IonPage,
   IonRow,
-  NavContext,
 } from "@ionic/react";
 import { close } from "ionicons/icons";
 import "../join-page.scss";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import QrScanner from "qr-scanner";
 import { useHistory, Redirect } from "react-router-dom";
 import { useSessionIdInput } from "../../hooks/joinsession/useJoinDetails";
-import { useToast } from "../../hooks/util/useToast";
 
 const Scanner: React.FC = (props) => {
-  // const { presentToast } = useToast();
-  // const { goBack } = useContext(NavContext);
   const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
   const [shouldGoBack, setShouldGoBack] = useState(false);
 

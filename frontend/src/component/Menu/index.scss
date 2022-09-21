@@ -1,0 +1,19 @@
+.menu {
+  &__icon {
+    font-size: 25px;
+    margin-right: 0.2em;
+  }
+
+  &__row {
+    margin: 0.1rem 0rem 0.2rem 0rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-weight: 500;
+    color: grey;
+  }
+
+  &__button {
+    margin-left: -1.5em;
+  }
+}
