@@ -11,6 +11,7 @@ class Student(models.Model):
         "ReactionType", on_delete=models.PROTECT, null=True
     )
     display_name = models.CharField(max_length=120, null=False, blank=False)
+    is_online = models.BooleanField(default=True)
 
     def __str__(self):
         return self.display_name

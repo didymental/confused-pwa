@@ -72,7 +72,8 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         students = Student.objects.filter(session=session)
         if not students.exists():
             return
-        students.delete()
+        # students.delete()
+        students.update(is_online=False)
 
     @database_sync_to_async
     def close_session(self, session: Session):
@@ -87,7 +88,9 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     def get_current_students(self, session: Session):
         return [
             StudentSerializer(student).data
-            for student in Student.objects.filter(session=session)
+            for student in Student.objects.filter(
+                session=session, is_online=True
+            )
         ]
 
     @database_sync_to_async
@@ -172,8 +175,10 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         )
 
     @database_sync_to_async
-    def delete_student(self, student: Student):
-        student.delete()
+    def remove_student(self, student: Student):
+        # student.delete()
+        student.is_online = False
+        student.save()
 
     @database_sync_to_async
     def get_user(self, session: Session):
@@ -291,7 +296,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         await self.close_session(session=session)
 
     async def student_leave_session(self, student: Student):
-        await self.delete_student(student=student)
+        await self.remove_student(student=student)
 
     async def connect(self):
         await super().connect()
@@ -490,6 +495,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             )
 
         if action == "update":
+            print("kw update stud", message, observer, kwargs)
             await self._handle_student_update(
                 message=message,
                 observer=observer,
@@ -703,7 +709,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 
         await self.reply(data=message, action="create_question")
 
-    # TODO: fix question observer not working
     @handle_question_change.serializer
     def handle_question_change(self, question: Question, action, **kwargs):
         return dict(
