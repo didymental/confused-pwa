@@ -19,7 +19,7 @@ export const useToast = (): ToastState => {
       message: message,
       duration: 1000,
       position: "top",
-      color: color === "success" ? "toastsuccess" : "toastsuccess",
+      color: color === "success" ? "toastsuccess" : "toastdanger",
     });
   };
 

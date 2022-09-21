@@ -73,7 +73,7 @@ const Menu: React.FC<MenuProps> = ({ user }) => {
 
   return (
     <IonPopover dismiss-on-select trigger={"menu-button"} triggerAction="click">
-      <IonItemDivider color="primary">Your Profile</IonItemDivider>
+      <IonItemDivider color="dark-purple">Your Profile</IonItemDivider>
       <IonGrid>
         <IonRow className="menu__row">
           <IonCol size="2">
@@ -93,7 +93,7 @@ const Menu: React.FC<MenuProps> = ({ user }) => {
         </IonRow>
       </IonGrid>
 
-      <IonItemDivider color="primary">Settings</IonItemDivider>
+      <IonItemDivider color="dark-purple">Settings</IonItemDivider>
       <IonGrid>
         <IonRow className="menu__button">
           <IonButton fill="clear" onClick={handleChangeName}>

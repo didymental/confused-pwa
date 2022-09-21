@@ -61,7 +61,7 @@ const DashboardPage: React.FC = () => {
         </IonGrid>
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton
-            color="primary"
+            color="dark-purple"
             className="dashboard__add-session-button"
             onClick={() => history.push("/instructor/session/create")}
           >
