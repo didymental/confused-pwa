@@ -12,7 +12,6 @@ from djangochannelsrestframework.observer.generics import (
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 
-
 from core.models.Question import Question
 from core.models.Session import Session
 from core.models.Student import Student
@@ -54,9 +53,13 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         self, student_pk: int, reaction_type_pk: Optional[int]
     ) -> Optional[Student]:
         student = Student.objects.get(pk=student_pk)
-        reaction = ReactionType.objects.get(pk=reaction_type_pk)
+        try:
+            reaction = ReactionType.objects.get(pk=reaction_type_pk)
+            student.reaction_type = reaction
 
-        student.reaction_type = reaction
+        except ObjectDoesNotExist:
+            student.reaction_type = None
+
         student.save()
 
     @database_sync_to_async
