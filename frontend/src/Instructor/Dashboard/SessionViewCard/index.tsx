@@ -7,6 +7,7 @@ import {
   IonCol,
   IonGrid,
   IonIcon,
+  IonItemDivider,
   IonPopover,
   IonRow,
   useIonAlert,
@@ -19,10 +20,17 @@ import { SessionEntity } from "../../../types/session";
 import { getFormattedDate } from "../../../utils/date";
 import "./index.scss";
 
-const SessionViewCard: React.FC<SessionEntity> = (session) => {
+const colors = ["yellow", "green", "red", "blue"];
+
+interface SessionViewCardProps {
+  session: SessionEntity;
+  index: number;
+}
+
+const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index }) => {
   const { id: sessionId, name, is_open: isOpen, created_date_time: dateTime } = session;
-  // TODO: convert to correct date format
   const createdDate = dateTime ? getFormattedDate(dateTime) : null;
+  const colorId = index % 4;
 
   const history = useHistory();
   const { getSessions, deleteSession } = useSessions();
@@ -62,7 +70,8 @@ const SessionViewCard: React.FC<SessionEntity> = (session) => {
   return (
     <>
       <IonCard key={sessionId}>
-        <IonCardContent>
+        <IonItemDivider color={colors[colorId]}></IonItemDivider>
+        <IonCardContent className="card__container">
           <IonGrid>
             <IonRow>
               <IonCol size="10">
@@ -100,11 +109,11 @@ const SessionViewCard: React.FC<SessionEntity> = (session) => {
             </IonRow>
           </IonGrid>
           {isOpen ? (
-            <IonButton fill="solid" expand="block" color="secondary">
+            <IonButton fill="solid" expand="block" color={colors[colorId]}>
               ONGOING
             </IonButton>
           ) : (
-            <IonButton fill="solid" expand="block" color="success">
+            <IonButton fill="solid" expand="block" color={"light"}>
               START
             </IonButton>
           )}

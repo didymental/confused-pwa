@@ -24,8 +24,8 @@ const DashboardPage: React.FC = () => {
 
   const renderMainContent = () => {
     if (sessions) {
-      return sessions.map((sessionData) => (
-        <SessionViewCard key={sessionData.id} {...sessionData} />
+      return sessions.map((sessionData, index) => (
+        <SessionViewCard key={sessionData.id} session={sessionData} index={index} />
       ));
     } else {
       return (
