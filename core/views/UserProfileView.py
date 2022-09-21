@@ -28,40 +28,49 @@ class UserSignUpView(generics.CreateAPIView):
         token = TokenObtainPairSerializer.get_token(user=user)
         # token2 = RefreshToken.for_user(user).access_token
 
-        current_site = get_current_site(request=request).domain
-        relative_link = reverse("email-verify")
-        absurl = (
-            "http://" + current_site + relative_link + "?token=" + str(token)
-        )
-        email_body = (
-            "Hi "
-            + user.name
-            + " Use link below to verify your email address \n"
-            + absurl
-        )
-        data = {
-            "email_subject": "Verify your email",
-            "email_body": email_body,
-            "to_email": user.email,
-        }
+        # current_site = get_current_site(request=request).domain
+        # relative_link = reverse("email-verify")
+        # absurl = (
+        #     "http://" + current_site + relative_link + "?token=" + str(token)
+        # )
+        # email_body = (
+        #     "Hi "
+        #     + user.name
+        #     + " Use link below to verify your email address \n"
+        #     + absurl
+        # )
+        # data = {
+        #     "email_subject": "Verify your email",
+        #     "email_body": email_body,
+        #     "to_email": user.email,
+        # }
 
-        try:
-            Util.send_email(data)
+        # try:
+        #     Util.send_email(data)
 
-            return Response(
-                {**serializer.data},
-                status=status.HTTP_201_CREATED,
-                headers=headers,
-            )
-        except SMTPAuthenticationError:
-            return Response(
-                {
-                    **serializer.data,
-                    "refresh": str(token),
-                },
-                status=status.HTTP_201_CREATED,
-                headers=headers,
-            )
+        #     return Response(
+        #         {**serializer.data},
+        #         status=status.HTTP_201_CREATED,
+        #         headers=headers,
+        #     )
+        # except SMTPAuthenticationError:
+        #     return Response(
+        #         {
+        #             **serializer.data,
+        #             "refresh": str(token),
+        #         },
+        #         status=status.HTTP_201_CREATED,
+        #         headers=headers,
+        #     )
+
+        return Response(
+            {
+                **serializer.data,
+                "refresh": str(token),
+            },
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
 
 
 class VerifyEmail(generics.GenericAPIView):
