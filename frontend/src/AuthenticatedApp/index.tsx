@@ -7,6 +7,7 @@ import NotFoundPage from "../NotFound";
 import Splash from "../Splash";
 import LoginPage from "../Instructor/Auth/Login";
 import SignUpPage from "../Instructor/Auth/SignUp";
+import InstructorSessionPage from "../Instructor/Session";
 
 const AuthenticatedApp: React.FC = () => {
   useAuthenticationRefresh();
@@ -19,6 +20,7 @@ const AuthenticatedApp: React.FC = () => {
       <Route path="/instructor/dashboard" component={DashboardPage} />
       <Route path="/instructor/session/create" component={SessionFormPage} />
       <Route path="/instructor/session/edit" component={SessionFormPage} />
+      <Route path="/instructor/session/:id" exact component={InstructorSessionPage} />
       <Route>
         <NotFoundPage />
       </Route>

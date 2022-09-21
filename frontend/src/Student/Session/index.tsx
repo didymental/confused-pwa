@@ -12,18 +12,24 @@ import {
   IonSlides,
   IonTextarea,
   CreateAnimation,
+  IonTitle,
+  IonHeader,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
-import Navbar from "../../component/Navbar";
 import { send } from "ionicons/icons";
 import confused_reaction from "../../assets/confused-face.svg";
 import clear_reaction from "../../assets/thumbs-up.svg";
-import client from "../../api/client";
+import { getWebSocketClient } from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
-import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
+import { useSessionDetails } from "../../hooks/joinsession/useJoinDetails";
+
+const POST_QUESTION = "post_question";
+const PUT_REACTION = "put_reaction";
+const JOIN_SESSION = "join_session";
+const LEAVE_SESSION = "leave_session";
 
 interface ReactionState {
   title: string;
@@ -31,73 +37,126 @@ interface ReactionState {
   iconUrl: string;
 }
 
-const StudentSessionPage: React.FC<{
-  sessionId: number;
-  studentId: number;
-  displayName: string;
-}> = (props) => {
-  let { sessionId, studentId, displayName } = props;
+const StudentSessionPage: React.FC<void> = () => {
   const initialReactionStates: ReactionState[] = [
     { title: "I'm confused!", isSelected: false, iconUrl: confused_reaction },
     { title: "I'm OK!", isSelected: false, iconUrl: clear_reaction },
   ];
   const [reactionStates, setReactionStates] = useState<ReactionState[]>(initialReactionStates);
   const [question, setQuestion] = useState<string>("");
+  const { sessionId, displayName, studentId } = useSessionDetails();
+  const [questions, setQuestions] = useState<QuestionData[] | []>([]);
+  const [sessionName, setSessionName] = useState<string>("");
   const { presentToast } = useToast();
+  const ws = useRef<WebSocket | null>(null);
 
-  /* TO DELETE - FOR TESTING ONLY */
-  sessionId = 3;
-  studentId = 3;
-  displayName = "Test User";
-
-  // on mount, reset all reactions to false
   useEffect(() => {
-    updateStudentReaction("", studentId);
+    ws.current = getWebSocketClient(false);
+    ws.current.onopen = () => handleWsOpen(ws.current);
+    ws.current.onmessage = (e) => handleWsMessageListener(e);
+    ws.current.onclose = () => handleWsClose(ws.current);
+    ws.current.onerror = () => handleError("The connection has failed. Please try again.");
 
-    // on dismount, clear all reactions from student
+    const wsCurrent = ws.current;
+
     return () => {
-      updateStudentReaction("", studentId);
+      wsCurrent.close();
     };
   }, []);
 
-  const getQuestionsInSession = () => {
-    // To change to GET_QUESTION action from websocket
+  const askQuestion = (wsCurrent: WebSocket | null) => {
+    if (!wsCurrent) {
+      return;
+    }
+
+    wsCurrent.send(
+      JSON.stringify({
+        action: POST_QUESTION,
+        question_content: question,
+        request_id: Math.random(),
+      }),
+    );
+
+    setQuestion("");
   };
 
-  const upVoteQuestion = () => {
-    // To change to PUT_QUESTION action from websocket
+  const handleWsOpen = (wsCurrent: WebSocket | null) => {
+    if (!wsCurrent) {
+      return;
+    }
+    wsCurrent.send(
+      JSON.stringify({
+        action: JOIN_SESSION,
+        pk: sessionId,
+        display_name: displayName,
+        request_id: Math.random(),
+      }),
+    );
   };
 
-  const askQuestion = () => {
-    let toSend: QuestionData = {
-      student: studentId,
-      question_content: question,
-      vote_count: 0,
-    };
+  const handleWsClose = (wsCurrent: WebSocket | null) => {
+    if (!wsCurrent) {
+      return;
+    }
+  };
 
-    // To change to POST_QUESTION action on websocket
-    client
-      .post("/questions/", toSend)
-      .then((res) => {
-        setQuestion("");
-      })
-      .catch((err) => {
-        presentToast({
-          header: "Error occurred!",
-          message: err.response.data.detail,
-          color: "danger",
+  const handleWsMessageListener = (msg: MessageEvent<any>) => {
+    let res = JSON.parse(msg.data);
+    console.log(res);
+
+    if (res.data.type === "success" && res.data.questions) {
+      setQuestions((questionsParam) => res.data.questions);
+    }
+
+    if (sessionName === "" && res.data.type === "update_joiners" && res.data.session) {
+      setSessionName(res.data.session.name);
+    }
+
+    if (res.data.type === "failed") {
+      res.errors.map((err: string) => handleError(err));
+      return;
+    }
+    // listen to other students' questions
+    if (res.action === "create_question") {
+      setQuestions((questionsParam) => {
+        let questionsCopy = [...questionsParam];
+        let isExistingQuestion = false;
+        questionsCopy.forEach((question, index) => {
+          if (question.question_content === res.data.question_content) {
+            questionsCopy[index] = res.data;
+            isExistingQuestion = true;
+            return;
+          }
         });
+
+        if (!isExistingQuestion) {
+          questionsCopy = [res.data, ...questionsParam];
+        }
+
+        return questionsCopy;
       });
+    }
+  };
+
+  const handleError = (msg: string) => {
+    presentToast({
+      header: "Error occurred",
+      message: msg,
+      color: "danger",
+    });
   };
 
   const handleReactionStateChange = (index: number) => {
     let newStates: ReactionState[] = [...initialReactionStates];
     newStates[index].isSelected = !reactionStates[index].isSelected;
+    updateStudentReaction(newStates[index].isSelected ? newStates[index].iconUrl : "", ws.current);
     setReactionStates(newStates);
-    updateStudentReaction(newStates[index].isSelected ? newStates[index].iconUrl : "", studentId);
   };
 
-  const updateStudentReaction = (reactionType: string, studentId: number) => {
+  const updateStudentReaction = (reactionType: string, wsCurrent: WebSocket | null) => {
+    if (!wsCurrent) {
+      return;
+    }
     let reactionId = null;
     if (reactionType === confused_reaction) {
       reactionId = 1;
@@ -107,29 +166,25 @@ const StudentSessionPage: React.FC<{
       reactionId = 2;
     }
 
-    let toSend: StudentData = {
-      id: studentId,
-      display_name: displayName,
-      session: sessionId,
-      reaction_type: reactionId,
-    };
-
-    // To change to PUT_REACTION on Websocket
-    client.put(`/students/${studentId}`, toSend).catch((err) => {
-      presentToast({
-        header: "Error occurred!",
-        message: err.response.data.detail,
-        color: "danger",
-      });
-    });
+    wsCurrent.send(
+      JSON.stringify({
+        action: PUT_REACTION,
+        reaction_type_pk: reactionId,
+        request_id: Math.random(),
+      }),
+    );
   };
 
   return (
     <IonPage className="student-session">
-      <Navbar title={"Session Title"} />
+      <IonHeader>
+        <IonCardContent>
+          <IonTitle>{sessionName}</IonTitle>
+        </IonCardContent>
+      </IonHeader>
       <IonContent>
         <IonGrid className="container__questions-container">
-          <QuestionsDisplay questions={[]} />
+          <QuestionsDisplay questions={questions} />
         </IonGrid>
 
         <IonSlides
@@ -174,7 +229,7 @@ const StudentSessionPage: React.FC<{
               onIonChange={(e) => setQuestion(e.detail.value || "")}
               rows={1}
             />
-            <IonButton fill="clear" onClick={askQuestion}>
+            <IonButton fill="clear" onClick={() => askQuestion(ws.current)}>
               <IonIcon icon={send} />
             </IonButton>
           </IonRow>
