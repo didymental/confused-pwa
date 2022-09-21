@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import api from "../../api";
+import { getSessions } from "../../api/session";
 import { EDIT_PROFILE_DATA_ID, getUser, setUser } from "../../localStorage";
 import { ProfileData, PutProfileData } from "../../types/profiles";
 import useAnalyticsTracker from "../util/useAnalyticsTracker";
@@ -8,19 +9,13 @@ import { useToast } from "../util/useToast";
 
 interface UpdateAuthenticationState {
   editProfile: (id: string, data: PutProfileData) => Promise<void>;
+  sendSavedProfileData: () => void;
 }
 
-export const useProfile = (): UpdateAuthenticationState => {
+export const useProfile = (isOnline = true): UpdateAuthenticationState => {
   const { presentToast } = useToast();
   const profileAnalyticsTracker = useAnalyticsTracker("Profile");
-  const isOnline = useOnlineStatus();
   const user = getUser();
-  useEffect(() => {
-    if (isOnline) {
-      sendSavedData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOnline]);
 
   const editProfile = async (id: string, data: PutProfileData, reconnected = false) => {
     try {
@@ -54,7 +49,7 @@ export const useProfile = (): UpdateAuthenticationState => {
   //executes when internet is offline
   // sends the locally stored data into the end point when stores it in DB
   // once stored, removes it from local storage
-  const sendSavedData = () => {
+  const sendSavedProfileData = () => {
     if (localStorage.getItem(EDIT_PROFILE_DATA_ID)) {
       editProfile(
         user!.id,
@@ -66,5 +61,6 @@ export const useProfile = (): UpdateAuthenticationState => {
 
   return {
     editProfile,
+    sendSavedProfileData,
   };
 };

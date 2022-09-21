@@ -21,19 +21,20 @@ import { useSessions } from "../../hooks/session/useSession";
 import { SessionEntity } from "../../types/session";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
+import { Detector } from "react-detect-offline";
 
 const SessionForm: React.FunctionComponent = () => {
   const location = useLocation();
   const history = useHistory();
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<number>();
   const [sessionName, setSessionName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [present, dismiss] = useIonLoading();
   const { user } = useAuthentication();
-  const { sessions, createSession, updateSession } = useSessions();
-  const isOnline = useOnlineStatus();
+  const { sessions, createSession, updateSession } = useSessions(isOnline);
 
   useEffect(() => {
     if (location.pathname === "/instructor/session/create") {
@@ -110,6 +111,12 @@ const SessionForm: React.FunctionComponent = () => {
       <IonPage>
         <Navbar title={`${isEdit ? "Edit" : "Create"} Sesssion`} showBackButton={true} />
         <IonContent>
+          <Detector
+            render={({ online }) => {
+              setIsOnline(online);
+              return <></>;
+            }}
+          />
           <IonGrid className="session-form__grid">
             <IonRow>
               <IonCol className="session-form__description">

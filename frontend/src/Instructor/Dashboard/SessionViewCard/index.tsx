@@ -25,7 +25,7 @@ const SessionViewCard: React.FC<SessionEntity> = (session) => {
   const createdDate = dateTime ? getFormattedDate(dateTime) : null;
 
   const history = useHistory();
-  const { getSessions, deleteSession } = useSessions();
+  const { getSessions, deleteSession } = useSessions(false);
   const [present, dismiss] = useIonLoading();
 
   const deleteHandler = async (sessionId: number) => {

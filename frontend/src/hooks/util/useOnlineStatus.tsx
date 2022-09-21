@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 
-const OnlineStatusContext = React.createContext(true);
+const OnlineStatusContext = React.createContext(navigator.onLine);
 
 export const OnlineStatusProvider: React.FC<any> = ({ children }) => {
   const [onlineStatus, setOnlineStatus] = useState<boolean>(true);

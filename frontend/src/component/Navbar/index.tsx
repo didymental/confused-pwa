@@ -20,6 +20,9 @@ import { useToast } from "../../hooks/util/useToast";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 import { useProfile } from "../../hooks/authentication/useProfile";
 import { getUser } from "../../localStorage";
+import { useEffect, useState } from "react";
+import { Detector } from "react-detect-offline";
+import { getSessions } from "../../api/session";
 
 interface NavbarProps {
   title?: string;
@@ -32,10 +35,18 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   const { title = "", showProfileIcon = false, showBackButton = false, showLogo = false } = props;
   const location = useLocation();
   const user = getUser();
+  const [isOnline, setIsOnline] = useState<boolean>(false);
   const [presentAlert] = useIonAlert();
   const { presentToast } = useToast();
   const { logout } = useAuthentication();
-  const { editProfile } = useProfile();
+  const { editProfile, sendSavedProfileData } = useProfile(isOnline);
+
+  useEffect(() => {
+    if (isOnline) {
+      sendSavedProfileData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline]);
 
   const handleChangeName = () => {
     if (!user) {
@@ -94,7 +105,12 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             <IonBackButton text="" />
           </IonButtons>
         )}
-
+        <Detector
+          render={({ online }) => {
+            setIsOnline(online);
+            return <></>;
+          }}
+        />
         <IonGrid>
           <IonRow>
             {showLogo && <img src={logo} alt="logo" className="navbar navbar__logo" />}
