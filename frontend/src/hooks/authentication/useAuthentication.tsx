@@ -110,10 +110,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
       await setAuthenthicationData(access, refresh);
 
       userAnalyticsTracker("Logged in with refreshed token");
-      history.push("/instructor/dashboard");
-      presentToast({ header: "Login success!", color: "success" });
     } catch (err: any) {
-      history.push("/");
       presentToast({
         header: "Login failed!",
         message: "The previous session expired or internet connection is poor.",
@@ -125,7 +122,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
   const logout = () => {
     clearAuthenticationData();
     userAnalyticsTracker("Logged out");
-    history.push("/");
+    history.push("/login");
     presentToast({ header: "Logout success!", color: "success" });
   };
 
@@ -139,7 +136,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
 };
 
 export const useAuthenticationRefresh = () => {
-  const { loginWithAccessToken } = useAuthentication();
+  const { loginWithAccessToken, logout } = useAuthentication();
 
   const getNewAccessToken = async () => {
     if (!getUser()) {
@@ -155,8 +152,9 @@ export const useAuthenticationRefresh = () => {
         await sleep(oneSecond * delay);
       }
     }
+    await logout();
   };
 
-  const fiftyFiveMinutes = 55 * 60 * 1000; // ms
-  useInterval(getNewAccessToken, fiftyFiveMinutes);
+  const fiveMinutes = 5 * 60 * 1000; // ms
+  useInterval(getNewAccessToken, fiveMinutes);
 };

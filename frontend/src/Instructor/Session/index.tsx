@@ -228,7 +228,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
     props;
   const [hasAnimated, setHasAnimated] = useState(false);
   const [presentAlert] = useIonAlert();
-
+  const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
@@ -253,6 +253,8 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
       }),
     );
     ws.close();
+
+    history.push("/instructor/dashboard");
   };
 
   const copyLinkToClipboard = () => {

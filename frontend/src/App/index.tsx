@@ -7,9 +7,9 @@ import AuthenticatedApp from "../AuthenticatedApp";
 import UnauthenticatedApp from "../UnauthenticatedApp";
 import { getUser, STORAGE_EVENT } from "../localStorage";
 import { useEffect, useState } from "react";
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 
-const TRACKING_ID = "UA-241949846-1";
+const TRACKING_ID = "G-NN5DW2VQ4G";
 
 ReactGA.initialize(TRACKING_ID);
 
@@ -36,7 +36,10 @@ function App() {
   setupIonicReact();
 
   useEffect(() => {
-    ReactGA.pageview(window.location.pathname + window.location.search);
+    ReactGA.send({
+      hitType: "pageview",
+      page: window.location.pathname + window.location.search,
+    });
   }, []);
 
   return (

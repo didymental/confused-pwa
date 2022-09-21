@@ -87,7 +87,7 @@ export const useSessions = (): UpdateSessionsState => {
 
       sessionAnalyticsTracker("Created session");
       history.push("/instructor/dashboard");
-      presentToast({ header: "Create session successfully!", color: "success" });
+      presentToast({ header: "Create session success!", color: "success" });
     } catch (err: any) {
       presentToast({
         header: "Create sessions failed!",
@@ -117,7 +117,7 @@ export const useSessions = (): UpdateSessionsState => {
 
       sessionAnalyticsTracker("Updated session");
       history.push("/instructor/dashboard");
-      presentToast({ header: "Edit session successfully!", color: "success" });
+      presentToast({ header: "Edit session success!", color: "success" });
     } catch (err: any) {
       presentToast({
         header: "Edit sessions failed!",
@@ -131,7 +131,7 @@ export const useSessions = (): UpdateSessionsState => {
       await api.session.deleteSession(session_id);
 
       sessionAnalyticsTracker("Deleted session");
-      presentToast({ header: "Delete session successfully!", color: "success" });
+      presentToast({ header: "Delete session success!", color: "success" });
     } catch (err: any) {
       presentToast({
         header: "Delete sessions failed!",

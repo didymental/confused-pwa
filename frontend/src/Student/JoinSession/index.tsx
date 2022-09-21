@@ -36,7 +36,6 @@ const JoinPage: React.FC = () => {
   const invalidPINMsg: string = "Session code should only contain numbers.";
   const invalidNameMsg: string =
     "Name should only contain alphabets, numbers and spaces, and cannot be empty";
-  const unknownErrorMsg: string = "error. Please contact administrators for more details";
 
   const isNumericalOnly = (input: string) => {
     //Check that input consists of one or more numerical digits
@@ -46,7 +45,7 @@ const JoinPage: React.FC = () => {
   };
 
   const isNameValid = (name: string) => {
-    const res = /^\s*(([A-Za-z0-9]|\d){1,}([-']| |))+[A-Za-z0-9]+\s*$/.exec(name);
+    const res = /^\s*(([A-Za-z0-9]){1,}([-']| |))+[A-Za-z0-9]*\s*$/.exec(name);
     const valid = !!res;
     return valid;
   };
