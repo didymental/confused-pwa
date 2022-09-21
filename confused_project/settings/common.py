@@ -20,10 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # TODO: move this to production settings?
 dotenv_file = os.path.join(BASE_DIR, ".env")
 if os.path.isfile(dotenv_file):  # .env file will not exist in Heroku
-    print("kw dot env exists")
     dotenv.load_dotenv(dotenv_file)
-else:
-    print("kw no dot env")
 
 
 # Quick-start development settings - unsuitable for production

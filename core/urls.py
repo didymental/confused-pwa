@@ -42,6 +42,7 @@ urlpatterns = [
     path("login/refresh/", TokenRefreshView.as_view()),
 ]
 
+
 websocket_urlpatterns = [
     re_path(r"ws/session/", SessionConsumer.as_asgi()),
 ]

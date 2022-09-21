@@ -1,3 +1,4 @@
+from smtplib import SMTPAuthenticationError
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import permissions, generics, filters, status
 from rest_framework.response import Response
@@ -24,8 +25,8 @@ class UserSignUpView(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
 
         user = serializer.instance
-        # token = TokenObtainPairSerializer.get_token(user=user)
-        token = RefreshToken.for_user(user).access_token
+        token = TokenObtainPairSerializer.get_token(user=user)
+        # token2 = RefreshToken.for_user(user).access_token
 
         current_site = get_current_site(request=request).domain
         relative_link = reverse("email-verify")
@@ -34,7 +35,7 @@ class UserSignUpView(generics.CreateAPIView):
         )
         email_body = (
             "Hi "
-            + user.username
+            + user.name
             + " Use link below to verify your email address \n"
             + absurl
         )
@@ -43,14 +44,25 @@ class UserSignUpView(generics.CreateAPIView):
             "email_body": email_body,
             "to_email": user.email,
         }
-        Util.send_email(data)
 
-        # serializer.data will serialize all the readable fields
-        return Response(
-            {**serializer.data, "refresh": str(token)},
-            status=status.HTTP_201_CREATED,
-            headers=headers,
-        )
+        try:
+            Util.send_email(data)
+
+            return Response(
+                {**serializer.data},
+                status=status.HTTP_201_CREATED,
+                headers=headers,
+            )
+        except SMTPAuthenticationError:
+            # serializer.data will serialize all the readable fields
+            return Response(
+                {
+                    **serializer.data,
+                    "refresh": str(token),
+                },
+                status=status.HTTP_201_CREATED,
+                headers=headers,
+            )
 
 
 class VerifyEmail(generics.GenericAPIView):
@@ -70,5 +82,6 @@ class UserProfileViewSet(ModelViewSet):
         "email",
     )
 
+    # TODO: split into update and list view
     def get_queryset(self):
-        return self.queryset.filter(email=self.request.user)
+        return self.queryset.filter(pk=self.request.user.pk)
