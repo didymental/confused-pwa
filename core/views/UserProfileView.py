@@ -45,8 +45,6 @@ class UserSignUpView(generics.CreateAPIView):
             "to_email": user.email,
         }
 
-        Util.send_email(data)
-
         try:
             Util.send_email(data)
 
