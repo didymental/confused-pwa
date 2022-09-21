@@ -12,12 +12,14 @@ from core.views import (
     UserSignUpView,
     QuestionView,
     StudentView,
+    VerifyEmail,
 )
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+
 
 router = DefaultRouter()
 bulk_router = BulkRouter()
@@ -34,6 +36,7 @@ urlpatterns = [
     path("", include(bulk_router.urls)),
     # TODO: convert to RESTful endpoints?
     path("admin/", admin.site.urls),
+    path("email-verify/", VerifyEmail.as_view(), name="email-verify"),
     path("signup/", UserSignUpView.as_view()),
     path("login/", TokenObtainPairView.as_view()),
     path("login/refresh/", TokenRefreshView.as_view()),

@@ -697,7 +697,6 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         subscribing_request_ids=[],
         **kwargs,
     ):
-
         question_pk = message.get("id")
         if question_pk is None:
             return
@@ -707,6 +706,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
         if session.pk != self.session_subscribe:
             return
 
+        # TODO: rename to create_or_update_question?
         await self.reply(data=message, action="create_question")
 
     @handle_question_change.serializer

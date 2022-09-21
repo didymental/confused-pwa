@@ -20,7 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # TODO: move this to production settings?
 dotenv_file = os.path.join(BASE_DIR, ".env")
 if os.path.isfile(dotenv_file):  # .env file will not exist in Heroku
+    print("kw dot env exists")
     dotenv.load_dotenv(dotenv_file)
+else:
+    print("kw no dot env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -139,3 +142,9 @@ WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 
 AUTH_USER_MODEL = "core.UserProfile"
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
