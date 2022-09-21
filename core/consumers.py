@@ -602,10 +602,29 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
+        if self.session_subscribe is None:
+            return await self.notify_failure(
+                action="leave_session",
+                errors=["You have not joined a session yet"],
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
         await self._clear_reactions()
-        await self.notify_success(
+
+        if self.channel_layer is not None:
+            await self.channel_layer.group_send(
+                str(self.session_subscribe),
+                {
+                    "type": "update_clear_reactions",
+                    "message": "Reactions cleared!",
+                },
+            )
+
+    # TODO: rename later
+    async def update_clear_reactions(self, event: dict):
+        await self.reply(
+            data=event,
             action="clear_reactions",
-            message="You have successfully cleared the reactions",
         )
 
     @action()
