@@ -17,9 +17,7 @@ class Question(models.Model):
     )
 
     # no submitting empty questions
-    question_content = models.CharField(
-        max_length=255, null=False, blank=False
-    )
+    question_content = models.TextField(null=False, blank=False)
 
     def __str__(self):
         return self.question_content
