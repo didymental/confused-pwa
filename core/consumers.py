@@ -91,7 +91,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             StudentSerializer(student).data
             for student in Student.objects.filter(
                 session=session, is_online=True
-            )
+            ).order_by("-id")
         ]
 
     @database_sync_to_async
@@ -108,7 +108,7 @@ class SessionConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
             QuestionSerializer(question).data
             for question in Question.objects.filter(
                 student__session__pk=self.session_subscribe
-            )
+            ).order_by("-id")
         ]
 
     @database_sync_to_async
