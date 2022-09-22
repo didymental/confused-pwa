@@ -11,11 +11,9 @@ import {
   IonPopover,
   IonRow,
   useIonAlert,
-  useIonLoading,
 } from "@ionic/react";
 import { createOutline, trashOutline, ellipsisVertical } from "ionicons/icons";
 import { useHistory } from "react-router";
-import { useSessions } from "../../../hooks/session/useSession";
 import { SessionEntity } from "../../../types/session";
 import { getFormattedDate } from "../../../utils/date";
 import "./index.scss";
@@ -25,32 +23,22 @@ const colors = ["yellow", "green", "red", "blue"];
 interface SessionViewCardProps {
   session: SessionEntity;
   index: number;
+  deleteHandler: (sessionId: number) => void;
 }
 
-const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index }) => {
+const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index, deleteHandler }) => {
   const { id: sessionId, name, is_open: isOpen, created_date_time: dateTime } = session;
   const createdDate = dateTime ? getFormattedDate(dateTime) : null;
   const colorId = sessionId % 4;
-
-  const history = useHistory();
-  const { getSessions, deleteSession } = useSessions();
-  const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
-  const editClickHandler = () => {
+  const history = useHistory();
+
+  const editClickHandler = (sessionId: number) => {
     history.push(`/instructor/session/edit?id=${sessionId}&name=${name}`);
   };
 
   const deleteClickHandler = () => {
-    const deleteHandler = async () => {
-      present({
-        message: "Deleting",
-      });
-      await deleteSession(sessionId);
-      await getSessions();
-      dismiss();
-    };
-
     presentAlert({
       header: "Are you sure you want to delete this session?",
       subHeader: "This action is irreversible!",
@@ -62,7 +50,7 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index }) => 
         {
           text: "DELETE",
           role: "destructive",
-          handler: () => deleteHandler(),
+          handler: () => deleteHandler(sessionId),
         },
       ],
     });
@@ -101,7 +89,7 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index }) => 
                   trigger={`ellipsis-button-${sessionId}`}
                   triggerAction="click"
                 >
-                  <IonButton fill="clear" onClick={editClickHandler}>
+                  <IonButton fill="clear" onClick={() => editClickHandler(sessionId)}>
                     <IonIcon slot="start" icon={createOutline}></IonIcon>
                     Edit Session
                   </IonButton>

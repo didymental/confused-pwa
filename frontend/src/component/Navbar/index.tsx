@@ -11,8 +11,12 @@ import {
 } from "@ionic/react";
 import { useLocation } from "react-router-dom";
 import logo from "../../assets/logo.svg";
+import { useProfile } from "../../hooks/authentication/useProfile";
+import localStorage from "../../localStorage";
+import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
 import { personCircleOutline } from "ionicons/icons";
-import { getUser } from "../../localStorage";
+import { useEffect } from "react";
+
 import Menu from "../Menu";
 
 interface NavbarProps {
@@ -25,7 +29,16 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = (props) => {
   const { title = "", showProfileIcon = false, showBackButton = false, showLogo = false } = props;
   const location = useLocation();
-  const user = getUser();
+  const user = localStorage.auth.getUser();
+  const isOnline = useOnlineStatus();
+  const { sendProfileSavedData } = useProfile(isOnline);
+
+  useEffect(() => {
+    if (isOnline) {
+      sendProfileSavedData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline]);
 
   if (
     location.pathname === "/" ||
@@ -43,7 +56,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             <IonBackButton text="" />
           </IonButtons>
         )}
-
         <IonGrid>
           <IonRow>
             {showLogo && <img src={logo} alt="logo" className="navbar navbar__logo" />}

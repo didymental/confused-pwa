@@ -9,18 +9,20 @@ interface UseLightLogo {
 }
 
 const ConfusedIcon: React.FC<UseLightLogo> = ({ useLightLogo = false }) => {
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   return (
     <>
-      <div style={{ display: loading ? "block" : "none" }}>
+      {/* <div style={{ display: loading ? "block" : "none" }}>
         <IonSpinner name="crescent" />
-      </div>
+      </div> */}
       <a href="/">
         {useLightLogo ? (
-          <img className="icon" src={logoLight} alt="logo" onLoad={() => setLoading(false)} />
+          <img className="icon" src={logoLight} alt="logo" />
         ) : (
-          <img className="icon" src={logo} alt="logo" onLoad={() => setLoading(false)} />
+          //onLoad={() => setLoading(false)} />
+          <img className="icon" src={logo} alt="logo" />
+          //onLoad={() => setLoading(false)} />
         )}
       </a>
     </>

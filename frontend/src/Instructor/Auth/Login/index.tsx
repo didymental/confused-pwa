@@ -27,8 +27,8 @@ function validateEmail(email: string) {
 }
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("admin@gmail.com");
-  const [password, setPassword] = useState<string>("123456");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { user, login } = useAuthentication();
@@ -120,7 +120,7 @@ const LoginPage: React.FC = () => {
               <p className="login-form__auxilliary-text--small">
                 By clicking LOGIN you agree to our <a href="/">Policy</a>
               </p>
-              <IonButton expand="block" onClick={handleLogin}>
+              <IonButton onClick={handleLogin} className="login-form__button">
                 Login
               </IonButton>
               <p className="login-form__auxilliary-text--middle">

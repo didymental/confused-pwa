@@ -1,5 +1,5 @@
-.join-page__content {
-  margin-top: 3vh;
+.join-page__grid {
+  margin-top: 12vh;
   max-width: 800px;
   width: 90vw;
   text-align: center;
@@ -17,9 +17,8 @@
 }
 
 .login-form__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 7em;
+  margin: 0 auto;
 }
 
 .join-page__auxilliary-text {
@@ -38,7 +37,8 @@
   }
 }
 
-.join-page__input {
+.join-page__field {
+  margin-top: 16px;
   --background: white;
 }
 

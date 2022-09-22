@@ -16,7 +16,7 @@ const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questi
           </IonItem>
         ) : (
           questions.map((question: QuestionData) => (
-            <IonItem className="questions__item is-transparent" key={question.question_content}>
+            <IonItem className="questions__item" key={question.question_content}>
               {'"' + question.question_content + '"'}
             </IonItem>
           ))

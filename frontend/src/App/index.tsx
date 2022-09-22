@@ -5,27 +5,23 @@ import { IonReactRouter } from "@ionic/react-router";
 import { RecoilRoot } from "recoil";
 import AuthenticatedApp from "../AuthenticatedApp";
 import UnauthenticatedApp from "../UnauthenticatedApp";
-import { getUser, STORAGE_EVENT } from "../localStorage";
+import localStorage from "../localStorage";
 import { useEffect, useState } from "react";
 import ReactGA from "react-ga4";
-
-const TRACKING_ID = "G-NN5DW2VQ4G";
-
-ReactGA.initialize(TRACKING_ID);
+import { OnlineStatusProvider } from "../hooks/util/useOnlineStatus";
 
 const ActiveApp: React.FC = () => {
-  const [user, setUser] = useState(getUser());
-
+  const [user, setUser] = useState(localStorage.auth.getUser());
   useEffect(() => {
     function checkUserData() {
-      const user = getUser();
+      const user = localStorage.auth.getUser();
       setUser(user);
     }
 
-    window.addEventListener(STORAGE_EVENT, checkUserData);
+    window.addEventListener(localStorage.constants.STORAGE_EVENT, checkUserData);
 
     return () => {
-      window.removeEventListener(STORAGE_EVENT, checkUserData);
+      window.removeEventListener(localStorage.constants.STORAGE_EVENT, checkUserData);
     };
   }, []);
 
@@ -43,13 +39,15 @@ function App() {
   }, []);
 
   return (
-    <RecoilRoot>
-      <IonApp>
-        <IonReactRouter>
-          <ActiveApp />
-        </IonReactRouter>
-      </IonApp>
-    </RecoilRoot>
+    <OnlineStatusProvider>
+      <RecoilRoot>
+        <IonApp>
+          <IonReactRouter>
+            <ActiveApp />
+          </IonReactRouter>
+        </IonApp>
+      </RecoilRoot>
+    </OnlineStatusProvider>
   );
 }
 

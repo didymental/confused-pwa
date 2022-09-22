@@ -1,7 +1,6 @@
 import "./index.scss";
 import {
   IonButton,
-  IonCard,
   IonContent,
   IonGrid,
   IonPage,
@@ -14,17 +13,14 @@ import {
   useIonAlert,
   IonCardContent,
   IonModal,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonList,
   IonItem,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router";
 import QRCode from "react-qr-code";
-import { powerSharp, shareSocialSharp, linkSharp } from "ionicons/icons";
-import client, { BASE_URL, getWebSocketClient } from "../../api/client";
+import { power, shareSocial, link, copy } from "ionicons/icons";
+import client, { getWebSocketClient } from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import clear from "../../assets/clear-bg.svg";
 import confused_1 from "../../assets/confused-1-bg.svg";
@@ -43,6 +39,9 @@ const CONFUSED_2_STATE = "confused-2";
 const JOIN_SESSION = "join_session";
 const LEAVE_SESSION = "leave_session";
 const CLEAR_REACTIONS_ACTION = "clear_reactions";
+
+// Base URL for shareable link
+const BASE_URL_FRONTEND = "https://confusedsession.vercel.app";
 
 /**
  * Represents the page that shows the Instructor when the Instructor is
@@ -198,7 +197,7 @@ const InstructorSessionPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className={`ion-content-instructor-session__${levelOfConfusion}`}>
+      <IonContent fullscreen className={`instructor-session__background--${levelOfConfusion}`}>
         <ConfusionDisplay
           levelOfConfusion={levelOfConfusion || "clear"}
           questions={questions || []}
@@ -230,7 +229,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
-  const shareableLink = `${BASE_URL}/student/session/` + sessionId;
+  const shareableLink = `${BASE_URL_FRONTEND}/student/session/` + sessionId;
 
   useEffect(() => {
     setHasAnimated(true);
@@ -262,8 +261,9 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
 
   const copyLinkToClipboard = () => {
     navigator.clipboard.writeText(shareableLink);
-    presentAlert("Copied to your clipboard!");
+    presentAlert("Copied to clipboard!");
   };
+
   const clearReactions = () => {
     if (!ws) {
       return;
@@ -286,86 +286,135 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
 
   return (
     <>
-      <IonCard />
-      <IonGrid className="ion-grid-instructor-session__overall">
-        <CreateAnimation
-          duration={2000}
-          iterations={1}
-          fromTo={[{ property: "opacity", fromValue: "0.1", toValue: "1" }]}
-          play={hasAnimated}
-        >
-          <IonRow className="ion-row-instructor-session">
-            <img src={mapLevelToSvg[levelOfConfusion]} alt={levelOfConfusion} onClick={() => {}} />
+      <IonContent fullscreen className="instructor-session__container">
+        <IonGrid className="instructor-session__grid">
+          <CreateAnimation
+            duration={2000}
+            iterations={1}
+            fromTo={[{ property: "opacity", fromValue: "0.1", toValue: "1" }]}
+            play={hasAnimated}
+          >
+            <IonRow>
+              <IonCol>
+                <img
+                  src={mapLevelToSvg[levelOfConfusion]}
+                  alt={levelOfConfusion}
+                  onClick={() => {}}
+                  className="instructor-session__sentiment-image"
+                />
+              </IonCol>
+            </IonRow>
+          </CreateAnimation>
+          <IonRow>
+            <IonCol>
+              <IonText className="instructor-session__text--sentiment-indicator">
+                {mapLevelToText[levelOfConfusion]}
+              </IonText>
+            </IonCol>
           </IonRow>
-        </CreateAnimation>
-        <IonRow className="ion-row-instructor-session">
-          <IonText className="ion-text-instructor-session">
-            {mapLevelToText[levelOfConfusion]}
-          </IonText>
-        </IonRow>
-        <IonRow className="ion-row-instructor-session">
-          <QuestionsDisplay questions={questions} />
-        </IonRow>
-        <IonRow className="ion-row-instructor-session">
-          <ReactionsDisplay students={students} setLevelOfConfusion={setLevelOfConfusion} />
-        </IonRow>
-        <IonRow className="ion-row-instructor-session">
-          <IonButton
-            className="ion-btn-instructor-session__reactions"
-            onClick={clearReactions}
-            fill="clear"
-          >
-            <IonCardContent>RESET</IonCardContent>
-          </IonButton>
-        </IonRow>
-        <IonRow className="ion-row-instructor-session">
-          <IonButton
-            className="ion-btn-instructor-session__share"
-            onClick={() => setOpenModal(true)}
-            fill="clear"
-          >
-            <IonIcon icon={shareSocialSharp} size="small" color="tertiary" />
-            <IonCardContent>Share to students</IonCardContent>
-          </IonButton>
-        </IonRow>
-        <IonRow className="ion-row-instructor-session">
-          <IonButton
-            onClick={endSession}
-            className="ion-btn-instructor-session__end-session"
-            color="primary"
-          >
-            <IonIcon icon={powerSharp} color="secondary" size="medium" />
-            <IonCardContent>End Session</IonCardContent>
-          </IonButton>
-        </IonRow>
-
-        <IonModal
-          isOpen={openModal}
-          initialBreakpoint={0.75}
-          breakpoints={[0, 0.25, 0.5, 0.75]}
-          onIonModalWillDismiss={() => setOpenModal(false)}
-        >
-          <IonContent>
-            <IonHeader>
-              <IonToolbar>
-                <IonTitle>Share via ...</IonTitle>
-              </IonToolbar>
-            </IonHeader>
-            <IonItem className="modal__item">
-              <IonButton onClick={copyLinkToClipboard} fill="clear">
-                <IonIcon icon={linkSharp} size="large" />
+          <IonRow>
+            <IonCol>
+              <QuestionsDisplay questions={questions} />
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <ReactionsDisplay students={students} setLevelOfConfusion={setLevelOfConfusion} />
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonButton
+                className="instructor-session__button instructor-session__button--reactions"
+                onClick={clearReactions}
+              >
+                <IonCardContent>RESET</IonCardContent>
               </IonButton>
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonButton
+                className="instructor-session__button instructor-session__button--share"
+                onClick={() => setOpenModal(true)}
+              >
+                <IonIcon icon={shareSocial} size="small" color="tertiary" />
+                <IonCardContent>Share to students</IonCardContent>
+              </IonButton>
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonButton
+                onClick={endSession}
+                className="instructor-session__button instructor-session__button--end-session"
+              >
+                <IonIcon icon={power} color="secondary" size="medium" />
+                <IonCardContent>End Session</IonCardContent>
+              </IonButton>
+            </IonCol>
+          </IonRow>
+
+          <IonModal
+            isOpen={openModal}
+            initialBreakpoint={0.75}
+            breakpoints={[0, 0.25, 0.5, 0.75]}
+            onIonModalWillDismiss={() => setOpenModal(false)}
+          >
+            <IonContent className="instructor-session__container">
+              {/* <IonHeader>
+                <IonToolbar>
+                  <IonTitle>Share via ...</IonTitle>
+                </IonToolbar>
+              </IonHeader> */}
+              <IonIcon className="instructor-session__share-icon" icon={link} />
+
+              <IonItem lines="none">
+                <IonText className="instructor-session__text--header">Share the session</IonText>
+              </IonItem>
+
+              <IonItem lines="none">
+                <IonText className="instructor-session__text--subheading instructor-session__text--translucent">
+                  Anyone with the session code or session link can join the session
+                </IonText>
+              </IonItem>
+
+              <IonItem lines="none" className="instructor-session__modal--item">
+                <IonText className="instructor-session__text--subheading">
+                  {`Session code: ${sessionId}`}
+                </IonText>
+              </IonItem>
+
+              <IonItem lines="none" className="instructor-session__modal--item">
+                <IonIcon icon={link} size="large" />
+                <IonCardContent>
+                  <IonText className="instructor-session__text--link">{shareableLink}</IonText>
+                </IonCardContent>
+              </IonItem>
+
+              {/* <IonItem className="instructor-session__modal--item"> */}
+              <IonButton onClick={copyLinkToClipboard} className="instructor-session__button--copy">
+                <IonIcon icon={copy} size="medium" />
+                <IonCardContent>
+                  <IonText>Copy</IonText>
+                </IonCardContent>
+              </IonButton>
+              {/* </IonItem> */}
+
+              <IonList className="instructor-session__modal--list">
+                <QRCode value={shareableLink} />
+              </IonList>
+
               <IonCardContent>
-                <IonText>{shareableLink}</IonText>
+                <IonText className="instructor-session__text--subheading">
+                  {`Ask your students to scan this QR code with their \"Confused\" or with their
+                    preferred QR scanner`}
+                </IonText>
               </IonCardContent>
-            </IonItem>
-            <IonList className="modal__list">
-              <QRCode value={shareableLink} />
-            </IonList>
-          </IonContent>
-        </IonModal>
-      </IonGrid>
-      {}
+            </IonContent>
+          </IonModal>
+        </IonGrid>
+      </IonContent>
     </>
   );
 };
@@ -419,22 +468,22 @@ const ReactionsDisplay: React.FC<{
   return (
     <IonGrid>
       <IonRow>
-        <IonCol className="ion-col-instructor-session__reactions">
+        <IonCol className="instructor-session__reaction-display">
           <IonRow>
             <img src={confused_reaction} alt={"confused"} onClick={() => {}} />
           </IonRow>
           <IonRow>
-            <IonBadge className="ion-badge-instructor-session__reactions">
+            <IonBadge className="instructor-session__reaction-count">
               <IonText>{countOfConfused}</IonText>
             </IonBadge>
           </IonRow>
         </IonCol>
-        <IonCol className="ion-col-instructor-session__reactions">
+        <IonCol className="instructor-session__reaction-display">
           <IonRow>
             <img src={clear_reaction} alt={"clear"} onClick={() => {}} />
           </IonRow>
           <IonRow>
-            <IonBadge className="ion-badge-instructor-session__reactions">
+            <IonBadge className="instructor-session__reaction-count">
               <IonText>{countOfClear}</IonText>
             </IonBadge>
           </IonRow>

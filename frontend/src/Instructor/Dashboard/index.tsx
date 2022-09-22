@@ -8,6 +8,7 @@ import {
   IonPage,
   IonRow,
   IonSpinner,
+  useIonLoading,
 } from "@ionic/react";
 import Navbar from "../../component/Navbar";
 import "./index.scss";
@@ -16,16 +17,23 @@ import { add } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { useSessions } from "../../hooks/session/useSession";
 import { useEffect, useState } from "react";
+import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
 
 const DashboardPage: React.FC = () => {
   const history = useHistory();
+  const isOnline = useOnlineStatus();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { sessions, getSessions } = useSessions();
-
+  const { sessions, getSessions, deleteSession, sendSessionSavedData } = useSessions(isOnline);
+  const [present, dismiss] = useIonLoading();
   const renderMainContent = () => {
     if (sessions) {
       return sessions.map((sessionData, index) => (
-        <SessionViewCard key={sessionData.id} session={sessionData} index={index} />
+        <SessionViewCard
+          key={sessionData.id}
+          deleteHandler={handleDelete}
+          session={sessionData}
+          index={index}
+        />
       ));
     } else {
       return (
@@ -39,10 +47,26 @@ const DashboardPage: React.FC = () => {
     setIsLoading(false);
   };
 
+  const handleDelete = async (sessionId: number) => {
+    await present({
+      message: "Deleting",
+    });
+    await deleteSession(sessionId);
+    await getSessions();
+    await dismiss();
+  };
+
   useEffect(() => {
     handleRendering();
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (isOnline) {
+      sendSessionSavedData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline]);
 
   return (
     <IonPage>

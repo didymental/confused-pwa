@@ -20,18 +20,20 @@ import { useHistory, useLocation } from "react-router";
 import { useSessions } from "../../hooks/session/useSession";
 import { SessionEntity } from "../../types/session";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
+import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
 
 const SessionForm: React.FC = () => {
   const location = useLocation();
   const history = useHistory();
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const isOnline = useOnlineStatus();
   const [sessionId, setSessionId] = useState<number>();
   const [sessionName, setSessionName] = useState<string>("");
   const [iserror, setIserror] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [present, dismiss] = useIonLoading();
   const { user } = useAuthentication();
-  const { sessions, createSession, updateSession } = useSessions();
+  const { sessions, createSession, updateSession } = useSessions(isOnline);
 
   useEffect(() => {
     if (location.pathname === "/instructor/session/create") {
@@ -86,9 +88,12 @@ const SessionForm: React.FC = () => {
     }
     setIserror(false);
 
-    present({
-      message: isEdit ? "Editing Session" : "Creating Session",
-    });
+    if (isOnline) {
+      present({
+        message: isEdit ? "Editing Session" : "Creating Session",
+      });
+    }
+
     if (isEdit) {
       handleEdit();
     } else {

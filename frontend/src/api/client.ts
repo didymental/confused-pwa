@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { getAccessToken } from "../localStorage";
+import { getAccessToken } from "../localStorage/auth";
 
 export const BASE_URL =
   process.env.REACT_APP_BASE_URL || "https://confused-backend-3216.herokuapp.com";
