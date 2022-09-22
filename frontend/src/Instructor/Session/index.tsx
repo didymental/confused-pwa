@@ -15,6 +15,9 @@ import {
   IonModal,
   IonList,
   IonItem,
+  IonLabel,
+  IonSegment,
+  IonSegmentButton,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router";
@@ -31,6 +34,7 @@ import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
 import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
+import StudentsDisplay from "../../component/StudentsDisplay";
 
 const CLEAR_STATE = "clear";
 const CONFUSED_1_STATE = "confused-1";
@@ -189,6 +193,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<string>("questions");
   const shareableLink = `${BASE_URL_FRONTEND}/student/session/` + sessionId;
   const profileAnalyticsTracker = useAnalyticsTracker("Instructor In Session");
 
@@ -289,7 +294,30 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
             </IonCol>
           </IonRow>
           <IonRow>
-            <QuestionsDisplay questions={questions} />
+            <IonSegment
+              value={selectedTab}
+              onIonChange={(event) => {
+                const value = event.detail.value;
+
+                if (!value) {
+                  return;
+                }
+
+                setSelectedTab(value);
+              }}
+            >
+              <IonSegmentButton value="questions">
+                <IonLabel>Questions ({questions.length})</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="students">
+                <IonLabel>Students ({students.length})</IonLabel>
+              </IonSegmentButton>
+            </IonSegment>
+            {selectedTab === "questions" ? (
+              <QuestionsDisplay questions={questions} />
+            ) : (
+              <StudentsDisplay students={students} />
+            )}
           </IonRow>
           <IonRow>
             <IonCol>

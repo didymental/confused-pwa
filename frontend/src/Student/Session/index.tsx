@@ -20,6 +20,8 @@ import {
   IonProgressBar,
   IonLabel,
   IonInput,
+  IonSegment,
+  IonSegmentButton,
 } from "@ionic/react";
 import { useKeyboardState } from "@ionic/react-hooks/keyboard";
 import React, { useEffect, useState, useRef } from "react";
@@ -33,6 +35,7 @@ import QuestionsDisplay from "../../component/QuestionsDisplay";
 import { useSessionDetails } from "../../hooks/joinsession/useJoinDetails";
 import { useHistory, useParams } from "react-router";
 import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
+import StudentsDisplay from "../../component/StudentsDisplay";
 import useWindowDimensions from "../../hooks/util/useWindowDimensions";
 
 const POST_QUESTION = "post_question";
@@ -61,6 +64,7 @@ const StudentSessionPage: React.FC<void> = () => {
   const history = useHistory();
   const { sessionId, displayName } = useSessionDetails();
   const profileAnalyticsTracker = useAnalyticsTracker("Student In Session");
+  const [selectedTab, setSelectedTab] = useState<string>("questions");
   const { isOpen, keyboardHeight } = useKeyboardState();
   // const {width, height} = useWindowDimensions();
 
@@ -271,46 +275,52 @@ const StudentSessionPage: React.FC<void> = () => {
               </IonButtons>
             </IonToolbar>
           </IonHeader>
-          <IonContent>
-            <IonGrid className="container__questions-container">
-              <QuestionsDisplay questions={questions} />
-            </IonGrid>
-
-            <IonSlides
-              className="student-session__grid"
-              options={{
-                slidesPerView: 2,
-              }}
-            >
-              {reactionStates.map((item, index) => {
-                return (
-                  <IonSlide key={item.title}>
-                    <CreateAnimation
-                      play={item.isSelected}
-                      iterations={1}
-                      duration={400}
-                      keyframes={[
-                        { offset: 0, transform: "scale(1)", opacity: "1" },
-                        { offset: 0.2, transform: "scale(1.2)", opacity: "0.5" },
-                        { offset: 0.5, transform: "scale(1)", opacity: "1" },
-                      ]}
-                    >
-                      <IonCard
-                        onClick={() => handleReactionStateChange(index)}
-                        color={item.isSelected ? "primary" : "light"}
-                        className="card"
-                      >
-                        <IonCardContent className="card__content">{item.title}</IonCardContent>
-                        <IonCardContent>
-                          <img src={item.iconUrl} alt={"reaction"} />
-                        </IonCardContent>
-                      </IonCard>
-                    </CreateAnimation>
-                  </IonSlide>
-                );
-              })}
-            </IonSlides>
+          <IonContent className="student-session__container">
             <IonGrid className="student-session__grid">
+              <IonRow>
+                <IonSegment value={selectedTab}>
+                  <IonSegmentButton value="questions">
+                    <IonLabel>Questions from students ({questions.length})</IonLabel>
+                  </IonSegmentButton>
+                </IonSegment>
+                <QuestionsDisplay questions={questions} />
+              </IonRow>
+              <IonRow>
+                <IonSlides
+                  className="student-session__grid"
+                  options={{
+                    slidesPerView: 2,
+                  }}
+                >
+                  {reactionStates.map((item, index) => {
+                    return (
+                      <IonSlide key={item.title}>
+                        <CreateAnimation
+                          play={item.isSelected}
+                          iterations={1}
+                          duration={400}
+                          keyframes={[
+                            { offset: 0, transform: "scale(1)", opacity: "1" },
+                            { offset: 0.2, transform: "scale(1.2)", opacity: "0.5" },
+                            { offset: 0.5, transform: "scale(1)", opacity: "1" },
+                          ]}
+                        >
+                          <IonCard
+                            onClick={() => handleReactionStateChange(index)}
+                            color={item.isSelected ? "primary" : "light"}
+                            className="card"
+                          >
+                            <IonCardContent className="card__content">{item.title}</IonCardContent>
+                            <IonCardContent>
+                              <img src={item.iconUrl} alt={"reaction"} />
+                            </IonCardContent>
+                          </IonCard>
+                        </CreateAnimation>
+                      </IonSlide>
+                    );
+                  })}
+                </IonSlides>
+              </IonRow>
               <IonRow className="textarea">
                 <IonInput
                   placeholder="Ask a question here..."
