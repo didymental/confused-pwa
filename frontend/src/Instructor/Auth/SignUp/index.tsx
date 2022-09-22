@@ -94,7 +94,7 @@ const SignUpPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="stacked"> Email</IonLabel>
+                <IonLabel position="floating"> Email</IonLabel>
                 <IonInput
                   type="email"
                   value={email}
@@ -107,7 +107,7 @@ const SignUpPage: React.FC = () => {
           <IonRow className="signup-form__field">
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="stacked"> Password</IonLabel>
+                <IonLabel position="floating"> Password</IonLabel>
                 <IonInput
                   type="password"
                   value={password}
@@ -120,7 +120,7 @@ const SignUpPage: React.FC = () => {
           <IonRow className="signup-form__field">
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="stacked"> Display Name</IonLabel>
+                <IonLabel position="floating"> Display Name</IonLabel>
                 <IonInput
                   type="text"
                   value={displayName}
@@ -132,7 +132,7 @@ const SignUpPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <p className="signup-form__auxilliary-text--small">
-                By clicking on Sign up, you agree to our <Link to="/">Policy</Link>
+                By clicking Sign up, you agree to our <Link to="/">Policy</Link>
               </p>
               <IonButton onClick={handleSignUp} className="signup-form__button">
                 Sign up
