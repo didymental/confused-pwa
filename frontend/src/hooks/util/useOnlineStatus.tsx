@@ -33,6 +33,7 @@ export const OnlineStatusProvider: React.FC<any> = ({ children }) => {
       window.removeEventListener("offline", offlineListener);
       window.removeEventListener("online", onlineListener);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

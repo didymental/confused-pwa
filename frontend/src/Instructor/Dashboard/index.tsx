@@ -8,6 +8,7 @@ import {
   IonPage,
   IonRow,
   IonSpinner,
+  useIonLoading,
 } from "@ionic/react";
 import Navbar from "../../component/Navbar";
 import "./index.scss";
@@ -16,18 +17,23 @@ import { add } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { useSessions } from "../../hooks/session/useSession";
 import { useEffect, useState } from "react";
-import { Detector } from "react-detect-offline";
+import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
 
 const DashboardPage: React.FC = () => {
   const history = useHistory();
-  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const isOnline = useOnlineStatus();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { sessions, getSessions, sendSessionSavedData } = useSessions(isOnline);
-
+  const { sessions, getSessions, deleteSession, sendSessionSavedData } = useSessions(isOnline);
+  const [present, dismiss] = useIonLoading();
   const renderMainContent = () => {
     if (sessions) {
       return sessions.map((sessionData, index) => (
-        <SessionViewCard key={sessionData.id} session={sessionData} index={index} />
+        <SessionViewCard
+          key={sessionData.id}
+          deleteHandler={handleDelete}
+          session={sessionData}
+          index={index}
+        />
       ));
     } else {
       return (
@@ -39,6 +45,15 @@ const DashboardPage: React.FC = () => {
   const handleRendering = async () => {
     await getSessions();
     setIsLoading(false);
+  };
+
+  const handleDelete = async (sessionId: number) => {
+    await present({
+      message: "Deleting",
+    });
+    await deleteSession(sessionId);
+    await getSessions();
+    await dismiss();
   };
 
   useEffect(() => {
@@ -58,12 +73,6 @@ const DashboardPage: React.FC = () => {
       <Navbar title={"Dashboard"} showProfileIcon={true} showLogo={true} />
       <IonContent fullscreen>
         <IonGrid className="dashboard__grid">
-          <Detector
-            render={({ online }) => {
-              setIsOnline(online);
-              return <></>;
-            }}
-          />
           <IonRow>
             <IonCol className={isLoading ? "dashboard__column" : ""}>
               {isLoading ? (

@@ -125,17 +125,3 @@ self.addEventListener("activate", (event) => {
   console.log("activate");
   event.waitUntil(deleteOldCaches());
 });
-
-// self.addEventListener("activate", (event) => {
-//   event.waitUntil(
-//     (async () => {
-//       const keys = await caches.keys();
-//       return keys.map(async (cache) => {
-//         if (cache !== CACHE_NAME) {
-//           console.log("Service Worker: Removing old cache: " + cache);
-//           return await caches.delete(cache);
-//         }
-//       });
-//     })(),
-//   );
-// });

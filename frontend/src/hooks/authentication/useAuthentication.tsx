@@ -1,13 +1,7 @@
 import { useHistory } from "react-router";
 import { LoginRequest, SignUpRequest } from "../../types/auth";
 import api from "../../api";
-import {
-  getRefreshToken,
-  getUser,
-  setAccessToken,
-  setRefreshToken,
-  setUser,
-} from "../../localStorage";
+import localStorage from "../../localStorage";
 import { useToast } from "../util/useToast";
 import { useInterval } from "usehooks-ts";
 import { sleep } from "../../utils/time";
@@ -17,19 +11,19 @@ import { useSessions } from "../session/useSession";
 
 const useAuthenticatedUserState = () => {
   const setAuthenthicationData = async (accessToken: string, refreshToken: string) => {
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
+    localStorage.auth.setAccessToken(accessToken);
+    localStorage.auth.setRefreshToken(refreshToken);
 
     const response = await api.profile.getProfiles();
     const { id, email, name } = response.data[0];
 
-    setUser({ id: id, email: email, name: name });
+    localStorage.auth.setUser({ id: id, email: email, name: name });
   };
 
   const clearAuthenticationData = () => {
-    setAccessToken(null);
-    setRefreshToken(null);
-    setUser(null);
+    localStorage.auth.setAccessToken(null);
+    localStorage.auth.setRefreshToken(null);
+    localStorage.auth.setUser(null);
   };
 
   return {
@@ -47,7 +41,7 @@ interface UpdateAuthenticationState {
 }
 
 export const useAuthentication = (): UpdateAuthenticationState => {
-  const user = getUser();
+  const user = localStorage.auth.getUser();
   const history = useHistory();
   const { setAuthenthicationData, clearAuthenticationData } = useAuthenticatedUserState();
   const { presentToast } = useToast();
@@ -99,7 +93,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
   };
 
   const loginWithAccessToken = async () => {
-    const refreshToken = getRefreshToken();
+    const refreshToken = localStorage.auth.getRefreshToken();
     try {
       if (!refreshToken) {
         throw Error();
@@ -139,7 +133,7 @@ export const useAuthenticationRefresh = () => {
   const { loginWithAccessToken, logout } = useAuthentication();
 
   const getNewAccessToken = async () => {
-    if (!getUser()) {
+    if (!localStorage.auth.getUser()) {
       return;
     }
     const oneSecond = 1000; // ms
