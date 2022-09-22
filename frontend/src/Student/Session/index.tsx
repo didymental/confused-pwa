@@ -18,6 +18,7 @@ import {
   IonButtons,
   IonSpinner,
   IonProgressBar,
+  IonLabel,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 
@@ -29,7 +30,8 @@ import { useToast } from "../../hooks/util/useToast";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
 import { useSessionDetails } from "../../hooks/joinsession/useJoinDetails";
-import { useHistory } from "react-router";
+import { useHistory, useParams } from "react-router";
+import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
 
 const POST_QUESTION = "post_question";
 const PUT_REACTION = "put_reaction";
@@ -49,33 +51,34 @@ const StudentSessionPage: React.FC<void> = () => {
   ];
   const [reactionStates, setReactionStates] = useState<ReactionState[]>(initialReactionStates);
   const [question, setQuestion] = useState<string>("");
-  const { sessionId, displayName, studentId } = useSessionDetails();
   const [questions, setQuestions] = useState<QuestionData[] | []>([]);
   const [sessionName, setSessionName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { presentToast } = useToast();
   const ws = useRef<WebSocket | null>(null);
   const history = useHistory();
+  const { sessionId, displayName } = useSessionDetails();
+  const profileAnalyticsTracker = useAnalyticsTracker("Student In Session");
 
   useEffect(() => {
     ws.current = getWebSocketClient(false);
-    ws.current.onopen = () => handleWsOpen(ws.current);
-    ws.current.onmessage = (e) => handleWsMessageListener(e);
-    ws.current.onclose = () => handleWsClose(ws.current);
-    ws.current.onerror = () => handleError("The connection has failed. Please try again.");
-
     const wsCurrent = ws.current;
+    wsCurrent.onopen = () => handleWsOpen(wsCurrent);
+    wsCurrent.onmessage = (e) => handleWsMessageListener(e);
+    wsCurrent.onclose = () => handleWsClose(wsCurrent);
+    wsCurrent.onerror = () => handleError("The connection has failed. Please try again.");
 
     return () => {
       wsCurrent.close();
     };
-  }, [history]);
+  }, []);
 
   const askQuestion = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
       return;
     }
 
+    profileAnalyticsTracker("Student ask questions");
     wsCurrent.send(
       JSON.stringify({
         action: POST_QUESTION,
@@ -87,20 +90,7 @@ const StudentSessionPage: React.FC<void> = () => {
     setQuestion("");
   };
 
-  const handleWsOpen = (wsCurrent: WebSocket | null) => {
-    if (!wsCurrent) {
-      return;
-    }
-    wsCurrent.send(
-      JSON.stringify({
-        action: JOIN_SESSION,
-        pk: sessionId,
-        display_name: displayName,
-        request_id: Math.random(),
-      }),
-    );
-    setIsLoading(false);
-  };
+  const handleWsOpen = (wsCurrent: WebSocket | null) => {};
 
   const handleWsClose = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
@@ -111,6 +101,22 @@ const StudentSessionPage: React.FC<void> = () => {
 
   const handleWsMessageListener = (msg: MessageEvent<any>) => {
     let res = JSON.parse(msg.data);
+
+    if (res.action === "connect" && res.data.type === "success") {
+      if (!ws.current) {
+        return; // not possible
+      }
+      // join session
+      ws.current.send(
+        JSON.stringify({
+          action: JOIN_SESSION,
+          pk: sessionId,
+          display_name: displayName,
+          request_id: Math.random(),
+        }),
+      );
+      setIsLoading(false);
+    }
 
     if (res.data.message === "You have left or been removed from session " + sessionId) {
       leaveSession(ws.current);
@@ -188,6 +194,10 @@ const StudentSessionPage: React.FC<void> = () => {
       reactionId = 2;
     }
 
+    if (reactionType !== "") {
+      profileAnalyticsTracker("Student send reaction");
+    }
+
     wsCurrent.send(
       JSON.stringify({
         action: PUT_REACTION,
@@ -201,6 +211,8 @@ const StudentSessionPage: React.FC<void> = () => {
     if (!wsCurrent) {
       return null;
     }
+
+    profileAnalyticsTracker("Student leave session");
 
     updateStudentReaction("", wsCurrent);
 
@@ -221,10 +233,8 @@ const StudentSessionPage: React.FC<void> = () => {
       ) : (
         <>
           <IonHeader>
-            <IonToolbar>
-              <IonCardContent>
-                <IonTitle>{sessionName}</IonTitle>
-              </IonCardContent>
+            <IonToolbar className="toolbar">
+              <IonLabel className="toolbar__title">{sessionName}</IonLabel>
               <IonButtons slot="end">
                 <IonButton onClick={() => leaveSession(ws.current)}>Leave Session</IonButton>
               </IonButtons>
