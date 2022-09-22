@@ -275,7 +275,7 @@ const StudentSessionPage: React.FC<void> = () => {
               </IonButtons>
             </IonToolbar>
           </IonHeader>
-          <IonContent className="student-session__container">
+          <IonContent fullscreen className="student-session__container">
             <IonGrid className="student-session__grid">
               <IonRow>
                 <IonSegment value={selectedTab}>
