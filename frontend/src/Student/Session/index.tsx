@@ -20,6 +20,8 @@ import {
   IonProgressBar,
   IonLabel,
   IonInput,
+  IonSegment,
+  IonSegmentButton,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 
@@ -33,6 +35,7 @@ import QuestionsDisplay from "../../component/QuestionsDisplay";
 import { useSessionDetails } from "../../hooks/joinsession/useJoinDetails";
 import { useHistory, useParams } from "react-router";
 import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
+import StudentsDisplay from "../../component/StudentsDisplay";
 
 const POST_QUESTION = "post_question";
 const PUT_REACTION = "put_reaction";
@@ -60,6 +63,7 @@ const StudentSessionPage: React.FC<void> = () => {
   const history = useHistory();
   const { sessionId, displayName } = useSessionDetails();
   const profileAnalyticsTracker = useAnalyticsTracker("Student In Session");
+  const [selectedTab, setSelectedTab] = useState<string>("questions");
 
   useEffect(() => {
     ws.current = getWebSocketClient(false);
@@ -251,6 +255,24 @@ const StudentSessionPage: React.FC<void> = () => {
           </IonHeader>
           <IonContent>
             <IonGrid className="container__questions-container">
+              <IonSegment
+                value={selectedTab}
+                onIonChange={(event) => {
+                  // const value = event.detail.value;
+
+                  // if (!value) {
+                  //   return;
+                  // }
+
+                  // setSelectedTab(value);
+                  return;
+                }}
+              >
+                <IonSegmentButton value="questions">
+                  <IonLabel>Questions from students ({questions.length})</IonLabel>
+                </IonSegmentButton>
+              </IonSegment>
+
               <QuestionsDisplay questions={questions} />
             </IonGrid>
 
