@@ -35,7 +35,6 @@ const LoginPage: React.FC = () => {
   const { user, login } = useAuthentication();
   const [present, dismiss] = useIonLoading();
   const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
-
   const page = useRef(undefined);
 
   useEffect(() => {
