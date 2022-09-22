@@ -120,7 +120,7 @@ const LoginPage: React.FC = () => {
               <p className="login-form__auxilliary-text--small">
                 By clicking LOGIN you agree to our <a href="/">Policy</a>
               </p>
-              <IonButton expand="block" onClick={handleLogin}>
+              <IonButton onClick={handleLogin} className="login-form__button">
                 Login
               </IonButton>
               <p className="login-form__auxilliary-text--middle">

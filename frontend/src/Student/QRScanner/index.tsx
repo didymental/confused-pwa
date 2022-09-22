@@ -18,10 +18,24 @@ import { useSessionIdInput } from "../../hooks/joinsession/useJoinDetails";
 const Scanner: React.FC = (props) => {
   const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
   const [shouldGoBack, setShouldGoBack] = useState(false);
+  const [isQRScanned, setIsQRScanned] = useState(false);
 
   const history = useHistory();
 
   let [qrScanner, setQrScanner] = useState<QrScanner>();
+
+  const extractSessionId = (qrData: string) => {
+    // Match "/123" from "https://www.abc.com/student/session/123"
+    // .match(string) returns an array
+    const result = qrData.match(/[/]{1}[0-9]{1,6}[/]?$/);
+    if (result === null) {
+      setShouldGoBack(true);
+      return "";
+    }
+
+    //Remove the "/" from the matched string
+    return result[0].substring(1);
+  };
 
   //Create scanner and start scanning on page load. No rerenders otherwise
   useEffect(() => {
@@ -46,8 +60,9 @@ const Scanner: React.FC = (props) => {
         new QrScanner(
           video,
           (result) => {
-            setSessionIdInput(result.data);
-            setShouldGoBack(true);
+            let sessionIdFromQR = extractSessionId(result.data);
+            setSessionIdInput(sessionIdFromQR);
+            setIsQRScanned(true);
           },
           {
             returnDetailedScanResult: true,
@@ -85,6 +100,7 @@ const Scanner: React.FC = (props) => {
           </IonFabButton>
         </IonFab>
         {shouldGoBack ? <Redirect to="/student" /> : <></>}
+        {isQRScanned ? <Redirect to={`/student/session/${sessionIdInput}`} /> : <></>}
       </IonContent>
     </IonPage>
   );
