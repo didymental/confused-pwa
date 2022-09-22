@@ -192,6 +192,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<string>("questions");
   const shareableLink = `${BASE_URL_FRONTEND}/student/session/` + sessionId;
   const profileAnalyticsTracker = useAnalyticsTracker("Instructor In Session");
 
@@ -292,17 +293,28 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
             </IonCol>
           </IonRow>
           <IonRow>
-            <IonSegment value="warning">
-              <IonSegmentButton value="warning">
+            <IonSegment
+              value={selectedTab}
+              onIonChange={(event) => {
+                const value = event.detail.value;
+
+                if (!value) {
+                  return;
+                }
+
+                setSelectedTab(value);
+              }}
+            >
+              <IonSegmentButton value="questions">
                 <IonLabel>Questions</IonLabel>
               </IonSegmentButton>
-              <IonSegmentButton value="segment">
+              <IonSegmentButton value="students">
                 <IonLabel>Students</IonLabel>
               </IonSegmentButton>
             </IonSegment>
           </IonRow>
           <IonRow>
-            <QuestionsDisplay questions={questions} />
+            {selectedTab === "questions" ? <QuestionsDisplay questions={questions} /> : null}
           </IonRow>
           <IonRow>
             <IonCol>
