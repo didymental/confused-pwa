@@ -34,6 +34,7 @@ import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
 import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
+import StudentsDisplay from "../../component/StudentsDisplay";
 
 const CLEAR_STATE = "clear";
 const CONFUSED_1_STATE = "confused-1";
@@ -309,12 +310,16 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
                 <IonLabel>Questions</IonLabel>
               </IonSegmentButton>
               <IonSegmentButton value="students">
-                <IonLabel>Students</IonLabel>
+                <IonLabel>Students ({students.length})</IonLabel>
               </IonSegmentButton>
             </IonSegment>
           </IonRow>
           <IonRow>
-            {selectedTab === "questions" ? <QuestionsDisplay questions={questions} /> : null}
+            {selectedTab === "questions" ? (
+              <QuestionsDisplay questions={questions} />
+            ) : (
+              <StudentsDisplay students={students} />
+            )}
           </IonRow>
           <IonRow>
             <IonCol>
