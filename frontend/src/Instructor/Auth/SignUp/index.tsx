@@ -140,7 +140,7 @@ const SignUpPage: React.FC = () => {
             <IonCol>
               <p className="signup-form__auxilliary-text--small">
                 By clicking Sign up, you agree to our{" "}
-                <Link to="#" id="open-modal">
+                <Link to="#" id="signup-form__open-modal">
                   Privacy Policy
                 </Link>
               </p>
@@ -153,7 +153,7 @@ const SignUpPage: React.FC = () => {
             </IonCol>
           </IonRow>
         </IonGrid>
-        <PolicyModal presentingElement={presentingElement} />
+        <PolicyModal presentingElement={presentingElement} trigger={"signup-form__open-modal"} />
       </IonContent>
     </IonPage>
   );

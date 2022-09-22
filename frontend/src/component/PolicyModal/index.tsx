@@ -13,9 +13,10 @@ import React, { useRef } from "react";
 
 interface PolicyModalProps {
   presentingElement?: HTMLElement;
+  trigger: string;
 }
 
-export const PolicyModal: React.FC<PolicyModalProps> = ({ presentingElement }) => {
+export const PolicyModal: React.FC<PolicyModalProps> = ({ presentingElement, trigger }) => {
   const modal = useRef<HTMLIonModalElement>(null);
 
   function dismiss() {
@@ -25,7 +26,7 @@ export const PolicyModal: React.FC<PolicyModalProps> = ({ presentingElement }) =
   return (
     <IonModal
       ref={modal}
-      trigger="open-modal"
+      trigger={trigger}
       // canDismiss={canDismiss}
       presentingElement={presentingElement}
     >
