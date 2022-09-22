@@ -134,7 +134,7 @@ const SignUpPage: React.FC = () => {
               <p className="signup-form__auxilliary-text--small">
                 By clicking SIGN UP you agree to our <a href="/">Policy</a>
               </p>
-              <IonButton expand="block" onClick={handleSignUp}>
+              <IonButton onClick={handleSignUp} className="signup-form__button">
                 Sign up
               </IonButton>
               <p className="signup-form__auxilliary-text--middle">
