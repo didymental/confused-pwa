@@ -8,6 +8,7 @@ import {
   IonIcon,
   IonRow,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
 import { useLocation } from "react-router-dom";
 import logo from "../../assets/logo.svg";
@@ -17,6 +18,9 @@ import { useEffect, useState } from "react";
 import { Detector } from "react-detect-offline";
 import { getSessions } from "../../api/session";
 import Menu from "../Menu";
+import { useToast } from "../../hooks/util/useToast";
+import { useAuthentication } from "../../hooks/authentication/useAuthentication";
+import { useProfile } from "../../hooks/authentication/useProfile";
 
 interface NavbarProps {
   title?: string;

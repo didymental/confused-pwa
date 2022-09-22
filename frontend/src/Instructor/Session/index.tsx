@@ -230,7 +230,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
-  const shareableLink = `${BASE_URL}/student/session/` + sessionId;
+  const shareableLink = "https://confusedsession.vercel.app/student/session/" + sessionId;
 
   useEffect(() => {
     setHasAnimated(true);
