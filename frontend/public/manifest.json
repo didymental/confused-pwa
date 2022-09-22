@@ -13,6 +13,11 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    }, {
+      "src": "confused-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "start_url": ".",
