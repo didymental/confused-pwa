@@ -21,8 +21,8 @@ import {
   IonLabel,
   IonInput,
 } from "@ionic/react";
+import { useKeyboardState } from "@ionic/react-hooks/keyboard";
 import React, { useEffect, useState, useRef } from "react";
-
 import { send } from "ionicons/icons";
 import confused_reaction from "../../assets/confused-face.svg";
 import clear_reaction from "../../assets/thumbs-up.svg";
@@ -33,6 +33,7 @@ import QuestionsDisplay from "../../component/QuestionsDisplay";
 import { useSessionDetails } from "../../hooks/joinsession/useJoinDetails";
 import { useHistory, useParams } from "react-router";
 import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
+import useWindowDimensions from "../../hooks/util/useWindowDimensions";
 
 const POST_QUESTION = "post_question";
 const PUT_REACTION = "put_reaction";
@@ -60,6 +61,8 @@ const StudentSessionPage: React.FC<void> = () => {
   const history = useHistory();
   const { sessionId, displayName } = useSessionDetails();
   const profileAnalyticsTracker = useAnalyticsTracker("Student In Session");
+  const { isOpen, keyboardHeight } = useKeyboardState();
+  // const {width, height} = useWindowDimensions();
 
   useEffect(() => {
     ws.current = getWebSocketClient(false);
@@ -73,6 +76,21 @@ const StudentSessionPage: React.FC<void> = () => {
       wsCurrent.close();
     };
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      console.log("i am scrolling");
+      window.scroll({
+        top: keyboardHeight,
+        behavior: "smooth",
+      });
+    } else {
+      window.scroll({
+        top: keyboardHeight ? -keyboardHeight : 0,
+        behavior: "smooth",
+      });
+    }
+  }, [isOpen]);
 
   const askQuestion = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
@@ -235,6 +253,10 @@ const StudentSessionPage: React.FC<void> = () => {
     history.goBack();
   };
 
+  const openKeyboard = () => {};
+
+  const closeKeyboard = () => {};
+
   return (
     <IonPage className="student-session">
       {isLoading ? (
@@ -294,6 +316,8 @@ const StudentSessionPage: React.FC<void> = () => {
                   placeholder="Ask a question here..."
                   value={question.length === 0 ? null : question}
                   onIonChange={(e) => setQuestion(e.detail.value || "")}
+                  onIonFocus={openKeyboard}
+                  onIonBlur={closeKeyboard}
                 />
                 <IonButton fill="clear" onClick={() => askQuestion(ws.current)}>
                   <IonIcon icon={send} />
