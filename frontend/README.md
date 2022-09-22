@@ -1,3 +1,21 @@
+# Front End for Confused App
+
+This repo contains the code running the front end logic for Confused. 
+
+The front end has been deployed onto Vercel. 
+
+The front end can be accessed via: https://confusedsession.vercel.app/
+
+
+## Set Up Instructions for Local
+1. Install all package dependencies. 
+```
+npm install
+```
+
+2. Follow the following create-react-app instructions for the necessary scenario.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
