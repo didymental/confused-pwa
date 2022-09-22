@@ -105,21 +105,21 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// Remove old caches
-const deleteCache = async (key: string) => {
-  await caches.delete(key);
-};
+// // Remove old caches
+// const deleteCache = async (key: string) => {
+//   await caches.delete(key);
+// };
 
-const deleteOldCaches = async () => {
-  const cacheKeepList = [CACHE_NAME];
-  const keyList = await caches.keys();
-  const cachesToDelete = keyList.filter((key) => !cacheKeepList.includes(key));
-  await Promise.all(cachesToDelete.map(deleteCache));
-};
+// const deleteOldCaches = async () => {
+//   const cacheKeepList = [CACHE_NAME];
+//   const keyList = await caches.keys();
+//   const cachesToDelete = keyList.filter((key) => !cacheKeepList.includes(key));
+//   await Promise.all(cachesToDelete.map(deleteCache));
+// };
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(deleteOldCaches());
-});
+// self.addEventListener("activate", (event) => {
+//   event.waitUntil(deleteOldCaches());
+// });
 
 // self.addEventListener("activate", (event) => {
 //   event.waitUntil(
