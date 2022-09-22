@@ -19,7 +19,7 @@ const Splash: React.FC = () => {
         const loadImg = new Image();
         loadImg.src = imageUrl;
         resolve(imageUrl);
-        loadImg.onerror = (err) => reject(err);
+        loadImg.onerror = (err: any) => reject(err);
       });
     };
 

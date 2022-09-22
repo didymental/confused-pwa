@@ -15,7 +15,7 @@ const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questi
             There are currently no questions
           </IonItem>
         ) : (
-          questions.map((question, index) => (
+          questions.map((question: QuestionData, index: number) => (
             <IonItem className="questions__item" key={"" + question.question_content + index}>
               {'"' + question.question_content + '"'}
             </IonItem>
