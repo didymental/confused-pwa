@@ -6,22 +6,19 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonPopover,
   IonRow,
-  IonText,
   IonToolbar,
-  useIonAlert,
 } from "@ionic/react";
 import { useLocation } from "react-router-dom";
 import logo from "../../assets/logo.svg";
-import { personCircle, logOutOutline, createOutline } from "ionicons/icons";
-import { useToast } from "../../hooks/util/useToast";
-import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 import { useProfile } from "../../hooks/authentication/useProfile";
-import { useEffect } from "react";
 import localStorage from "../../localStorage";
 import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
+import { personCircleOutline } from "ionicons/icons";
+import { useEffect } from "react";
+
+import Menu from "../Menu";
+
 interface NavbarProps {
   title?: string;
   showProfileIcon?: boolean;
@@ -34,10 +31,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   const location = useLocation();
   const user = localStorage.auth.getUser();
   const isOnline = useOnlineStatus();
-  const [presentAlert] = useIonAlert();
-  const { presentToast } = useToast();
-  const { logout } = useAuthentication();
-  const { editProfile, sendProfileSavedData } = useProfile(isOnline);
+  const { sendProfileSavedData } = useProfile(isOnline);
 
   useEffect(() => {
     if (isOnline) {
@@ -45,47 +39,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOnline]);
-
-  const handleChangeName = () => {
-    if (!user) {
-      return;
-    }
-    presentAlert({
-      header: "Enter your new nickname",
-      buttons: [
-        {
-          text: "Cancel",
-          role: "cancel",
-          cssClass: "secondary",
-        },
-        {
-          text: "Done",
-          handler: (value) => {
-            const name = value?.name;
-            if (name) {
-              editProfile(user.id, { name: name });
-              return;
-            }
-            presentToast({
-              header: "Update nickname failed!",
-              message: "Please key in your nickname.",
-              color: "danger",
-            });
-          },
-        },
-      ],
-      inputs: [
-        {
-          name: "name",
-          type: "text",
-          placeholder: "e.g. Doctor Apple",
-          attributes: {
-            minLength: 0,
-          },
-        },
-      ],
-    });
-  };
 
   if (
     location.pathname === "/" ||
@@ -113,28 +66,15 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         {showProfileIcon && (
           <>
             <IonButtons slot="end">
-              <IonButton id="profile-button">
+              <IonButton id="menu-button">
                 <IonIcon
-                  className="navbar__profile-icon"
+                  className="navbar__menu-icon"
                   color="primary"
-                  icon={personCircle}
+                  icon={personCircleOutline}
                 ></IonIcon>
               </IonButton>
             </IonButtons>
-
-            <IonPopover dismiss-on-select trigger={"profile-button"} triggerAction="click">
-              <IonItem>
-                <IonText className="profile-dropdown__name">{user.name}</IonText>
-              </IonItem>
-              <IonButton fill="clear" onClick={handleChangeName}>
-                <IonIcon slot="start" icon={createOutline} />
-                Edit nickname
-              </IonButton>
-              <IonButton fill="clear" onClick={logout}>
-                <IonIcon slot="start" icon={logOutOutline} />
-                Log out
-              </IonButton>
-            </IonPopover>
+            <Menu user={user} />
           </>
         )}
       </IonToolbar>

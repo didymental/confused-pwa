@@ -7,7 +7,7 @@ interface ToastState {
 interface ToastProps {
   header: string;
   message?: string;
-  color: "success" | "danger" | "primary";
+  color: "success" | "danger";
 }
 
 export const useToast = (): ToastState => {
@@ -19,7 +19,7 @@ export const useToast = (): ToastState => {
       message: message,
       duration: 1000,
       position: "top",
-      color: color === "success" ? "toastsuccess" : color,
+      color: color === "success" ? "toastsuccess" : "toastdanger",
     });
   };
 

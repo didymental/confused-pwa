@@ -1,9 +1,6 @@
 .login-form__profile-icon {
-  font-weight: bold;
-  font-family: berlinSans;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 7em;
+  margin: 0 auto;
 }
 
 .login-form__grid {
@@ -34,5 +31,6 @@
 }
 
 .login-form__button {
-  background-color: var(--ion-color-primary);
+  --background: var(--ion-color-primary);
+  width: 100%;
 }

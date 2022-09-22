@@ -22,7 +22,7 @@ import { SessionEntity } from "../../types/session";
 import { useAuthentication } from "../../hooks/authentication/useAuthentication";
 import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
 
-const SessionForm: React.FunctionComponent = () => {
+const SessionForm: React.FC = () => {
   const location = useLocation();
   const history = useHistory();
   const [isEdit, setIsEdit] = useState<boolean>(false);

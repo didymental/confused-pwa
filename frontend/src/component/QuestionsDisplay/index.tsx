@@ -10,11 +10,17 @@ const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questi
         <IonLabel className="questions__list-header-label">Questions from Students</IonLabel>
       </IonListHeader>
       <IonList className="questions__list">
-        {questions.map((question: QuestionData) => (
-          <IonItem className="questions__item is-transparent" key={question.question_content}>
-            {'"' + question.question_content + '"'}
+        {questions.length === 0 ? (
+          <IonItem className="questions__item is-transparent" key={"no-questions"}>
+            There are currently no questions
           </IonItem>
-        ))}
+        ) : (
+          questions.map((question: QuestionData) => (
+            <IonItem className="questions__item" key={question.question_content}>
+              {'"' + question.question_content + '"'}
+            </IonItem>
+          ))
+        )}
       </IonList>
     </IonCard>
   );

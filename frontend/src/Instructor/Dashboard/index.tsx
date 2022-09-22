@@ -27,8 +27,13 @@ const DashboardPage: React.FC = () => {
   const [present, dismiss] = useIonLoading();
   const renderMainContent = () => {
     if (sessions) {
-      return sessions.map((sessionData) => (
-        <SessionViewCard key={sessionData.id} deleteHandler={handleDelete} session={sessionData} />
+      return sessions.map((sessionData, index) => (
+        <SessionViewCard
+          key={sessionData.id}
+          deleteHandler={handleDelete}
+          session={sessionData}
+          index={index}
+        />
       ));
     } else {
       return (
@@ -80,7 +85,7 @@ const DashboardPage: React.FC = () => {
         </IonGrid>
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton
-            color="primary"
+            color="dark-purple"
             className="dashboard__add-session-button"
             onClick={() => history.push("/instructor/session/create")}
           >

@@ -1,5 +1,16 @@
-.card__subtitle {
-  margin-top: 1em;
+.card {
+  &__topbar {
+    margin-top: -10px;
+  }
+
+  &__container {
+    padding: 10px;
+    padding-top: 0px;
+  }
+
+  &__subtitle {
+    margin-top: 1em;
+  }
 }
 
 .dashboard__ellipsis-button {

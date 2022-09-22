@@ -7,6 +7,7 @@ import {
   IonCol,
   IonGrid,
   IonIcon,
+  IonItemDivider,
   IonPopover,
   IonRow,
   useIonAlert,
@@ -17,22 +18,27 @@ import { SessionEntity } from "../../../types/session";
 import { getFormattedDate } from "../../../utils/date";
 import "./index.scss";
 
+const colors = ["yellow", "green", "red", "blue"];
+
 interface SessionViewCardProps {
   session: SessionEntity;
+  index: number;
   deleteHandler: (sessionId: number) => void;
 }
 
-const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, deleteHandler }) => {
+const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index, deleteHandler }) => {
   const { id: sessionId, name, is_open: isOpen, created_date_time: dateTime } = session;
   const createdDate = dateTime ? getFormattedDate(dateTime) : null;
+  const colorId = sessionId % 4;
+  const [presentAlert] = useIonAlert();
 
   const history = useHistory();
 
   const editClickHandler = (sessionId: number) => {
     history.push(`/instructor/session/edit?id=${sessionId}&name=${name}`);
   };
-  const [presentAlert] = useIonAlert();
-  const deleteClickHandler = (sessionId: number) => {
+
+  const deleteClickHandler = () => {
     presentAlert({
       header: "Are you sure you want to delete this session?",
       subHeader: "This action is irreversible!",
@@ -50,10 +56,15 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, deleteHandle
     });
   };
 
+  const startHandler = () => {
+    history.push(`/instructor/session/${sessionId}`);
+  };
+
   return (
     <>
       <IonCard key={sessionId}>
-        <IonCardContent>
+        <IonItemDivider color={colors[colorId]} className="card__topbar"></IonItemDivider>
+        <IonCardContent className="card__container">
           <IonGrid>
             <IonRow>
               <IonCol size="10">
@@ -82,7 +93,7 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, deleteHandle
                     <IonIcon slot="start" icon={createOutline}></IonIcon>
                     Edit Session
                   </IonButton>
-                  <IonButton fill="clear" onClick={() => deleteClickHandler(sessionId)}>
+                  <IonButton fill="clear" onClick={deleteClickHandler}>
                     <IonIcon slot="start" icon={trashOutline}></IonIcon>
                     Delete Session
                   </IonButton>
@@ -91,11 +102,11 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, deleteHandle
             </IonRow>
           </IonGrid>
           {isOpen ? (
-            <IonButton fill="solid" expand="block" color="secondary">
+            <IonButton fill="solid" expand="block" color={"primary"}>
               ONGOING
             </IonButton>
           ) : (
-            <IonButton fill="solid" expand="block" color="success">
+            <IonButton fill="outline" expand="block" color={"primary"} onClick={startHandler}>
               START
             </IonButton>
           )}
