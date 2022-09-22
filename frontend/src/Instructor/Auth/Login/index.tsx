@@ -35,7 +35,6 @@ const LoginPage: React.FC = () => {
   const { user, login } = useAuthentication();
   const [present, dismiss] = useIonLoading();
   const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
-
   const page = useRef(undefined);
 
   useEffect(() => {
@@ -126,7 +125,10 @@ const LoginPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <p className="login-form__auxilliary-text--small">
-                By clicking on Login, you agree to our <Link to="/">Privacy Policy</Link>
+                By clicking on Login, you agree to our{" "}
+                <Link to="#" id="open-modal">
+                  Privacy Policy
+                </Link>
               </p>
               <IonButton onClick={handleLogin} className="login-form__button">
                 Login
