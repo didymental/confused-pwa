@@ -7,6 +7,12 @@
       "sizes": "512x512 192x192 32x32",
       "type": "image/x-icon",
       "purpose": "maskable"
+    },
+    {
+      "src": "confused-logo-light.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "start_url": ".",
