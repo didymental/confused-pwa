@@ -307,7 +307,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
               }}
             >
               <IonSegmentButton value="questions">
-                <IonLabel>Questions</IonLabel>
+                <IonLabel>Questions ({questions.length})</IonLabel>
               </IonSegmentButton>
               <IonSegmentButton value="students">
                 <IonLabel>Students ({students.length})</IonLabel>
