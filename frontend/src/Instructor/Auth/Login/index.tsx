@@ -17,7 +17,7 @@ import "./index.scss";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
 import { LoginRequest } from "../../../types/auth";
 import ConfusedIcon from "../../../component/ConfusedIcon";
-import { Redirect } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 function validateEmail(email: string) {
   const re =
@@ -118,13 +118,13 @@ const LoginPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <p className="login-form__auxilliary-text--small">
-                By clicking LOGIN you agree to our <a href="/">Policy</a>
+                By clicking on Login, you agree to our <Link to="/">Policy</Link>
               </p>
               <IonButton onClick={handleLogin} className="login-form__button">
                 Login
               </IonButton>
               <p className="login-form__auxilliary-text--middle">
-                Do not have an account? <a href="/signup">Sign up!</a>
+                Do not have an account? <Link to="/signup">Sign up now</Link>
               </p>
             </IonCol>
           </IonRow>
