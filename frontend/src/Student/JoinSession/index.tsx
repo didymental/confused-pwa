@@ -36,9 +36,10 @@ const JoinPage: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const { id }: any = useParams();
 
-  const invalidPINMsg: string = "Session code should only contain numbers.";
-  const invalidNameMsg: string =
-    "Name should only contain alphabets, numbers and spaces, and cannot be empty";
+  const emptyPINMsg: string = "Please enter a session code";
+  const emptyNameMsg: string = "Please enter a display name";
+  const invalidPINMsg: string = "Session code should only contain numbers";
+  const invalidNameMsg: string = "Name should only contain alphabets, numbers and spaces";
 
   const isNumericalOnly = (input: string) => {
     //Check that input consists of one or more numerical digits
@@ -56,6 +57,18 @@ const JoinPage: React.FC = () => {
   const handleJoinSession = async () => {
     setSessionIdInput(sessionIdInput.trim().substring(0, MAX_SESSION_PIN_LEN));
     setStudentName(studentName.trim().substring(0, MAX_STUDENT_NAME_LEN));
+
+    if (sessionIdInput.length === 0) {
+      setMessage(emptyPINMsg);
+      setIsError(true);
+      return;
+    }
+
+    if (studentName.length === 0) {
+      setMessage(emptyNameMsg);
+      setIsError(true);
+      return;
+    }
 
     if (!isNumericalOnly(sessionIdInput)) {
       setSessionIdInput("");
@@ -123,6 +136,7 @@ const JoinPage: React.FC = () => {
                   value={sessionIdInput}
                   placeholder={"123456"}
                   onIonChange={(e) => setSessionIdInput(e.detail.value!)}
+                  autofocus
                 ></IonInput>
               </IonItem>
             </IonCol>
