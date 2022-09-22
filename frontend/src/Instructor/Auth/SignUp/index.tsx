@@ -12,12 +12,13 @@ import {
   IonRow,
   useIonLoading,
 } from "@ionic/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./index.scss";
 import ConfusedIcon from "../../../component/ConfusedIcon";
 import Navbar from "../../../component/Navbar";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
 import { Link, Redirect } from "react-router-dom";
+import { PolicyModal } from "../../../component/PolicyModal";
 
 function validateEmail(email: string) {
   const re =
@@ -34,6 +35,12 @@ const SignUpPage: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const { user, signUp } = useAuthentication();
   const [present, dismiss] = useIonLoading();
+  const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
+  const page = useRef(undefined);
+
+  useEffect(() => {
+    setPresentingElement(page.current);
+  }, []);
 
   const handleSignUp = async () => {
     if (!email) {
@@ -132,17 +139,21 @@ const SignUpPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <p className="signup-form__auxilliary-text--small">
-                By clicking Sign up, you agree to our <Link to="/">Policy</Link>
+                By clicking Sign up, you agree to our{" "}
+                <Link to="#" id="open-modal">
+                  Privacy Policy
+                </Link>
               </p>
               <IonButton onClick={handleSignUp} className="signup-form__button">
                 Sign up
               </IonButton>
               <p className="signup-form__auxilliary-text--middle">
-                Have an account? <Link to="/login">Log in now</Link>
+                Have an account? <Link to="/login">Log in</Link>
               </p>
             </IonCol>
           </IonRow>
         </IonGrid>
+        <PolicyModal presentingElement={presentingElement} />
       </IonContent>
     </IonPage>
   );
