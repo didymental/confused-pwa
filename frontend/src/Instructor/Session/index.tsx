@@ -15,6 +15,9 @@ import {
   IonModal,
   IonList,
   IonItem,
+  IonLabel,
+  IonSegment,
+  IonSegmentButton,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router";
@@ -287,6 +290,16 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
                 {mapLevelToText[levelOfConfusion]}
               </IonText>
             </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonSegment value="warning">
+              <IonSegmentButton value="warning">
+                <IonLabel>Questions</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="segment">
+                <IonLabel>Students</IonLabel>
+              </IonSegmentButton>
+            </IonSegment>
           </IonRow>
           <IonRow>
             <QuestionsDisplay questions={questions} />
