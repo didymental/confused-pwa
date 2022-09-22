@@ -19,6 +19,7 @@ import {
   IonSpinner,
   IonProgressBar,
   IonLabel,
+  IonInput,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 
@@ -76,6 +77,14 @@ const StudentSessionPage: React.FC<void> = () => {
   const askQuestion = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
       return;
+    }
+
+    if (question === "") {
+      presentToast({
+        header: "Note!",
+        message: "Please type a question",
+        color: "danger",
+      });
     }
 
     profileAnalyticsTracker("Student ask questions");
@@ -281,11 +290,10 @@ const StudentSessionPage: React.FC<void> = () => {
             </IonSlides>
             <IonGrid className="student-session__grid">
               <IonRow className="textarea">
-                <IonTextarea
+                <IonInput
                   placeholder="Ask a question here..."
                   value={question.length === 0 ? null : question}
                   onIonChange={(e) => setQuestion(e.detail.value || "")}
-                  rows={1}
                 />
                 <IonButton fill="clear" onClick={() => askQuestion(ws.current)}>
                   <IonIcon icon={send} />
