@@ -30,6 +30,7 @@ import clear_reaction from "../../assets/thumbs-up.svg";
 import { StudentData } from "../../types/students";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
+import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
 
 const CLEAR_STATE = "clear";
 const CONFUSED_1_STATE = "confused-1";
@@ -58,7 +59,6 @@ const InstructorSessionPage: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
-    getStudentsAndQuestionsInSession(sessionId);
     ws.current = getWebSocketClient(true);
     ws.current.onopen = () => handleWsOpen(ws.current);
     ws.current.onmessage = (e) => handleMessageListener(e);
@@ -73,45 +73,6 @@ const InstructorSessionPage: React.FC = () => {
 
   // to re render screen for each update of student or questions
   useEffect(() => {}, [students, questions]);
-
-  // Gets all students and questions in the session
-  const getStudentsAndQuestionsInSession = (sessionId: number) => {
-    client
-      .get("/students/")
-      .then((res) => {
-        let studentsInCurrSession: StudentData[] = res.data.results.filter(
-          (x: { session: number }) => x.session === sessionId,
-        );
-        setStudents(studentsInCurrSession);
-
-        let setOfStudents: Set<number> = new Set();
-        studentsInCurrSession.forEach((student) => setOfStudents.add(student.id));
-
-        client
-          .get("/questions/")
-          .then((res) => {
-            let questionsFetched: QuestionData[] = res.data.results;
-
-            setQuestions(
-              questionsFetched.filter((question) => setOfStudents.has(question.student)),
-            );
-          })
-          .catch((err) => {
-            presentToast({
-              header: "Error occurred!",
-              message: err.response.data.detail,
-              color: "danger",
-            });
-          });
-      })
-      .catch((err) => {
-        presentToast({
-          header: "Error occurred!",
-          message: err.response.data.detail,
-          color: "danger",
-        });
-      });
-  };
 
   const handleWsOpen = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
@@ -139,6 +100,10 @@ const InstructorSessionPage: React.FC = () => {
       res.errors.map((err: string) => handleError(err));
     }
 
+    if (res.data.type === "success" && res.data.questions) {
+      setQuestions((questionsParam) => res.data.questions);
+    }
+
     // student post or vote question
     if (res.action === "create_question") {
       setQuestions((questionsParam) => {
@@ -164,24 +129,19 @@ const InstructorSessionPage: React.FC = () => {
     if (res.action === "update_student") {
       setStudents((studentsParam) => {
         let studentsCopy = [...studentsParam];
-        studentsCopy.forEach((student, index) => {
-          if (student.id === res.data.id) {
-            studentsCopy[index] = res.data;
-            return;
+        for (let i = 0; i < studentsCopy.length; i++) {
+          if (studentsCopy[i].id === res.data.id) {
+            studentsCopy[i] = res.data;
+            break;
           }
-        });
+        }
         return studentsCopy;
       });
     }
 
     if (res.action === "notify_joiners") {
       setStudents((studentsParam) => {
-        let studentsCopy = [...studentsParam];
-        for (let i = 0; i < res.data.students.length; i++) {
-          studentsCopy.push(res.data.students[i]);
-        }
-
-        return studentsCopy;
+        return res.data.students;
       });
     }
   };
@@ -230,10 +190,11 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
   const shareableLink = `${BASE_URL_FRONTEND}/student/session/` + sessionId;
+  const profileAnalyticsTracker = useAnalyticsTracker("Instructor In Session");
 
   useEffect(() => {
     setHasAnimated(true);
-  }, [props]);
+  }, [levelOfConfusion]);
 
   useEffect(() => {
     if (hasAnimated) {
@@ -241,10 +202,13 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
     }
   }, [hasAnimated]);
 
+  useEffect(() => {}, [questions, students]);
+
   const endSession = () => {
     if (!ws) {
       return;
     }
+    profileAnalyticsTracker("Instructor Ends Session");
     clearReactions();
     ws.send(
       JSON.stringify({
@@ -260,14 +224,26 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
   };
 
   const copyLinkToClipboard = () => {
+    profileAnalyticsTracker("Instructor Shares Session via copying Link");
     navigator.clipboard.writeText(shareableLink);
     presentAlert("Copied to clipboard!");
+  };
+
+  const shareSession = () => {
+    setOpenModal(true);
+    profileAnalyticsTracker("Instructor Shares Session");
+  };
+
+  const dismissModal = () => {
+    setOpenModal(false);
+    profileAnalyticsTracker("Instructor Closes Modal");
   };
 
   const clearReactions = () => {
     if (!ws) {
       return;
     }
+    profileAnalyticsTracker("Instructor Clears Reactions from In Session");
     ws.send(
       JSON.stringify({
         action: CLEAR_REACTIONS_ACTION,
@@ -313,9 +289,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
             </IonCol>
           </IonRow>
           <IonRow>
-            <IonCol>
-              <QuestionsDisplay questions={questions} />
-            </IonCol>
+            <QuestionsDisplay questions={questions} />
           </IonRow>
           <IonRow>
             <IonCol>
@@ -336,7 +310,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
             <IonCol>
               <IonButton
                 className="instructor-session__button instructor-session__button--share"
-                onClick={() => setOpenModal(true)}
+                onClick={shareSession}
               >
                 <IonIcon icon={shareSocial} size="small" color="tertiary" />
                 <IonCardContent>Share to students</IonCardContent>
@@ -354,57 +328,38 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
               </IonButton>
             </IonCol>
           </IonRow>
-
           <IonModal
             isOpen={openModal}
-            initialBreakpoint={0.75}
-            breakpoints={[0, 0.25, 0.5, 0.75]}
-            onIonModalWillDismiss={() => setOpenModal(false)}
+            initialBreakpoint={0.98}
+            breakpoints={[0, 0.25, 0.5, 0.75, 0.98]}
+            onIonModalWillDismiss={dismissModal}
           >
             <IonContent className="instructor-session__container">
-              {/* <IonHeader>
-                <IonToolbar>
-                  <IonTitle>Share via ...</IonTitle>
-                </IonToolbar>
-              </IonHeader> */}
-              <IonIcon className="instructor-session__share-icon" icon={link} />
-
               <IonItem lines="none">
                 <IonText className="instructor-session__text--header">Share the session</IonText>
               </IonItem>
-
               <IonItem lines="none">
                 <IonText className="instructor-session__text--subheading instructor-session__text--translucent">
                   Anyone with the session code or session link can join the session
                 </IonText>
               </IonItem>
-
               <IonItem lines="none" className="instructor-session__modal--item">
                 <IonText className="instructor-session__text--subheading">
                   {`Session code: ${sessionId}`}
                 </IonText>
               </IonItem>
-
-              <IonItem lines="none" className="instructor-session__modal--item">
-                <IonIcon icon={link} size="large" />
-                <IonCardContent>
-                  <IonText className="instructor-session__text--link">{shareableLink}</IonText>
-                </IonCardContent>
+              <IonItem lines="none" className="instructor-session__modal--link">
+                <IonText className="instructor-session__text--link">{shareableLink}</IonText>
               </IonItem>
-
-              {/* <IonItem className="instructor-session__modal--item"> */}
               <IonButton onClick={copyLinkToClipboard} className="instructor-session__button--copy">
                 <IonIcon icon={copy} size="medium" />
                 <IonCardContent>
                   <IonText>Copy</IonText>
                 </IonCardContent>
               </IonButton>
-              {/* </IonItem> */}
-
               <IonList className="instructor-session__modal--list">
                 <QRCode value={shareableLink} />
               </IonList>
-
               <IonCardContent>
                 <IonText className="instructor-session__text--subheading">
                   {`Ask your students to scan this QR code with their \"Confused\" or with their

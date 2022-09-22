@@ -7,6 +7,20 @@
   
 }
 
+.toolbar {
+  text-overflow: unset;
+  white-space: unset;
+  padding: 0.5rem;
+
+  &__title {
+    justify-content: center;
+    align-items: center;
+    font-size: medium;
+    font-weight: 900;
+    padding-left: 0.25rem;
+  }
+}
+
 .container {
   padding: 10vh;
 }
@@ -15,6 +29,14 @@
   height: 40vh;
   max-width: 800px;
   width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  align-items: top;
+  background-color: rgba(var(--ion-color-secondary-rgb), 0.5);
+  border-radius: 10px;
+  margin-top: 0.25rem;
 }
 
 ion-slides.slides {
