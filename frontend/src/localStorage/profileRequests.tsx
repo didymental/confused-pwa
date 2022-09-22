@@ -15,11 +15,9 @@ export function getOfflineProfileRequest(): OfflineProfileRequest | null {
 export function setOfflineProfileRequest(
   offlineSessionRequest?: OfflineProfileRequest | null,
 ): void {
-  console.log("hello in delete", offlineSessionRequest);
   if (offlineSessionRequest) {
     localStorage.setItem(OFFLINE_PROFILE_REQUEST, JSON.stringify(offlineSessionRequest));
   } else {
-    console.log("hello should remove");
     localStorage.removeItem(OFFLINE_PROFILE_REQUEST);
   }
 }

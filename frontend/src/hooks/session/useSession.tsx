@@ -103,13 +103,11 @@ export const useSessions = (isOnline = true): UpdateSessionsState => {
   const getSessions = async () => {
     try {
       const localSessionIds = getLocalSessionsIds();
-      console.log("session ids", localSessionIds);
       if (isOnline && localSessionIds?.length === 0) {
         const response = await api.session.getSessions();
         const { results } = response.data;
         setSessions(results);
       }
-      console.log("in get");
     } catch (err: any) {
       presentToast({
         header: "Fetch sessions failed!",
@@ -152,7 +150,7 @@ export const useSessions = (isOnline = true): UpdateSessionsState => {
         session = {
           id: fakeSessionId,
           instructor: user?.id ?? "",
-          created_date_time: new Date().toString(), // TODO: to check
+          created_date_time: new Date().toString(),
           ...createSessionRequest,
         };
         setSession(session);
