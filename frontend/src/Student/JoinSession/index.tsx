@@ -20,6 +20,7 @@ import { useJoinSession } from "../../hooks/joinsession/useJoinSession";
 import ConfusedIcon from "../../component/ConfusedIcon";
 import { JoinSessionRequest } from "../../types/join";
 import { useParams } from "react-router";
+import { useToast } from "../../hooks/util/useToast";
 
 const JoinPage: React.FC = () => {
   const MAX_SESSION_PIN_LEN = 6;
@@ -86,13 +87,14 @@ const JoinPage: React.FC = () => {
     if (id === undefined) {
       return;
     }
+    console.log(id);
     setSessionIdInput(id);
-  }, []);
+  }, [id, setSessionIdInput]);
 
   return (
     <IonPage>
       <IonContent fullscreen className="join-page__container">
-        <IonGrid className="join-page__content">
+        <IonGrid className="join-page__grid">
           <IonRow>
             <IonCol>
               <IonAlert
@@ -112,7 +114,7 @@ const JoinPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonItem fill="outline" className="join-page__input">
+              <IonItem fill="outline" className="join-page__field">
                 <IonLabel position="stacked">Session Code</IonLabel>
                 <IonInput
                   type="tel"
@@ -128,7 +130,7 @@ const JoinPage: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonItem fill="outline" className="join-page__input">
+              <IonItem fill="outline" className="join-page__field">
                 <IonLabel position="stacked">Display Name</IonLabel>
                 <IonInput
                   type="text"

@@ -34,5 +34,6 @@
 }
 
 .signup-form__button {
-  color: var(--ion-color-primary);
+  --background: var(--ion-color-primary);
+  width: 100%;
 }
