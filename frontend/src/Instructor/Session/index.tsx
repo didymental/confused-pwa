@@ -1,7 +1,6 @@
 import "./index.scss";
 import {
   IonButton,
-  IonCard,
   IonContent,
   IonGrid,
   IonPage,
@@ -14,9 +13,6 @@ import {
   useIonAlert,
   IonCardContent,
   IonModal,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonList,
   IonItem,
 } from "@ionic/react";
@@ -24,7 +20,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router";
 import QRCode from "react-qr-code";
 import { power, shareSocial, link, copy } from "ionicons/icons";
-import client, { BASE_URL, getWebSocketClient } from "../../api/client";
+import client, { getWebSocketClient } from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import clear from "../../assets/clear-bg.svg";
 import confused_1 from "../../assets/confused-1-bg.svg";

@@ -33,7 +33,7 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index }) => 
   const colorId = sessionId % 4;
 
   const history = useHistory();
-  const { getSessions, deleteSession } = useSessions();
+  const { getSessions, deleteSession } = useSessions(false);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
