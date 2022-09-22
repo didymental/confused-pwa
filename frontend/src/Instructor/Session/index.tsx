@@ -313,8 +313,6 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
                 <IonLabel>Students ({students.length})</IonLabel>
               </IonSegmentButton>
             </IonSegment>
-          </IonRow>
-          <IonRow>
             {selectedTab === "questions" ? (
               <QuestionsDisplay questions={questions} />
             ) : (
