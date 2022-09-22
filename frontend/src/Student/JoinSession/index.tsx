@@ -154,11 +154,6 @@ const JoinPage: React.FC = () => {
                   onIonChange={(e) => setStudentName(e.detail.value!)}
                 ></IonInput>
               </IonItem>
-            </IonCol>
-          </IonRow>
-
-          <IonRow>
-            <IonCol>
               <p
                 className="
                 join-page__auxilliary-text--medium
@@ -168,6 +163,11 @@ const JoinPage: React.FC = () => {
                 This name will be displayed to your instructor. You can&apos;t change this name
                 later.
               </p>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
+            <IonCol>
               <IonButton
                 color="secondary"
                 size="default"
