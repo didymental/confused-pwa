@@ -6,23 +6,17 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonPopover,
   IonRow,
-  IonText,
   IonToolbar,
-  useIonAlert,
 } from "@ionic/react";
 import { useLocation } from "react-router-dom";
 import logo from "../../assets/logo.svg";
-import { personCircle, logOutOutline, createOutline } from "ionicons/icons";
-import { useToast } from "../../hooks/util/useToast";
-import { useAuthentication } from "../../hooks/authentication/useAuthentication";
-import { useProfile } from "../../hooks/authentication/useProfile";
+import { personCircleOutline } from "ionicons/icons";
 import { getUser } from "../../localStorage";
 import { useEffect, useState } from "react";
 import { Detector } from "react-detect-offline";
 import { getSessions } from "../../api/session";
+import Menu from "../Menu";
 
 interface NavbarProps {
   title?: string;
@@ -121,28 +115,15 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         {showProfileIcon && (
           <>
             <IonButtons slot="end">
-              <IonButton id="profile-button">
+              <IonButton id="menu-button">
                 <IonIcon
-                  className="navbar__profile-icon"
+                  className="navbar__menu-icon"
                   color="primary"
-                  icon={personCircle}
+                  icon={personCircleOutline}
                 ></IonIcon>
               </IonButton>
             </IonButtons>
-
-            <IonPopover dismiss-on-select trigger={"profile-button"} triggerAction="click">
-              <IonItem>
-                <IonText className="profile-dropdown__name">{user.name}</IonText>
-              </IonItem>
-              <IonButton fill="clear" onClick={handleChangeName}>
-                <IonIcon slot="start" icon={createOutline} />
-                Edit nickname
-              </IonButton>
-              <IonButton fill="clear" onClick={logout}>
-                <IonIcon slot="start" icon={logOutOutline} />
-                Log out
-              </IonButton>
-            </IonPopover>
+            <Menu user={user} />
           </>
         )}
       </IonToolbar>

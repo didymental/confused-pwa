@@ -58,9 +58,9 @@ export const useStudentId = () => {
 
 export const useSessionDetails = () => {
   const details = {
-    session: useRecoilValue(sessionIdState),
-    name: useRecoilValue(studentNameState),
-    id: useRecoilValue(studentIdState),
+    sessionId: useRecoilValue(sessionIdState),
+    displayName: useRecoilValue(studentNameState),
+    studentId: useRecoilValue(studentIdState),
   };
 
   return details;

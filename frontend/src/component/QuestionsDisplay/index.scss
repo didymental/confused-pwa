@@ -10,6 +10,7 @@
     display: flex;
     flex-direction: column;
 
+
     /**ELEMENT**/
     &__list-header-label {
         font-size: large;
@@ -27,5 +28,7 @@
     &__item {
         font-size: medium;
         --background: transparent;
+        word-wrap: break-word;
+        word-break: break-all;
     }
 }

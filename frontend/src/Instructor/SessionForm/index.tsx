@@ -23,7 +23,7 @@ import { useAuthentication } from "../../hooks/authentication/useAuthentication"
 import { useOnlineStatus } from "../../hooks/util/useOnlineStatus";
 import { Detector } from "react-detect-offline";
 
-const SessionForm: React.FunctionComponent = () => {
+const SessionForm: React.FC = () => {
   const location = useLocation();
   const history = useHistory();
   const [isEdit, setIsEdit] = useState<boolean>(false);

@@ -175,7 +175,7 @@ export const useSessions = (isOnline = true): UpdateSessionsState => {
       await api.session.deleteSession(session_id);
 
       sessionAnalyticsTracker("Deleted session");
-      presentToast({ header: "Delete session successfully!", color: "success" });
+      presentToast({ header: "Delete session success!", color: "success" });
     } catch (err: any) {
       presentToast({
         header: "Delete sessions failed!",

@@ -14,11 +14,12 @@ import {
 } from "@ionic/react";
 import { scan } from "ionicons/icons";
 import "../join-page.scss";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSessionIdInput, useStudentName } from "../../hooks/joinsession/useJoinDetails";
 import { useJoinSession } from "../../hooks/joinsession/useJoinSession";
 import ConfusedIcon from "../../component/ConfusedIcon";
 import { JoinSessionRequest } from "../../types/join";
+import { useParams } from "react-router";
 
 const JoinPage: React.FC = () => {
   const MAX_SESSION_PIN_LEN = 6;
@@ -32,6 +33,7 @@ const JoinPage: React.FC = () => {
 
   const [isError, setIsError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const { id }: any = useParams();
 
   const invalidPINMsg: string = "Session code should only contain numbers.";
   const invalidNameMsg: string =
@@ -78,45 +80,14 @@ const JoinPage: React.FC = () => {
     });
     await joinSession(joinRequest);
     dismiss();
-
-    /* Dummy API call for debugging purposes */
-
-    // const api = axios.create({
-    //   baseURL: "https://reqres.in/api/",
-    // });
-
-    // let resStatus: number = 0;
-    // if (sessionIdInput === "123456") {
-    //   //Simulating a valid session PIN
-    //   api
-    //     .get("/unknown/2")
-    //     .then((res) => {
-    //       console.log(res);
-    //       resStatus = res.status;
-    //       history.push("/student/session/:id");
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       setMessage(error.message + unknownErrorMsg);
-    //       setIsError(true);
-    //     });
-    // } else {
-    //   //Simulating session not found
-    //   api
-    //     .get("/unknown/23")
-    //     .then((res) => {
-    //       console.log(res);
-    //       resStatus = res.status;
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       setMessage(sessionNotFoundMsg);
-    //       setIsError(true);
-    //     });
-    // }
-
-    /* End of dummy API call for debugging purposes */
   };
+
+  useEffect(() => {
+    if (id === undefined) {
+      return;
+    }
+    setSessionIdInput(id);
+  }, []);
 
   return (
     <IonPage>
