@@ -40,7 +40,7 @@
   align-items: center;
   justify-content: start;
   align-items: top;
-  background-color: rgba(var(--ion-color-secondary-rgb), 0.5);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   margin-top: 0.25rem;
 }
@@ -64,7 +64,7 @@ ion-slides.slides {
 }
 
 .textarea {
-  background-color: rgba(var(--ion-color-secondary-rgb), 0.5);
+  background: rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
