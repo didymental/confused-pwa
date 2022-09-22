@@ -16,11 +16,13 @@ import { add } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { useSessions } from "../../hooks/session/useSession";
 import { useEffect, useState } from "react";
+import { Detector } from "react-detect-offline";
 
 const DashboardPage: React.FC = () => {
   const history = useHistory();
+  const [isOnline, setIsOnline] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { sessions, getSessions } = useSessions();
+  const { sessions, getSessions, sendSessionSavedData } = useSessions(isOnline);
 
   const renderMainContent = () => {
     if (sessions) {
@@ -44,11 +46,24 @@ const DashboardPage: React.FC = () => {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    if (isOnline) {
+      sendSessionSavedData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline]);
+
   return (
     <IonPage>
       <Navbar title={"Dashboard"} showProfileIcon={true} showLogo={true} />
       <IonContent fullscreen>
         <IonGrid className="dashboard__grid">
+          <Detector
+            render={({ online }) => {
+              setIsOnline(online);
+              return <></>;
+            }}
+          />
           <IonRow>
             <IonCol className={isLoading ? "dashboard__column" : ""}>
               {isLoading ? (

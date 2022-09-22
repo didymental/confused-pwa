@@ -53,7 +53,7 @@ export const useAuthentication = (): UpdateAuthenticationState => {
   const { presentToast } = useToast();
   const userAnalyticsTracker = useAnalyticsTracker("User");
 
-  const { createSampleSessions, getSessions } = useSessions();
+  const { createSampleSessions, getSessions } = useSessions(true);
 
   const signUp = async (signUpRequest: SignUpRequest) => {
     try {

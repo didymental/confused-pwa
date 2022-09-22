@@ -4,6 +4,10 @@ import { CreateSessionRequest, SessionEntity } from "../../types/session";
 import api from "../../api";
 import { useToast } from "../util/useToast";
 import useAnalyticsTracker from "../util/useAnalyticsTracker";
+import { useOnlineStatus } from "../util/useOnlineStatus";
+import { CREATE_SESSION_DATA_ID, EDIT_SESSION_DATA_ID, getUser } from "../../localStorage";
+import { useEffect } from "react";
+import { sleep } from "../../utils/time";
 
 const sessionsState = atom({
   key: "SESSIONS_ATOM",
@@ -39,10 +43,14 @@ const useSessionsState = () => {
 interface UpdateSessionsState {
   sessions: SessionEntity[] | null;
   getSessions: () => Promise<void>;
-  createSession: (createSessionRequest: CreateSessionRequest) => Promise<void>;
+  createSession: (
+    createSessionRequest: CreateSessionRequest,
+    reconnected?: boolean,
+  ) => Promise<void>;
   createSampleSessions: () => Promise<void>;
-  updateSession: (updateSessionRequest: SessionEntity) => Promise<void>;
+  updateSession: (updateSessionRequest: SessionEntity, reconnected?: boolean) => Promise<void>;
   deleteSession: (sessionId: number) => Promise<void>;
+  sendSessionSavedData: () => Promise<void>;
 }
 
 const sampleSessions = [
@@ -60,11 +68,13 @@ const sampleSessions = [
   },
 ];
 
-export const useSessions = (): UpdateSessionsState => {
+export const useSessions = (isOnline = true): UpdateSessionsState => {
   const history = useHistory();
   const { sessions, setSessions, setSession } = useSessionsState();
   const { presentToast } = useToast();
   const sessionAnalyticsTracker = useAnalyticsTracker("Session");
+  // const isOnline = useOnlineStatus();
+  const user = getUser();
 
   const getSessions = async () => {
     try {
@@ -79,15 +89,33 @@ export const useSessions = (): UpdateSessionsState => {
     }
   };
 
-  const createSession = async (createSessionRequest: CreateSessionRequest) => {
+  const createSession = async (
+    createSessionRequest: CreateSessionRequest,
+    reonnected: boolean = false,
+  ) => {
     try {
-      const response = await api.session.createSession(createSessionRequest);
-      const session = response.data;
-      setSession(session);
-
-      sessionAnalyticsTracker("Created session");
-      history.push("/instructor/dashboard");
-      presentToast({ header: "Create session success!", color: "success" });
+      let session: SessionEntity;
+      if (!isOnline) {
+        localStorage.setItem(CREATE_SESSION_DATA_ID, JSON.stringify(createSessionRequest));
+        session = {
+          id: sessions?.length ?? 0,
+          instructor: user?.id ?? "",
+          created_date_time: new Date().toJSON(),
+          ...createSessionRequest,
+        };
+        setSession(session);
+      } else {
+        const response = await api.session.createSession(createSessionRequest);
+        session = response.data;
+        sessionAnalyticsTracker("Created session");
+        getSessions();
+      }
+      if (reonnected) {
+        localStorage.removeItem(CREATE_SESSION_DATA_ID);
+      } else {
+        history.push("/instructor/dashboard");
+        presentToast({ header: "Create session successfully!", color: "success" });
+      }
     } catch (err: any) {
       presentToast({
         header: "Create sessions failed!",
@@ -109,16 +137,32 @@ export const useSessions = (): UpdateSessionsState => {
     }
   };
 
-  const updateSession = async (sessionEntity: SessionEntity) => {
+  const updateSession = async (sessionEntity: SessionEntity, reconnected = false) => {
     try {
-      const response = await api.session.updateSession(sessionEntity);
-      const session = response.data;
-      setSession(session);
+      let session: SessionEntity;
+      if (!isOnline) {
+        localStorage.setItem(EDIT_SESSION_DATA_ID, JSON.stringify(sessionEntity));
+        session = {
+          ...sessionEntity,
+        };
+      } else {
+        const response = await api.session.updateSession(sessionEntity);
+        session = response.data;
+        sessionAnalyticsTracker("Updated session");
+      }
 
-      sessionAnalyticsTracker("Updated session");
-      history.push("/instructor/dashboard");
-      presentToast({ header: "Edit session success!", color: "success" });
+      setSession(session);
+      if (reconnected) {
+        localStorage.removeItem(EDIT_SESSION_DATA_ID);
+      } else {
+        history.push("/instructor/dashboard");
+        presentToast({ header: "Edit session successfully!", color: "success" });
+      }
     } catch (err: any) {
+      if (localStorage.getItem(EDIT_SESSION_DATA_ID)) {
+        // if user attempt to edit a session created during offline
+        localStorage.removeItem(EDIT_SESSION_DATA_ID);
+      }
       presentToast({
         header: "Edit sessions failed!",
         color: "danger",
@@ -139,6 +183,25 @@ export const useSessions = (): UpdateSessionsState => {
       });
     }
   };
+
+  //executes when internet is offline
+  // sends the locally stored data into the end point when stores it in DB
+  // once stored, removes it from local storage
+  const sendSessionSavedData = async () => {
+    if (localStorage.getItem(EDIT_SESSION_DATA_ID)) {
+      updateSession(JSON.parse(localStorage.getItem(EDIT_SESSION_DATA_ID) ?? ""), true).then(() =>
+        localStorage.removeItem(EDIT_SESSION_DATA_ID),
+      );
+    }
+
+    if (localStorage.getItem(CREATE_SESSION_DATA_ID)) {
+      createSession(JSON.parse(localStorage.getItem(CREATE_SESSION_DATA_ID) ?? ""), true).then(
+        () => {
+          localStorage.removeItem(CREATE_SESSION_DATA_ID);
+        },
+      );
+    }
+  };
   return {
     sessions,
     getSessions,
@@ -146,5 +209,6 @@ export const useSessions = (): UpdateSessionsState => {
     createSampleSessions,
     updateSession,
     deleteSession,
+    sendSessionSavedData,
   };
 };
