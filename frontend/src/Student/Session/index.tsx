@@ -20,7 +20,6 @@ import {
   IonSegment,
   IonSegmentButton,
 } from "@ionic/react";
-import { useKeyboard } from "@capacitor-community/keyboard-react";
 import React, { useEffect, useState, useRef } from "react";
 import { send } from "ionicons/icons";
 import confused_reaction from "../../assets/confused-face.svg";
@@ -61,7 +60,6 @@ const StudentSessionPage: React.FC<void> = () => {
   const profileAnalyticsTracker = useAnalyticsTracker("Student In Session");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedTab, setSelectedTab] = useState<string>("questions");
-  const { isOpen, keyboardHeight } = useKeyboard();
 
   useEffect(() => {
     ws.current = getWebSocketClient(false);
@@ -77,21 +75,6 @@ const StudentSessionPage: React.FC<void> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (isOpen) {
-      console.log("i am scrolling");
-      window.scroll({
-        top: keyboardHeight,
-        behavior: "smooth",
-      });
-    } else {
-      window.scroll({
-        top: keyboardHeight ? -keyboardHeight : 0,
-        behavior: "smooth",
-      });
-    }
-  }, [isOpen, keyboardHeight]);
-
   const askQuestion = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {
       return;
@@ -104,6 +87,7 @@ const StudentSessionPage: React.FC<void> = () => {
         color: "danger",
       });
     }
+    setQuestion("");
 
     profileAnalyticsTracker("Student ask questions");
     wsCurrent.send(
@@ -113,8 +97,6 @@ const StudentSessionPage: React.FC<void> = () => {
         request_id: Math.random(),
       }),
     );
-
-    setQuestion("");
   };
 
   const handleWsOpen = (wsCurrent: WebSocket | null) => {};
@@ -256,10 +238,6 @@ const StudentSessionPage: React.FC<void> = () => {
     history.goBack();
   };
 
-  const openKeyboard = () => {};
-
-  const closeKeyboard = () => {};
-
   return (
     <IonPage className="student-session">
       {isLoading ? (
@@ -321,12 +299,14 @@ const StudentSessionPage: React.FC<void> = () => {
                 </IonSlides>
               </IonRow>
               <IonRow className="textarea">
-                <IonInput
+                <input
                   placeholder="Ask a question here..."
-                  value={question.length === 0 ? null : question}
-                  onIonChange={(e) => setQuestion(e.detail.value || "")}
-                  onIonFocus={openKeyboard}
-                  onIonBlur={closeKeyboard}
+                  type="text"
+                  onChange={(e) => {
+                    setQuestion(e.target.value);
+                  }}
+                  className="textarea__input"
+                  value={question}
                 />
                 <IonButton fill="clear" onClick={() => askQuestion(ws.current)}>
                   <IonIcon icon={send} />
