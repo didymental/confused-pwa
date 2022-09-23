@@ -29,13 +29,12 @@ const JoinPage: React.FC = () => {
 
   const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
   const { studentName, setStudentName } = useStudentName();
-  // const { joinSession } = useJoinSession();
 
   const [isError, setIsError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { id }: any = useParams();
   const history = useHistory();
-  const { sessionId, setSessionId } = useSessionId();
+  const { setSessionId } = useSessionId();
 
   const emptyPINMsg: string = "Please enter a session code";
   const emptyNameMsg: string = "Please enter a display name";
