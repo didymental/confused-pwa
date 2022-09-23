@@ -12,15 +12,13 @@ import { close } from "ionicons/icons";
 import "../join-page.scss";
 import { useState, useEffect } from "react";
 import QrScanner from "qr-scanner";
-import { useHistory, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { useSessionIdInput } from "../../hooks/joinsession/useJoinDetails";
 
 const Scanner: React.FC = (props) => {
   const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
   const [shouldGoBack, setShouldGoBack] = useState(false);
   const [isQRScanned, setIsQRScanned] = useState(false);
-
-  const history = useHistory();
 
   let [qrScanner, setQrScanner] = useState<QrScanner>();
 

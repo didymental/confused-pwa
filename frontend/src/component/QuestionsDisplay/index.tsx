@@ -1,6 +1,6 @@
 import "./index.scss";
 import React from "react";
-import { IonCard, IonList, IonListHeader, IonItem, IonLabel } from "@ionic/react";
+import { IonCard, IonList, IonItem } from "@ionic/react";
 import { QuestionData } from "../../types/questions";
 
 const QuestionsDisplay: React.FC<{ questions: QuestionData[] | [] }> = ({ questions }) => {

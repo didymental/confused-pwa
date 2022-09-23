@@ -6,7 +6,6 @@ import {
   IonButtons,
   IonButton,
   IonContent,
-  IonItem,
   IonText,
 } from "@ionic/react";
 import React, { useRef } from "react";
