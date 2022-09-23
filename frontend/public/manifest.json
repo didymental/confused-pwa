@@ -9,11 +9,6 @@
       "purpose": "maskable"
     },
     {
-      "src": "confused-logo-light.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }, {
       "src": "confused-logo.png",
       "sizes": "512x512",
       "type": "image/png",
@@ -23,5 +18,6 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "prefer_related_applications": true
 }

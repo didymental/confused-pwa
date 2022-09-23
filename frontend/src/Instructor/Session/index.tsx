@@ -367,34 +367,30 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
               <IonItem lines="none">
                 <IonText className="instructor-session__text--header">Share the session</IonText>
               </IonItem>
-              <IonItem lines="none">
-                <IonText className="instructor-session__text--subheading instructor-session__text--translucent">
-                  Anyone with the session code or session link can join the session
-                </IonText>
-              </IonItem>
               <IonItem lines="none" className="instructor-session__modal--item">
-                <IonText className="instructor-session__text--subheading">
-                  {`Session code: ${sessionId}`}
+                <IonText className="instructor-session__text--secondary">
+                  {"Session code: "}
+                  <IonText className="instructor-session__text--code">{sessionId}</IonText>
                 </IonText>
               </IonItem>
+              <IonList className="instructor-session__modal--list">
+                <QRCode value={shareableLink} />
+              </IonList>
+              <IonCardContent>
+                <IonText className="instructor-session__text--subheading">
+                  {`Scan this QR code via the student page, or with your
+                    preferred QR scanner`}
+                </IonText>
+              </IonCardContent>
               <IonItem lines="none" className="instructor-session__modal--link">
                 <IonText className="instructor-session__text--link">{shareableLink}</IonText>
               </IonItem>
               <IonButton onClick={copyLinkToClipboard} className="instructor-session__button--copy">
                 <IonIcon icon={copy} size="medium" />
                 <IonCardContent>
-                  <IonText>Copy</IonText>
+                  <IonText>COPY</IonText>
                 </IonCardContent>
               </IonButton>
-              <IonList className="instructor-session__modal--list">
-                <QRCode value={shareableLink} />
-              </IonList>
-              <IonCardContent>
-                <IonText className="instructor-session__text--subheading">
-                  {`Ask your students to scan this QR code with their "Confused" or with their
-                    preferred QR scanner`}
-                </IonText>
-              </IonCardContent>
             </IonContent>
           </IonModal>
         </IonGrid>
@@ -409,7 +405,6 @@ const ReactionsDisplay: React.FC<{
 }> = ({ students, setLevelOfConfusion }) => {
   const [countOfClear, setCountOfClear] = useState<number>(0);
   const [countOfConfused, setCountOfConfused] = useState<number>(0);
-  const [ratio, setRatio] = useState<number>(0.5);
 
   useEffect(() => {
     let countClear = 0;
@@ -426,29 +421,20 @@ const ReactionsDisplay: React.FC<{
 
     setCountOfClear(countClear);
     setCountOfConfused(countConfused);
-
-    if (countClear === 0 && countConfused === 0) {
-      setRatio(0.5);
-    } else {
-      let ratioOfConfused = countConfused / (countClear + countConfused);
-      setRatio(ratioOfConfused);
-    }
   }, [students]);
 
   useEffect(() => {
-    if (ratio > 0.7 && ratio <= 0.9) {
+    if (countOfConfused / students.length >= 0.5) {
+      setLevelOfConfusion(CONFUSED_2_STATE);
+      return;
+    }
+    if (countOfConfused >= 1) {
       setLevelOfConfusion(CONFUSED_1_STATE);
       return;
     }
 
-    if (ratio > 0.9) {
-      setLevelOfConfusion(CONFUSED_2_STATE);
-      return;
-    }
-
     setLevelOfConfusion(CLEAR_STATE);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ratio]);
+  }, [students, countOfConfused, setLevelOfConfusion]);
 
   return (
     <IonGrid>
