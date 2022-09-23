@@ -70,4 +70,16 @@ ion-slides.slides {
   justify-content: center;
   padding-left: 1em;
   border-radius: 1em;
+
+  &__input {
+    background: transparent;
+    width: 80%;
+    border: 0px;
+    display: flex;
+    border-radius: 0.25em;
+
+    &:focus{
+      border: 0;
+    }
+  }
 }

@@ -4,6 +4,15 @@
 <p align='center'>AY22/23 CS3216 Assignment 3</p>
 <p align="center"><a href="https://confusedsession.vercel.app">Give it a try now!</a></p>
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Team Members](#team-members)
+3. [User Guide](#user-guide)
+   - [Instructor](#instructor)
+   - [Student](#student)
+4. [Development Guide](#development-guide)
+
 ## Overview
 
 Confused is a Progressive Web App (PWA) designed to help students give instructors real time feedback. It is traditionally uneasy for shy students to raise a concern publically in a big classroom, so Confused is here to help reduce the mental barriers for students to say "I'm confused" during lessons.
@@ -26,7 +35,53 @@ Members of CS3216 Assignment 3 Group 6:
 | Toh Kar Wi          | A0217996J   | Backend Developer    |
 | Zhang Ziqing        | A0223145R   | Frontend Developer   |
 
-## Set up local environment
+## User Guide
+
+Choose to join as instructor or student upon landing at this page:
+
+<p align="center"><img src="doc/landing.png" height="400px"/></p>
+
+### Instructor
+
+1. Sign Up or Log in as an instructor using email
+
+2. View Session and Create a Session
+
+Upon logging in, you can view the list of sessions and edit them. If you want to create a new session, click on the "+" button at the bottom right corner
+
+<p align="center"><img src="doc/instructor-flow.png" width="700px"/></p>
+
+3. Start a Session
+
+Press the "START" button to start a session. Now you can share the session for your students to join!
+
+4. In a Session
+
+Your page color will trun yellow then red as more students become confused. Meanwhlie if fewer students are confused, the screen will return to green eventually. Press "RESET" to reset reaction counts on the screen.
+
+<p align="center"><img src="doc/instructor-screenshot.png" width="700px"/></p>
+
+5. End Session
+
+Press "End Session" to end the session and return to dashboard.
+
+### Student
+
+1. Join Session
+
+Join a session by clicking a shared link, keying in the session code or scanning QR code shared by instructors. Add a nickname to continue. Rest assured that your activities will be kept anonymous to everyone.
+
+2. In a Session
+
+When you are confused, do not hesitate to press "I'm confused" so that your instructor will know immediately. You can also unselect "I'm confused" or press "I'm OK". You can also ask a specific question if you feel a single reaction is not enough.
+
+<p align="center"><img src="doc/student-flow.png" width="600px"/></p>
+
+3. Leave Session
+
+Click on "Leave Session" on the top left bar to leave the session.
+
+## Development Guide
 
 To run this application locally, first clone this repository.
 
