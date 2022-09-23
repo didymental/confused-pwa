@@ -133,10 +133,13 @@ const StudentSessionPage: React.FC<void> = () => {
   const handleWsMessageListener = (msg: MessageEvent<any>) => {
     let res = JSON.parse(msg.data);
 
+    console.log("kw res", res);
+
     if (res.action === "connect" && res.data.type === "success") {
       if (!ws.current) {
         return; // not possible
       }
+
       // join session
       ws.current.send(
         JSON.stringify({
