@@ -65,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-		text-align: center;
+    text-align: center;
   }
 
   &__grid {
@@ -84,23 +84,22 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 2.5rem;
+      padding: 1.5rem;
+      padding-bottom: 0;
     }
 
     &--item {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      margin: 0.5em;
+      margin-top: 1.5em;
     }
 
     &--link {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			border: grey 0.5px solid;
-			margin-left: 1.5rem;
-			margin-right: 1.5rem;
-			border-radius: 2.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: grey 0.5px solid;
+      border-radius: 1rem;
+      margin: 1.5em;
     }
   }
 
@@ -139,13 +138,29 @@
 
     &--header {
       font-size: x-large;
-			margin: auto;
-			padding-top: 1.5rem;
+      font-weight: 700;
+      margin: auto;
+      padding-top: 1.5rem;
+    }
+
+    &--secondary {
+      font-size: larger;
+      margin: auto;
+      color: black;
+    }
+
+    &--code {
+      font-size: larger;
+      font-weight: 600;
+      font-family: Tahoma;
+      margin: auto;
+      color: black;
     }
 
     &--subheading {
-      font-size: large;
+      font-size: medium;
       margin: auto;
+      color: grey;
     }
 
     &--link {
@@ -158,153 +173,3 @@
     }
   }
 }
-
-// .instructor-session__background {
-//   &--clear {
-//     --ion-background-color: #6bf178;
-//   }
-
-//   &--confused-1 {
-//     --ion-background-color: #ffe74c;
-//   }
-
-//   &--confused-2 {
-//     --ion-background-color: #ff5964;
-//   }
-// }
-
-// .instructor-session__button {
-//   width: 100%;
-
-//   &--reactions {
-//     --background: rgba(255, 255, 255, 0.75);
-//     color: #ff6242;
-
-//     &:hover {
-//       text-decoration: underline;
-//       --background: rgba(0, 0, 0, 0.25);
-//       color: white;
-//     }
-//   }
-
-//   &--end-session {
-//     --background: var(--ion-color-primary);
-
-//     &:hover {
-//       --background: rgba(0, 0, 0, 0.25);
-//       color: white;
-//     }
-//   }
-
-//   &--share {
-//     --background: rgba(255, 255, 255, 0.75);
-//     color: #1877f2;
-
-//     &:hover {
-//       --background: rgba(0, 0, 0, 0.25);
-//       color: white;
-//     }
-//   }
-// }
-
-// .instructor-session__container {
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// }
-
-// .instructor-session__grid {
-//   max-width: 800px;
-//   width: 90vw;
-//   text-align: center;
-// }
-
-// .instructor-session__sentiment-image {
-//   margin-top: 3vh;
-// }
-
-// // .ion-card-instructor-session {
-// //   &__clear {
-// //     padding-top: 3rem;
-// //     padding-left: 0rem;
-// //     padding-right: 0rem;
-// //     padding-bottom: 3rem;
-// //     height: 100%;
-// //     background-color: transparent;
-// //     box-shadow: none;
-// //   }
-
-// //   &__confused-1 {
-// //     padding-top: 3rem;
-// //     padding-left: 1.25rem;
-// //     padding-right: 1.25rem;
-// //     padding-bottom: 3rem;
-// //     height: 100%;
-// //     background-color: transparent;
-// //     box-shadow: none;
-// //   }
-
-// //   &__confused-2 {
-// //     padding-top: 3rem;
-// //     padding-left: 1.25rem;
-// //     padding-right: 1.25rem;
-// //     padding-bottom: 3rem;
-// //     height: fit-content;
-// //     background-color: transparent;
-// //     box-shadow: none;
-// //   }
-// // }
-
-// .instructor-session__modal {
-//   &--list {
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: center;
-//     align-items: center;
-//     padding: 2.5rem;
-//   }
-
-//   &--item {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     font-size: medium;
-//   }
-// }
-
-// .instructor-session__reaction-display {
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   align-items: center;
-// }
-
-// .instructor-session__reaction-count {
-//   margin: 1.25rem;
-//   border-radius: 0.25rem;
-//   min-width: 5rem;
-//   display: flex;
-//   flex-direction: row;
-//   justify-content: center;
-//   align-items: center;
-//   font-size: medium;
-//   font-weight: 550;
-//   color: black;
-//   --background: rgba(255, 255, 255, 0.3);
-// }
-
-// .ion-progress-bar-instructor-session {
-//   min-height: 10px;
-// }
-
-// .instructor-session__text {
-//   &--sentiment-indicator {
-//     font-size: x-large;
-//     font-weight: 550;
-//     margin-top: 10px;
-//   }
-
-//   &--link {
-//     font-size: large;
-//   }
-// }

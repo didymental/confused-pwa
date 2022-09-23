@@ -367,34 +367,30 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
               <IonItem lines="none">
                 <IonText className="instructor-session__text--header">Share the session</IonText>
               </IonItem>
-              <IonItem lines="none">
-                <IonText className="instructor-session__text--subheading instructor-session__text--translucent">
-                  Anyone with the session code or session link can join the session
-                </IonText>
-              </IonItem>
               <IonItem lines="none" className="instructor-session__modal--item">
-                <IonText className="instructor-session__text--subheading">
-                  {`Session code: ${sessionId}`}
+                <IonText className="instructor-session__text--secondary">
+                  {"Session code: "}
+                  <IonText className="instructor-session__text--code">{sessionId}</IonText>
                 </IonText>
               </IonItem>
+              <IonList className="instructor-session__modal--list">
+                <QRCode value={shareableLink} />
+              </IonList>
+              <IonCardContent>
+                <IonText className="instructor-session__text--subheading">
+                  {`Scan this QR code via the student page, or with your
+                    preferred QR scanner`}
+                </IonText>
+              </IonCardContent>
               <IonItem lines="none" className="instructor-session__modal--link">
                 <IonText className="instructor-session__text--link">{shareableLink}</IonText>
               </IonItem>
               <IonButton onClick={copyLinkToClipboard} className="instructor-session__button--copy">
                 <IonIcon icon={copy} size="medium" />
                 <IonCardContent>
-                  <IonText>Copy</IonText>
+                  <IonText>COPY</IonText>
                 </IonCardContent>
               </IonButton>
-              <IonList className="instructor-session__modal--list">
-                <QRCode value={shareableLink} />
-              </IonList>
-              <IonCardContent>
-                <IonText className="instructor-session__text--subheading">
-                  {`Ask your students to scan this QR code with their "Confused" or with their
-                    preferred QR scanner`}
-                </IonText>
-              </IonCardContent>
             </IonContent>
           </IonModal>
         </IonGrid>
