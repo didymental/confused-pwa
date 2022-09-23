@@ -8,14 +8,15 @@
 
 1. [Overview](#overview)
 2. [Team Members](#team-members)
-3. [User Guide](#user-guide)
+3. [Submission](#submission)
+4. [User Guide](#user-guide)
    - [Instructor](#instructor)
    - [Student](#student)
-4. [Development Guide](#development-guide)
+5. [Development Guide](#development-guide)
 
 ## Overview
 
-Confused is a Progressive Web App (PWA) designed to help students give instructors real time feedback. It is traditionally uneasy for shy students to raise a concern publically in a big classroom, so Confused is here to help reduce the mental barriers for students to say "I'm confused" during lessons.
+Confused is a Progressive Web App (PWA) designed to help students give instructors real time feedback. It is traditionally uneasy for shy students to raise concerns in the public in big classrooms, so Confused is here to help reduce the mental barriers for students to say "I'm confused" during lessons.
 
 On our app, instructors could create, start and share sessions using session code or QR code. They could easily keep track of students' reactions and questions in a session.
 
@@ -35,11 +36,19 @@ Members of CS3216 Assignment 3 Group 6:
 | Toh Kar Wi          | A0217996J   | Backend Developer    |
 | Zhang Ziqing        | A0223145R   | Frontend Developer   |
 
+## Submission
+
+The following files are in `submission` folder:
+
+- [group-6-milestones.pdf](submission/group-6-milestones.pdf)
+- [group-6-pitch.pdf](submission/group-6-pitch.pdf)
+- [group-6-lighthouse.html](submission/group-6-lighthouse.html)
+
 ## User Guide
 
 Choose to join as instructor or student upon landing at this page:
 
-<p align="center"><img src="doc/landing.png" height="400px"/></p>
+<p align="center"><img src="doc/landing.png" height="600px"/></p>
 
 ### Instructor
 
@@ -49,7 +58,7 @@ Choose to join as instructor or student upon landing at this page:
 
 Upon logging in, you can view the list of sessions and edit them. If you want to create a new session, click on the "+" button at the bottom right corner
 
-<p align="center"><img src="doc/instructor-flow.png" width="700px"/></p>
+<p align="center"><img src="doc/instructor-flow.png" width="800px"/></p>
 
 3. Start a Session
 
@@ -59,7 +68,7 @@ Press the "START" button to start a session. Now you can share the session for y
 
 Your page color will trun yellow then red as more students become confused. Meanwhlie if fewer students are confused, the screen will return to green eventually. Press "RESET" to reset reaction counts on the screen.
 
-<p align="center"><img src="doc/instructor-screenshot.png" width="700px"/></p>
+<p align="center"><img src="doc/instructor-screenshot.png" width="800px"/></p>
 
 5. End Session
 
