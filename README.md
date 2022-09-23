@@ -77,6 +77,10 @@ When you are confused, do not hesitate to press "I'm confused" so that your inst
 
 <p align="center"><img src="doc/student-flow.png" width="600px"/></p>
 
+3. Leave Session
+
+Click on "Leave Session" on the top left bar to leave the session.
+
 ## Development Guide
 
 To run this application locally, first clone this repository.
