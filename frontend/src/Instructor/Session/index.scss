@@ -65,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
+		text-align: center;
   }
 
   &__grid {
@@ -91,8 +91,16 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: medium;
-      text-align: center;
+    }
+
+    &--link {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: grey 0.5px solid;
+			margin-left: 1.5rem;
+			margin-right: 1.5rem;
+			border-radius: 2.5rem;
     }
   }
 
@@ -131,7 +139,8 @@
 
     &--header {
       font-size: x-large;
-      margin: auto;
+			margin: auto;
+			padding-top: 1.5rem;
     }
 
     &--subheading {

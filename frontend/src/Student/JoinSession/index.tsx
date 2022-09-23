@@ -10,17 +10,18 @@ import {
   IonLabel,
   IonPage,
   IonRow,
-  useIonLoading,
 } from "@ionic/react";
 import { scan } from "ionicons/icons";
 import "../join-page.scss";
 import { useState, useEffect } from "react";
-import { useSessionIdInput, useStudentName } from "../../hooks/joinsession/useJoinDetails";
-import { useJoinSession } from "../../hooks/joinsession/useJoinSession";
+import {
+  useSessionId,
+  useSessionIdInput,
+  useStudentName,
+} from "../../hooks/joinsession/useJoinDetails";
 import ConfusedIcon from "../../component/ConfusedIcon";
-import { JoinSessionRequest } from "../../types/join";
 import { useParams } from "react-router";
-import { useToast } from "../../hooks/util/useToast";
+import { useHistory } from "react-router-dom";
 
 const JoinPage: React.FC = () => {
   const MAX_SESSION_PIN_LEN = 6;
@@ -28,17 +29,18 @@ const JoinPage: React.FC = () => {
 
   const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
   const { studentName, setStudentName } = useStudentName();
-  const { joinSession } = useJoinSession();
-
-  const [present, dismiss] = useIonLoading();
+  // const { joinSession } = useJoinSession();
 
   const [isError, setIsError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { id }: any = useParams();
+  const history = useHistory();
+  const { sessionId, setSessionId } = useSessionId();
 
-  const invalidPINMsg: string = "Session code should only contain numbers.";
-  const invalidNameMsg: string =
-    "Name should only contain alphabets, numbers and spaces, and cannot be empty";
+  const emptyPINMsg: string = "Please enter a session code";
+  const emptyNameMsg: string = "Please enter a display name";
+  const invalidPINMsg: string = "Session code should only contain numbers";
+  const invalidNameMsg: string = "Name should only contain alphabets, numbers and spaces";
 
   const isNumericalOnly = (input: string) => {
     //Check that input consists of one or more numerical digits
@@ -57,6 +59,18 @@ const JoinPage: React.FC = () => {
     setSessionIdInput(sessionIdInput.trim().substring(0, MAX_SESSION_PIN_LEN));
     setStudentName(studentName.trim().substring(0, MAX_STUDENT_NAME_LEN));
 
+    if (sessionIdInput.length === 0) {
+      setMessage(emptyPINMsg);
+      setIsError(true);
+      return;
+    }
+
+    if (studentName.length === 0) {
+      setMessage(emptyNameMsg);
+      setIsError(true);
+      return;
+    }
+
     if (!isNumericalOnly(sessionIdInput)) {
       setSessionIdInput("");
       setMessage(invalidPINMsg);
@@ -70,17 +84,8 @@ const JoinPage: React.FC = () => {
       return;
     }
 
-    const joinRequest: JoinSessionRequest = {
-      session: parseInt(sessionIdInput),
-      display_name: studentName,
-      reaction_type: null,
-    };
-
-    present({
-      message: "Joining session...",
-    });
-    await joinSession(joinRequest);
-    dismiss();
+    setSessionId(parseInt(sessionIdInput));
+    history.push("/student/session");
   };
 
   useEffect(() => {
@@ -122,6 +127,7 @@ const JoinPage: React.FC = () => {
                   value={sessionIdInput}
                   placeholder={"123456"}
                   onIonChange={(e) => setSessionIdInput(e.detail.value!)}
+                  autofocus
                 ></IonInput>
               </IonItem>
             </IonCol>
@@ -139,11 +145,6 @@ const JoinPage: React.FC = () => {
                   onIonChange={(e) => setStudentName(e.detail.value!)}
                 ></IonInput>
               </IonItem>
-            </IonCol>
-          </IonRow>
-
-          <IonRow>
-            <IonCol>
               <p
                 className="
                 join-page__auxilliary-text--medium
@@ -153,6 +154,11 @@ const JoinPage: React.FC = () => {
                 This name will be displayed to your instructor. You can&apos;t change this name
                 later.
               </p>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
+            <IonCol>
               <IonButton
                 color="secondary"
                 size="default"

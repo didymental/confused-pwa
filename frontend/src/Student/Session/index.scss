@@ -1,10 +1,30 @@
 .student-session {
-
   &__grid {
     max-width: 800px;
     width: 90vw;
   }
-  
+
+  &__container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    --ion-background-color: rgba(var(--ion-color-tertiary-rgb), 0.3);
+  }
+}
+
+.toolbar {
+  text-overflow: unset;
+  white-space: unset;
+  padding: 0.5rem;
+
+  &__title {
+    justify-content: center;
+    align-items: center;
+    font-size: medium;
+    font-weight: 900;
+    padding-left: 0.25rem;
+  }
 }
 
 .container {
@@ -15,6 +35,14 @@
   height: 40vh;
   max-width: 800px;
   width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  align-items: top;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  margin-top: 0.25rem;
 }
 
 ion-slides.slides {
@@ -36,11 +64,10 @@ ion-slides.slides {
 }
 
 .textarea {
-  background-color: rgba(var(--ion-color-secondary-rgb), 0.5);
+  background: rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   padding-left: 1em;
   border-radius: 1em;
-  
 }

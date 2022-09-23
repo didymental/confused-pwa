@@ -3,6 +3,7 @@ import logo from "../../assets/logo.svg";
 import logoLight from "../../assets/logo-light.svg";
 import { useState } from "react";
 import { IonSpinner } from "@ionic/react";
+import { Link } from "react-router-dom";
 
 interface UseLightLogo {
   useLightLogo?: boolean;
@@ -16,7 +17,7 @@ const ConfusedIcon: React.FC<UseLightLogo> = ({ useLightLogo = false }) => {
       {/* <div style={{ display: loading ? "block" : "none" }}>
         <IonSpinner name="crescent" />
       </div> */}
-      <a href="/">
+      <Link to="/">
         {useLightLogo ? (
           <img className="icon" src={logoLight} alt="logo" />
         ) : (
@@ -24,7 +25,7 @@ const ConfusedIcon: React.FC<UseLightLogo> = ({ useLightLogo = false }) => {
           <img className="icon" src={logo} alt="logo" />
           //onLoad={() => setLoading(false)} />
         )}
-      </a>
+      </Link>
     </>
   );
 };

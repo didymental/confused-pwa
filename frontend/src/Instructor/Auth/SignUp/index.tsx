@@ -12,12 +12,13 @@ import {
   IonRow,
   useIonLoading,
 } from "@ionic/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./index.scss";
 import ConfusedIcon from "../../../component/ConfusedIcon";
 import Navbar from "../../../component/Navbar";
 import { useAuthentication } from "../../../hooks/authentication/useAuthentication";
-import { Redirect } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { PolicyModal } from "../../../component/PolicyModal";
 
 function validateEmail(email: string) {
   const re =
@@ -34,6 +35,12 @@ const SignUpPage: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const { user, signUp } = useAuthentication();
   const [present, dismiss] = useIonLoading();
+  const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
+  const page = useRef(undefined);
+
+  useEffect(() => {
+    setPresentingElement(page.current);
+  }, []);
 
   const handleSignUp = async () => {
     if (!email) {
@@ -94,7 +101,7 @@ const SignUpPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="stacked"> Email</IonLabel>
+                <IonLabel position="floating"> Email</IonLabel>
                 <IonInput
                   type="email"
                   value={email}
@@ -107,7 +114,7 @@ const SignUpPage: React.FC = () => {
           <IonRow className="signup-form__field">
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="stacked"> Password</IonLabel>
+                <IonLabel position="floating"> Password</IonLabel>
                 <IonInput
                   type="password"
                   value={password}
@@ -120,7 +127,7 @@ const SignUpPage: React.FC = () => {
           <IonRow className="signup-form__field">
             <IonCol>
               <IonItem fill="outline">
-                <IonLabel position="stacked"> Display Name</IonLabel>
+                <IonLabel position="floating"> Display Name</IonLabel>
                 <IonInput
                   type="text"
                   value={displayName}
@@ -132,17 +139,21 @@ const SignUpPage: React.FC = () => {
           <IonRow>
             <IonCol>
               <p className="signup-form__auxilliary-text--small">
-                By clicking SIGN UP you agree to our <a href="/">Policy</a>
+                By clicking Sign up, you agree to our{" "}
+                <Link to="#" id="signup-form__open-modal">
+                  Privacy Policy
+                </Link>
               </p>
               <IonButton onClick={handleSignUp} className="signup-form__button">
                 Sign up
               </IonButton>
               <p className="signup-form__auxilliary-text--middle">
-                Have an account? <a href="/login">Log in!</a>
+                Have an account? <Link to="/login">Log in</Link>
               </p>
             </IonCol>
           </IonRow>
         </IonGrid>
+        <PolicyModal presentingElement={presentingElement} trigger={"signup-form__open-modal"} />
       </IonContent>
     </IonPage>
   );
