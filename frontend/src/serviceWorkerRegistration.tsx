@@ -38,7 +38,6 @@ export function register(config?: Config) {
 
     window.addEventListener("load", () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
-      console.log("load");
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
         checkValidServiceWorker(swUrl, config);
@@ -115,20 +114,13 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
         response.status === 404 ||
         (contentType != null && contentType.indexOf("javascript") === -1)
       ) {
-        console.log("no service worker found");
-        console.log(navigator.serviceWorker);
         // No service worker found. Probably a different app. Reload the page.
         navigator.serviceWorker.ready.then((registration) => {
-          console.log("unregister");
           registration.unregister().then(() => {
-            console.log("reload page");
             window.location.reload();
           });
         });
       } else {
-        console.log("service worker found");
-        console.log(swUrl);
-        console.log(config);
         // Service worker found. Proceed as normal.
         registerValidSW(swUrl, config);
       }

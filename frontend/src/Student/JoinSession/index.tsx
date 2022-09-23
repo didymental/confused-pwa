@@ -87,7 +87,6 @@ const JoinPage: React.FC = () => {
     if (id === undefined) {
       return;
     }
-    console.log(id);
     setSessionIdInput(id);
   }, [id, setSessionIdInput]);
 

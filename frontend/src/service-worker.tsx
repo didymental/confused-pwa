@@ -86,7 +86,6 @@ self.addEventListener("message", (event) => {
 
 // cache the static assets for the page
 self.addEventListener("install", (event) => {
-  console.log("installing");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       // Open a cache and cache our files
@@ -100,8 +99,6 @@ self.addEventListener("install", (event) => {
 // which looks at the request and will find any cached results from entries the service worker created.
 // If there’s a matching response, the cached value is returned.
 self.addEventListener("fetch", (event) => {
-  console.log("fetch");
-  console.log(event.request.url);
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request);
@@ -122,6 +119,5 @@ const deleteOldCaches = async () => {
 };
 
 self.addEventListener("activate", (event) => {
-  console.log("activate");
   event.waitUntil(deleteOldCaches());
 });
