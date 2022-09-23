@@ -77,7 +77,7 @@ const DashboardPage: React.FC = () => {
       <Navbar title={"Dashboard"} showProfileIcon={true} showLogo={true} />
       <IonContent fullscreen>
         <IonRefresher slot="fixed" onIonRefresh={handleRendering}>
-          <IonRefresherContent></IonRefresherContent>
+          <IonRefresherContent pullingIcon="lines"></IonRefresherContent>
         </IonRefresher>
         <IonGrid className="dashboard__grid">
           <IonRow>

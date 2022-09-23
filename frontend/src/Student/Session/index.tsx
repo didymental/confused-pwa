@@ -10,13 +10,10 @@ import {
   IonRow,
   IonSlide,
   IonSlides,
-  IonTextarea,
   CreateAnimation,
-  IonTitle,
   IonHeader,
   IonToolbar,
   IonButtons,
-  IonSpinner,
   IonProgressBar,
   IonLabel,
   IonInput,
@@ -33,10 +30,8 @@ import { useToast } from "../../hooks/util/useToast";
 import { QuestionData } from "../../types/questions";
 import QuestionsDisplay from "../../component/QuestionsDisplay";
 import { useSessionDetails } from "../../hooks/joinsession/useJoinDetails";
-import { useHistory, useParams } from "react-router";
+import { useHistory } from "react-router";
 import useAnalyticsTracker from "../../hooks/util/useAnalyticsTracker";
-import StudentsDisplay from "../../component/StudentsDisplay";
-import useWindowDimensions from "../../hooks/util/useWindowDimensions";
 
 const POST_QUESTION = "post_question";
 const PUT_REACTION = "put_reaction";
@@ -94,7 +89,7 @@ const StudentSessionPage: React.FC<void> = () => {
         behavior: "smooth",
       });
     }
-  }, [isOpen]);
+  }, [isOpen, keyboardHeight]);
 
   const askQuestion = (wsCurrent: WebSocket | null) => {
     if (!wsCurrent) {

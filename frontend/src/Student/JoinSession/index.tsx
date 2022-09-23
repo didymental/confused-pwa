@@ -10,7 +10,6 @@ import {
   IonLabel,
   IonPage,
   IonRow,
-  useIonLoading,
 } from "@ionic/react";
 import { scan } from "ionicons/icons";
 import "../join-page.scss";
@@ -21,9 +20,7 @@ import {
   useStudentName,
 } from "../../hooks/joinsession/useJoinDetails";
 import ConfusedIcon from "../../component/ConfusedIcon";
-import { JoinSessionRequest } from "../../types/join";
 import { useParams } from "react-router";
-import { useToast } from "../../hooks/util/useToast";
 import { useHistory } from "react-router-dom";
 
 const JoinPage: React.FC = () => {
@@ -34,13 +31,11 @@ const JoinPage: React.FC = () => {
   const { studentName, setStudentName } = useStudentName();
   // const { joinSession } = useJoinSession();
 
-  const [present, dismiss] = useIonLoading();
-
   const [isError, setIsError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { id }: any = useParams();
   const history = useHistory();
-  const { setSessionId } = useSessionId();
+  const { sessionId, setSessionId } = useSessionId();
 
   const emptyPINMsg: string = "Please enter a session code";
   const emptyNameMsg: string = "Please enter a display name";
@@ -89,27 +84,14 @@ const JoinPage: React.FC = () => {
       return;
     }
 
-    const joinRequest: JoinSessionRequest = {
-      session: parseInt(sessionIdInput),
-      display_name: studentName,
-      reaction_type: null,
-    };
-
-    // present({
-    //   message: "Joining session...",
-    // });
-
-    setSessionId(joinRequest.session);
+    setSessionId(parseInt(sessionIdInput));
     history.push("/student/session");
-
-    dismiss();
   };
 
   useEffect(() => {
     if (id === undefined) {
       return;
     }
-    console.log(id);
     setSessionIdInput(id);
   }, [id, setSessionIdInput]);
 
