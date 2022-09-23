@@ -19,7 +19,7 @@ Confused is a Progressive Web App (PWA) designed to help students give instructo
 
 On our app, instructors could create, start and share sessions using session code or QR code. They could easily keep track of students' reactions and questions in a session.
 
-Whenever students feel confused during a session, they could simply tap the reaction "I'm confused" to give instrutors instantaneously feedback. They are also encouraged to send questions to give instructors more hints of what they are confused about!
+Whenever students feel confused during a session, they could simply tap the reaction "I'm confused" to give instructors instantaneously feedback. They are also encouraged to send questions to give instructors more hints of what they are confused about!
 
 Feel free to give it a try at: https://confusedsession.vercel.app
 
