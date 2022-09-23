@@ -22,6 +22,12 @@ npm install
 npm start
 ```
 
+3. If you are not running a local backend server and would like to use the online server at https://confused-backend-3216.herokuapp.com, remove the line below in `.env.deveopment`:
+
+```
+REACT_APP_BASE_URL='http://localhost:8000'
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
