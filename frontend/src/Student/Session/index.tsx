@@ -59,9 +59,9 @@ const StudentSessionPage: React.FC<void> = () => {
   const history = useHistory();
   const { sessionId, displayName } = useSessionDetails();
   const profileAnalyticsTracker = useAnalyticsTracker("Student In Session");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedTab, setSelectedTab] = useState<string>("questions");
   const { isOpen, keyboardHeight } = useKeyboard();
-  // const {width, height} = useWindowDimensions();
 
   useEffect(() => {
     ws.current = getWebSocketClient(false);
@@ -74,6 +74,7 @@ const StudentSessionPage: React.FC<void> = () => {
     return () => {
       wsCurrent.close();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

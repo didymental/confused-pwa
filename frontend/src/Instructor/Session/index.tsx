@@ -22,8 +22,8 @@ import {
 import React, { useEffect, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router";
 import QRCode from "react-qr-code";
-import { power, shareSocial, link, copy } from "ionicons/icons";
-import client, { getWebSocketClient } from "../../api/client";
+import { power, shareSocial, copy } from "ionicons/icons";
+import { getWebSocketClient } from "../../api/client";
 import { useToast } from "../../hooks/util/useToast";
 import clear from "../../assets/clear-bg.svg";
 import confused_1 from "../../assets/confused-1-bg.svg";
@@ -73,6 +73,7 @@ const InstructorSessionPage: React.FC = () => {
     return () => {
       wsCurrent.close();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // to re render screen for each update of student or questions
@@ -390,7 +391,7 @@ const ConfusionDisplay: React.FC<ConfusionDisplayProps> = (props) => {
               </IonList>
               <IonCardContent>
                 <IonText className="instructor-session__text--subheading">
-                  {`Ask your students to scan this QR code with their \"Confused\" or with their
+                  {`Ask your students to scan this QR code with their "Confused" or with their
                     preferred QR scanner`}
                 </IonText>
               </IonCardContent>
@@ -446,6 +447,7 @@ const ReactionsDisplay: React.FC<{
     }
 
     setLevelOfConfusion(CLEAR_STATE);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ratio]);
 
   return (
