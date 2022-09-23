@@ -15,12 +15,16 @@ import {
 import { scan } from "ionicons/icons";
 import "../join-page.scss";
 import { useState, useEffect } from "react";
-import { useSessionIdInput, useStudentName } from "../../hooks/joinsession/useJoinDetails";
-import { useJoinSession } from "../../hooks/joinsession/useJoinSession";
+import {
+  useSessionId,
+  useSessionIdInput,
+  useStudentName,
+} from "../../hooks/joinsession/useJoinDetails";
 import ConfusedIcon from "../../component/ConfusedIcon";
 import { JoinSessionRequest } from "../../types/join";
 import { useParams } from "react-router";
 import { useToast } from "../../hooks/util/useToast";
+import { useHistory } from "react-router-dom";
 
 const JoinPage: React.FC = () => {
   const MAX_SESSION_PIN_LEN = 6;
@@ -28,13 +32,15 @@ const JoinPage: React.FC = () => {
 
   const { sessionIdInput, setSessionIdInput } = useSessionIdInput();
   const { studentName, setStudentName } = useStudentName();
-  const { joinSession } = useJoinSession();
+  // const { joinSession } = useJoinSession();
 
   const [present, dismiss] = useIonLoading();
 
   const [isError, setIsError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const { id }: any = useParams();
+  const history = useHistory();
+  const { setSessionId } = useSessionId();
 
   const emptyPINMsg: string = "Please enter a session code";
   const emptyNameMsg: string = "Please enter a display name";
@@ -89,10 +95,13 @@ const JoinPage: React.FC = () => {
       reaction_type: null,
     };
 
-    present({
-      message: "Joining session...",
-    });
-    await joinSession(joinRequest);
+    // present({
+    //   message: "Joining session...",
+    // });
+
+    setSessionId(joinRequest.session);
+    history.push("/student/session");
+
     dismiss();
   };
 
