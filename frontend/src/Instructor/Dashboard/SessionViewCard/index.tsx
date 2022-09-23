@@ -102,7 +102,7 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index, delet
             </IonRow>
           </IonGrid>
           {isOpen ? (
-            <IonButton fill="solid" expand="block" color={"primary"}>
+            <IonButton fill="solid" expand="block" color={"primary"} onClick={startHandler}>
               ONGOING
             </IonButton>
           ) : (
