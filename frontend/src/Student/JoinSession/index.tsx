@@ -109,7 +109,7 @@ const JoinPage: React.FC = () => {
               />
             </IonCol>
           </IonRow>
-          <IonRow className="login-form__icon">
+          <IonRow className="join_page__icon">
             <IonCol>
               <ConfusedIcon useLightLogo={true} />
             </IonCol>

@@ -69,7 +69,7 @@ const SessionViewCard: React.FC<SessionViewCardProps> = ({ session, index, delet
             <IonRow>
               <IonCol size="10">
                 <IonRow>
-                  <IonCardTitle>{name}</IonCardTitle>
+                  <IonCardTitle className="card__title">{name}</IonCardTitle>
                 </IonRow>
                 <IonRow className="card__subtitle">
                   <IonCardSubtitle>{`Created on ${createdDate}`}</IonCardSubtitle>
