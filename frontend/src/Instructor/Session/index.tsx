@@ -409,7 +409,6 @@ const ReactionsDisplay: React.FC<{
 }> = ({ students, setLevelOfConfusion }) => {
   const [countOfClear, setCountOfClear] = useState<number>(0);
   const [countOfConfused, setCountOfConfused] = useState<number>(0);
-  const [ratio, setRatio] = useState<number>(0.5);
 
   useEffect(() => {
     let countClear = 0;
@@ -426,29 +425,20 @@ const ReactionsDisplay: React.FC<{
 
     setCountOfClear(countClear);
     setCountOfConfused(countConfused);
-
-    if (countClear === 0 && countConfused === 0) {
-      setRatio(0.5);
-    } else {
-      let ratioOfConfused = countConfused / (countClear + countConfused);
-      setRatio(ratioOfConfused);
-    }
   }, [students]);
 
   useEffect(() => {
-    if (ratio > 0.7 && ratio <= 0.9) {
+    if (countOfConfused / students.length >= 0.5) {
+      setLevelOfConfusion(CONFUSED_2_STATE);
+      return;
+    }
+    if (countOfConfused >= 1) {
       setLevelOfConfusion(CONFUSED_1_STATE);
       return;
     }
 
-    if (ratio > 0.9) {
-      setLevelOfConfusion(CONFUSED_2_STATE);
-      return;
-    }
-
     setLevelOfConfusion(CLEAR_STATE);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ratio]);
+  }, [students, countOfConfused, setLevelOfConfusion]);
 
   return (
     <IonGrid>
