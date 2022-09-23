@@ -20,7 +20,7 @@ import {
   IonSegment,
   IonSegmentButton,
 } from "@ionic/react";
-import { useKeyboardState } from "@ionic/react-hooks/keyboard";
+import { useKeyboard } from "@capacitor-community/keyboard-react";
 import React, { useEffect, useState, useRef } from "react";
 import { send } from "ionicons/icons";
 import confused_reaction from "../../assets/confused-face.svg";
@@ -60,7 +60,7 @@ const StudentSessionPage: React.FC<void> = () => {
   const { sessionId, displayName } = useSessionDetails();
   const profileAnalyticsTracker = useAnalyticsTracker("Student In Session");
   const [selectedTab, setSelectedTab] = useState<string>("questions");
-  const { isOpen, keyboardHeight } = useKeyboardState();
+  const { isOpen, keyboardHeight } = useKeyboard();
   // const {width, height} = useWindowDimensions();
 
   useEffect(() => {

@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "@capacitor-community/barcode-scanner": "^3.0.0",
+    "@capacitor-community/keyboard-react": "^0.1.0",
+    "@capacitor/core": "^4.3.0",
+    "@capacitor/keyboard": "^4.0.1",
     "@ionic/react": "^6.2.6",
-    "@ionic/react-hooks": "0.0.8",
     "@ionic/react-router": "^6.2.6",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.5",
