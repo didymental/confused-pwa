@@ -6,8 +6,11 @@ import {
   IonGrid,
   IonIcon,
   IonPage,
+  IonRefresher,
+  IonRefresherContent,
   IonRow,
   IonSpinner,
+  RefresherEventDetail,
   useIonLoading,
 } from "@ionic/react";
 import Navbar from "../../component/Navbar";
@@ -42,9 +45,10 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const handleRendering = async () => {
+  const handleRendering = async (event?: CustomEvent<RefresherEventDetail>) => {
     await getSessions();
     setIsLoading(false);
+    event?.detail.complete();
   };
 
   const handleDelete = async (sessionId: number) => {
@@ -72,6 +76,9 @@ const DashboardPage: React.FC = () => {
     <IonPage>
       <Navbar title={"Dashboard"} showProfileIcon={true} showLogo={true} />
       <IonContent fullscreen>
+        <IonRefresher slot="fixed" onIonRefresh={handleRendering}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
         <IonGrid className="dashboard__grid">
           <IonRow>
             <IonCol className={isLoading ? "dashboard__column" : ""}>
