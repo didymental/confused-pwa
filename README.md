@@ -28,13 +28,13 @@ Feel free to give it a try at: https://confusedsession.vercel.app
 
 Members of CS3216 Assignment 3 Group 6:
 
-| Name                | Matric. No. | Contribution         |
-| ------------------- | ----------- | -------------------- |
-| Ne Zhijian, Didymus | A0218159Y   | Full Stack Developer |
-| Duan Yu Hang        | A0201815R   | Frontend Developer   |
-| Hong Ai Ling        | A0221725M   | Frontend Developer   |
-| Toh Kar Wi          | A0217996J   | Backend Developer    |
-| Zhang Ziqing        | A0223145R   | Frontend Developer   |
+| Name                | Contribution         |
+| ------------------- | -------------------- |
+| Ne Zhijian, Didymus | Full Stack Developer |
+| Duan Yu Hang        | Frontend Developer   |
+| Hong Ai Ling        | Frontend Developer   |
+| Toh Kar Wi          | Backend Developer    |
+| Zhang Ziqing        | Frontend Developer   |
 
 ## Submission
 
